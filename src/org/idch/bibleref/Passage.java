@@ -8,6 +8,8 @@ package org.idch.bibleref;
  * @author Neal Audenaert
  */
 public abstract class Passage implements Comparable<Passage> {
+	protected static final String LOGGER = Passage.class.getName();
+	
 	protected BookOrder order = BookOrder.KJV;
 	
 	protected Passage(BookOrder order) {

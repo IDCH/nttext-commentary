@@ -30,8 +30,6 @@ import org.idch.util.LogService;
  * @author Neal Audenaert
  */
 public class VerseRef extends Passage {
-	private static final String LOGGER = VerseRef.class.getName();
-	
 	private Integer book = null;
 	private Integer chapter = null;
 	private Integer verse = null;
@@ -41,6 +39,11 @@ public class VerseRef extends Passage {
 	 */
 	private String ext = null;
 	
+	// TODO next/prev VERSE, CHAPTER, BOOK
+	// TODO increment/decrement VERSE, CHAPTER, BOOK by XX
+	// TODO go up (verse to chapter, chapter to book, book to testament)
+	// TODO get path (NT > Matt > Chapter 3 > Verse 6 > a)
+	// TODO Iterator<VerseRef> (passage)
 	
 //======================================================================================
 // CONSTUCTORS

@@ -8,10 +8,22 @@ package org.idch.bibleref;
  * @author Neal Audenaert
  */
 public abstract class Passage implements Comparable<Passage> {
-
+	protected BookOrder order = BookOrder.KJV;
+	
+	protected Passage(BookOrder order) {
+		this.order = order;
+	}
+	
 	public abstract VerseRef getFirst();
 	
 	public abstract VerseRef getLast();
+	
+//	public abstract boolean contains(VerseRef ref);
+	
+
+	public BookOrder getBookOrder() {
+		return this.order;
+	}
 	
 	private int compareParts(Integer a, Integer b) {
 		if ((a != null) && (b != null)) {

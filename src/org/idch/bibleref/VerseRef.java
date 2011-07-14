@@ -32,8 +32,6 @@ import org.idch.util.LogService;
 public class VerseRef extends Passage {
 	private static final String LOGGER = VerseRef.class.getName();
 	
-	private BookOrder order = BookOrder.KJV;
-	
 	private Integer book = null;
 	private Integer chapter = null;
 	private Integer verse = null;
@@ -52,7 +50,7 @@ public class VerseRef extends Passage {
 	}
 	
 	public VerseRef(BookOrder order, String ref) throws InvalidReferenceException {
-		this.order = order;
+		super(order);
 		this.parseCanonicalReference(ref, false /* defualtToChapter */);
 	}
 	
@@ -67,7 +65,7 @@ public class VerseRef extends Passage {
 	 * @param ref
 	 */
 	public VerseRef(VerseRef context, String ref) {
-		this.order = context.getBookOrder();
+		super(context.getBookOrder());
 		this.parseCanonicalReference(ref, !context.isVerseSpecified() /* defualtToChapter */);
 		
 		// We'll attempt to inherit book and verse references, 
@@ -83,7 +81,7 @@ public class VerseRef extends Passage {
 	}
 	
 	public VerseRef(BookOrder order, Integer book, Integer chapter, Integer vs, String ext) {
-		this.order = order;
+		super(order);
 		this.book = book;
 		this.chapter = chapter;
 		this.verse = vs;
@@ -194,10 +192,6 @@ public class VerseRef extends Passage {
 	
 	public VerseRef getLast() {
 		return this;
-	}
-	
-	public BookOrder getBookOrder() {
-		return this.order;
 	}
 	
 	/**

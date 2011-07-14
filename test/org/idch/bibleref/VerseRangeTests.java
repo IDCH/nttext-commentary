@@ -51,24 +51,24 @@ public class VerseRangeTests extends TestCase {
 	public void testValidReferences() {
 		VerseRange range = null;
 		range = new VerseRange("John.3.16-18");
-		checkRef(range.getStartVerse(), "John", 3, 16, null);
-		checkRef(range.getEndVerse(), "John", 3, 18, null);
+		checkRef(range.getFirst(), "John", 3, 16, null);
+		checkRef(range.getLast(), "John", 3, 18, null);
 		
 		range = new VerseRange("John.3.16-4.5");
-		checkRef(range.getStartVerse(), "John", 3, 16, null);
-		checkRef(range.getEndVerse(), "John", 4, 5, null);
+		checkRef(range.getFirst(), "John", 3, 16, null);
+		checkRef(range.getLast(), "John", 4, 5, null);
 		
 		range = new VerseRange("John.3.16-John.8.5");
-		checkRef(range.getStartVerse(), "John", 3, 16, null);
-		checkRef(range.getEndVerse(), "John", 8, 5, null);
+		checkRef(range.getFirst(), "John", 3, 16, null);
+		checkRef(range.getLast(), "John", 8, 5, null);
 		
 		range = new VerseRange("John.3.16-Acts.2");
-		checkRef(range.getStartVerse(), "John", 3, 16, null);
-		checkRef(range.getEndVerse(), "Acts", 2, null, null);
+		checkRef(range.getFirst(), "John", 3, 16, null);
+		checkRef(range.getLast(), "Acts", 2, null, null);
 		
 		range = new VerseRange("John.3-5");
-		checkRef(range.getStartVerse(), "John", 3, null, null);
-		checkRef(range.getEndVerse(), "John", 5, null, null);
+		checkRef(range.getFirst(), "John", 3, null, null);
+		checkRef(range.getLast(), "John", 5, null, null);
 	}
 	
 	public void checkToString(String strRef) {

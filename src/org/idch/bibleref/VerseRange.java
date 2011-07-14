@@ -14,6 +14,7 @@ public class VerseRange extends Passage {
 	private VerseRef end;
 
 	public VerseRange(VerseRef start, VerseRef end) {
+		super(start.getBookOrder());
 		this.start = start;
 		this.end = end;
 	}
@@ -23,6 +24,8 @@ public class VerseRange extends Passage {
 	}
 	
 	public VerseRange(BookOrder order, String ref) {
+		super(order);
+		
 		String[] references = ref.split("-");
 		if (references.length != 2) {
 			throw new InvalidReferenceException("A verse range must have two verse " +

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.idch.bibleref;
+package org.idch.bible.ref;
 
 import java.util.ArrayList;
 import java.util.List;

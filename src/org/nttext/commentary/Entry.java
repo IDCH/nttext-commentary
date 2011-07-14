@@ -5,7 +5,7 @@ package org.nttext.commentary;
 
 import java.util.List;
 
-import org.idch.bibleref.Passage;
+import org.idch.bible.ref.Passage;
 
 /**
  * @author Neal Audenaert

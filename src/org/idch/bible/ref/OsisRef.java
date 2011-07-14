@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.idch.bibleref;
+package org.idch.bible.ref;
 
 /**
  * A fully general implementation of an OSIS ID.

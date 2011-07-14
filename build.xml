@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!-- ===================================================================================== ==>
+<!== This Ant build file is suitable for a basic Ant/Ivy project. If your project's basedir 
+<!== is a sibling of the build-tools directory, all you need to do in order to get up and 
+<!== running is:
+<!==    1. Copy this file to your project directory as build.xml, and fill in the project 
+<!==       "name" attribute
+<!==    2. Copy ivy.xml.example to your project directory as ivy.xml and customize it for 
+<!==       your project
+<!==    3. Put your Java files under ${basedir}/src
+<!==
+<!== Voila! Now, you should be able to clean, compile, generate Javadocs...all sorts of 
+<!== good stuff. If your project has "special needs", the basic build configuration is highly 
+<!== customizable. You can override the values of Ant properties, <path> elements, etc. by 
+<!== defining them yourself, either in this file (do it before the <import> ofbasic.xml) or 
+<!== in the optional properties file ${basedir}/build.properties, which will be read by 
+<!== basic.xml as its first action (you can even change this filename by defining 
+<!== ${build.properties}). You can also override the implementations and/or dependencies of 
+<!== the various <target>s in build.xml in your build file (you can call the original version
+<!==  of the target by prefixing "basic." onto the target name. See build.xml for documentation
+<!==  of the properties, paths, and targets that are available for customization.
+<!== ==================================================================================== -->
+<project name="nttext" default="package" basedir=".">
+
+  <!-- Import the basic default project -->
+  <property name="lib.dir" value="WebContent/WEB-INF/lib"/>
+  <property name="classfile.dir" value="WebContent/WEB-INF/classes"/>
+  <import file="${basedir}/../build-tools/basic.xml"/>
+
+</project>

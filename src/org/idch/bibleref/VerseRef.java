@@ -53,8 +53,7 @@ public class VerseRef implements Comparable<VerseRef> {
 	
 	public VerseRef(BookOrder order, String ref) throws InvalidReferenceException {
 		this.order = order;
-		
-		this.parseCanonicalReference(ref);
+		this.parseCanonicalReference(ref, false /* defualtToChapter */);
 	}
 	
 	/**
@@ -68,7 +67,8 @@ public class VerseRef implements Comparable<VerseRef> {
 	 * @param ref
 	 */
 	public VerseRef(VerseRef context, String ref) {
-		this(context.getBookOrder(), ref);
+		this.order = context.getBookOrder();
+		this.parseCanonicalReference(ref, !context.isVerseSpecified() /* defualtToChapter */);
 		
 		// We'll attempt to inherit book and verse references, 
 		if (this.book == null) 
@@ -129,14 +129,14 @@ public class VerseRef implements Comparable<VerseRef> {
 	 * 
 	 * DESCRIBE THIS HERE
 	 * 
-	 * @param ref
+	 * @param ref The string-valued verse reference to parse.
+	 * @param defaultToChapter if only a single numeric value is provided, indicates whether
+	 * 		that value should be interpreted as a chapter or as a verse.
 	 * @throws InvalidReferenceException
 	 */
-	private void parseCanonicalReference(String ref) throws InvalidReferenceException {
-		// NOTE This currently uses simple string-based parsing. This may not be the 
-		//      most efficient approach to parsing verse identifiers. Also, since the 
-		//		OSIS spec defines valid identifiers in terms of RegEx's it is not clear 
-		//		from the code that this fully implements the specification. 
+	private void parseCanonicalReference(String ref, boolean defaultToChapter) 
+	throws InvalidReferenceException {
+		// NOTE Consider using RegEx based parsing. 
 		if (StringUtils.isBlank(ref)) {
 			throw new InvalidReferenceException("Blank reference", ref);
 		}
@@ -163,7 +163,10 @@ public class VerseRef implements Comparable<VerseRef> {
 		} else {
 			// first segment is not a book, process right to left
 			if (len == 1) {		// just a verse
-				this.verse = Integer.parseInt(segments[0]);
+				if (defaultToChapter)
+					this.chapter = Integer.parseInt(segments[0]);
+				else
+					this.verse = Integer.parseInt(segments[0]);
 			} else {			// chapter.verse
 				this.chapter = Integer.parseInt(segments[0]);
 				this.verse = Integer.parseInt(segments[1]);
@@ -305,12 +308,12 @@ public class VerseRef implements Comparable<VerseRef> {
 		// TODO possible null pointer errors
 		
 		assert (ref.book != null) && (book != null);
-		int bk = ref.book - book;
+		int bk = book - ref.book;
 		if (bk != 0) return bk;
 		
 		// compare chapters
 		if ((ref.chapter != null) && (chapter != null)) {
-			int ch = ref.chapter - chapter;
+			int ch = chapter - ref.chapter;
 			if (ch != 0) return ch;
 		} else {
 			return (ref.chapter == chapter) ? 0 
@@ -319,7 +322,7 @@ public class VerseRef implements Comparable<VerseRef> {
 		
 		// compare verses
 		if ((ref.verse != null) && (verse != null)) {
-			int vs = ref.verse - verse;
+			int vs = verse - ref.verse;
 			if (vs != 0) return vs;
 		} else {
 			return (ref.verse == verse) ? 0 

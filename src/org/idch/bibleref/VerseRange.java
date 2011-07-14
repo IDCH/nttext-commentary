@@ -29,13 +29,18 @@ public class VerseRange {
 		
 		this.start = new VerseRef(order, references[0]);
 		this.end = new VerseRef(start, references[1]);
+		
+		if (this.start.compareTo(this.end) > 0) { 
+			throw new InvalidReferenceException("The supplied ending verse is before the " +
+					"starting verse.", ref);
+		}
 	}
 	
-	public VerseRef getStartingVerse() {
+	public VerseRef getStartVerse() {
 		return this.start;
 	}
 	
-	public VerseRef getEndingVerser() {
+	public VerseRef getEndVerse() {
 		return this.end;
 	}
 }

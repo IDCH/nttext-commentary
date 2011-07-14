@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nttext.osis;
+package org.idch.bibleref;
 
 /**
  * @author Neal Audenaert

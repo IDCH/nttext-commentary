@@ -1,11 +1,11 @@
 /**
  * 
  */
-package org.nttext.osis;
+package org.idch.bibleref;
 
-import org.nttext.ref.BookOrder;
-import org.nttext.ref.InvalidReferenceException;
-import org.nttext.ref.VerseRef;
+import org.idch.bibleref.BookOrder;
+import org.idch.bibleref.InvalidReferenceException;
+import org.idch.bibleref.VerseRef;
 
 import junit.framework.TestCase;
 

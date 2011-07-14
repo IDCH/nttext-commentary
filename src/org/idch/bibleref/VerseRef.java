@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nttext.ref;
+package org.idch.bibleref;
 
 import org.apache.commons.lang.StringUtils;
 import org.idch.util.LogService;

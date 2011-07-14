@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nttext.ref;
+package org.idch.bibleref;
 
 /**
  * Represents one or more contiguous verses of scripture. 

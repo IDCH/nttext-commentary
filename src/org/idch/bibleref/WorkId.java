@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nttext.ref;
+package org.idch.bibleref;
 
 import java.util.ArrayList;
 import java.util.List;

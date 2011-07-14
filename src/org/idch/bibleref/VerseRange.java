@@ -6,7 +6,9 @@ package org.idch.bibleref;
 /**
  * @author Neal Audenaert
  */
-public class VerseRange {
+public class VerseRange extends Passage {
+	// TODO implements Comparable<VerseRange>
+	//      add in overlap tests, add in merge operation
 	
 	private VerseRef start;
 	private VerseRef end;
@@ -36,11 +38,11 @@ public class VerseRange {
 		}
 	}
 	
-	public VerseRef getStartVerse() {
+	public VerseRef getFirst() {
 		return this.start;
 	}
 	
-	public VerseRef getEndVerse() {
+	public VerseRef getLast() {
 		return this.end;
 	}
 }

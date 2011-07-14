@@ -29,7 +29,7 @@ import org.idch.util.LogService;
  * 
  * @author Neal Audenaert
  */
-public class VerseRef implements Comparable<VerseRef> {
+public class VerseRef extends Passage {
 	private static final String LOGGER = VerseRef.class.getName();
 	
 	private BookOrder order = BookOrder.KJV;
@@ -188,6 +188,14 @@ public class VerseRef implements Comparable<VerseRef> {
 	// GETTERS AND SETTERS
 	//======================================================================================
 	
+	public VerseRef getFirst() {
+		return this;
+	}
+	
+	public VerseRef getLast() {
+		return this;
+	}
+	
 	public BookOrder getBookOrder() {
 		return this.order;
 	}
@@ -302,35 +310,6 @@ public class VerseRef implements Comparable<VerseRef> {
 		return sb.toString();
 	}
 	
-	public int compareTo(VerseRef ref) {
-		// TODO need to make sure that we're using the same book order.
-		//      figure out how to order them if we aren't.
-		// TODO possible null pointer errors
-		
-		assert (ref.book != null) && (book != null);
-		int bk = book - ref.book;
-		if (bk != 0) return bk;
-		
-		// compare chapters
-		if ((ref.chapter != null) && (chapter != null)) {
-			int ch = chapter - ref.chapter;
-			if (ch != 0) return ch;
-		} else {
-			return (ref.chapter == chapter) ? 0 
-					: (chapter == null) ? -1 : 1;
-		}
-		
-		// compare verses
-		if ((ref.verse != null) && (verse != null)) {
-			int vs = verse - ref.verse;
-			if (vs != 0) return vs;
-		} else {
-			return (ref.verse == verse) ? 0 
-					: (verse == null) ? -1 : 1;
-		}
-		
-		
-		return ext.toLowerCase().compareTo(ref.ext.toLowerCase());
-	}
+	
 	
 }

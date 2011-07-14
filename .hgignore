@@ -1,0 +1,11 @@
+
+syntax: regexp
+^.classpath$
+syntax: regexp
+^.project$
+syntax: regexp
+^.settings$
+syntax: regexp
+^lib$
+syntax: regexp
+^WebContent/WEB-INF/lib$

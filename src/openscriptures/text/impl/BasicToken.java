@@ -28,7 +28,25 @@ import org.apache.commons.lang.StringUtils;
  * @author Neal Audenaert
  */
 public class BasicToken implements Token {
-	
+
+    /**
+     * 
+     * @param string
+     * @return
+     */
+    public static Token.Type classify(String string) {
+        Token.Type type = null;
+        if (string.matches("\\p{L}+")) {
+            type = Token.Type.WORD;
+        } else if (string.matches("\\p{P}+")) {
+            type = Token.Type.PUNCTUATION;
+        } else if (string.matches("\\p{javaWhitespace}+")) {
+            type = Token.Type.WHITESPACE;
+        }
+        
+        return type;
+    }
+    
 	private UUID uuid;
 	
 	private Work work;
@@ -43,19 +61,12 @@ public class BasicToken implements Token {
 	 * @param text
 	 */
 	protected BasicToken(Work work, int position, String text) {
-		// determine what type this text is
-		if (StringUtils.isBlank(text)) {
-			this.type = Type.WHITESPACE;
-		} else if (text.matches("^\\w*$")) {
-			this.type = Type.WORD;
-		} else { 
-			this.type = Type.PUNCTUATION;
-		}
-		
 		this.uuid = UUID.randomUUID();
-		this.position = position;
-		this.value = text;
+		
 		this.work = work;
+		this.value = text;
+		this.type = classify(text);
+		this.position = position;
 	}
 	
 	public Work getWork() {

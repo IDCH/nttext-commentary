@@ -216,4 +216,22 @@ public class WorkId {
 		
 		return builder.toString();
 	}
+	
+	public boolean equals(Object o) {
+	    String target = null;
+	    if (o instanceof WorkId) {
+	        target = ((WorkId)o).toString();
+	    } else if (o instanceof String) {
+	        target = (String)o;
+	    } else {
+	        @SuppressWarnings("unused")
+            WorkId wid = (WorkId)o;    // force class cast exception
+	    }
+	    
+	    return this.toString().equals(target);
+	}
+	
+	public int hashCode() {
+	    return this.toString().hashCode();
+	}
 }

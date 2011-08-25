@@ -67,12 +67,16 @@ public class WorkId {
 // MEMBER VARIABLES
 //============================================================================================	
 
-	private Type   type = Type.BIBLE;
+	private Type type = null;
 	private Language language;
 	private String publisher;
 	private String name;
 	private String publicationDate;
-	
+
+//============================================================================================
+// CONSTRUCTORS
+//============================================================================================  
+
 	/**
 	 * 
 	 * @param name
@@ -105,7 +109,7 @@ public class WorkId {
 	 */
 	public WorkId(String work) {
 		// parse
-		String[] segments = work.split(".");
+		String[] segments = work.split("\\.");
 		int ix = 0,			            // the index for the current segment 
 		    len = segments.length;		// the number of segments
 		
@@ -114,15 +118,15 @@ public class WorkId {
 			return;
 		}
 		
-		
 		// check to see if the current element is a work type
+		// XXX This requires named types but this limits the different types of works 
+		//     that we can represent. Need to split works off into their own class.
 		Type t = Type.find(segments[ix]); 
 		if (t != null) {
 			this.type = t;
 			ix++;
 			if (ix >= len) return;	// just a type identifier 		
 		}
-		
 		
 		// check to see if the current element is a language type
 		if (segments[ix].matches("^[a-z]{2,3}$")) {
@@ -156,6 +160,10 @@ public class WorkId {
 		// TODO handle revision number, version number, and edition number?
 	}
 	
+//============================================================================================
+// ACCESSORS
+//============================================================================================  
+
 	/** Returns the type of this work. */
 	public Type getType() {
 		return this.type;

@@ -11,12 +11,15 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import openscriptures.text.MutableWork;
 import openscriptures.text.Structure;
 import openscriptures.text.Token;
 import openscriptures.text.TokenSequence;
 import openscriptures.text.WorkId;
+import openscriptures.text.impl.BasicToken;
 import openscriptures.text.impl.BasicWork;
 import openscriptures.utils.Contributor;
 import openscriptures.utils.Language;
@@ -29,6 +32,12 @@ public class MemWork extends BasicWork implements MutableWork  {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(MemWork.class.getName());
 	
+	private static final String TOKENIZATION_PATTERN =
+        "\\p{L}+|" +                                // Unicode letters
+        "\\p{P}+|" +                                // Unicode punctuation
+        "\\p{javaWhitespace}+|" +                   // Java whitespace (becase I can't figure out Unicode whitespace)
+        "[^\\p{L}\\p{P}\\p{javaWhitespace}]+";      // everything else (typically ignored).
+	
 //============================================================================================
 // MEMBER VARIABLES
 //============================================================================================	
@@ -39,6 +48,7 @@ public class MemWork extends BasicWork implements MutableWork  {
 	// will be too large to fit in memory
 	private List<Token> tokens = new ArrayList<Token>();
 	
+	private boolean skipUnrecognizedTokens = true;
 
 //============================================================================================
 // CONSTRUCTORS
@@ -57,12 +67,39 @@ public class MemWork extends BasicWork implements MutableWork  {
 
 	// TODO HMM. . . .HOW TO REPRESENT THESE? FOR NOW WE'LL ASSUME LOCAL DB ACCESS
 	
-	
-	public synchronized Token addToken(String token) {
-	    Token t = new MemToken(this, tokens.size(), token);
-	    tokens.add(t);
-		
+	public Token addToken(String token) {
+	    Token t;
+	    synchronized (tokens) {
+	        t = new MemToken(this, tokens.size(), token);
+	        tokens.add(t);
+	    }
+	    
 	    return t;
+	}
+	
+	/**
+	 * 
+	 * @param text
+	 * @return
+	 */
+	public List<Token> tokenize(String text) {
+	    
+	    Token t;
+	    List<Token> results = new ArrayList<Token>();
+	    Matcher mat = Pattern.compile(TOKENIZATION_PATTERN).matcher(text);
+	    
+	    synchronized (tokens) {
+	        while (mat.find()) {
+	            String token = mat.group();
+	            if (BasicToken.classify(token) == null && skipUnrecognizedTokens)
+	                continue;
+	            
+	            t = new MemToken(this, tokens.size(), token);
+	            tokens.add(t);
+	            results.add(t);
+	        }
+	    }
+        return results;
 	}
 	
 	public Structure createStructure(Token start, Token end) {

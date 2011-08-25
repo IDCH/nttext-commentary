@@ -21,7 +21,6 @@ public interface Token extends Comparable<Token> {
 	public Work getWork();
 	
 	public long getPosition();
-	
 
 	/**
 	 * Returns the type of this Token. One of, <tt>WORD</tt>, <tt>PUNCTUATION</tt>,

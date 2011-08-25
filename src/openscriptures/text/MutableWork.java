@@ -4,6 +4,7 @@
 package openscriptures.text;
 
 import java.util.Date;
+import java.util.List;
 
 import openscriptures.utils.Contributor;
 import openscriptures.utils.Language;
@@ -59,7 +60,6 @@ public interface MutableWork extends Work {
     /** Sets the reference system used by this work. */
     public void setRefSystem(String value);
     
-    
     /** Sets the license under which this work is made available.  */
     public void setLicense(License value);
     
@@ -97,6 +97,13 @@ public interface MutableWork extends Work {
      * @return
      */
     public Token addToken(String token);
+    
+    /**
+     * 
+     * @param text
+     * @return
+     */
+    public List<Token> tokenize(String text);
     
     /**
      * 

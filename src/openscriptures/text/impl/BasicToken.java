@@ -8,8 +8,6 @@ import java.util.UUID;
 import openscriptures.text.Token;
 import openscriptures.text.Work;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * An atomic unit of text, such as a word, punctuation mark, or whitespace line break. 
  * Corresponds to OSIS w elements.
@@ -29,6 +27,21 @@ import org.apache.commons.lang.StringUtils;
  */
 public class BasicToken implements Token {
 
+    public static final String UNICODE_WORDSCHARS = 
+        "[\\p{L}\\p{Sk}\\d]";
+    public static final String UNICODE_PUNCTUATION = 
+        "[\\p{P}]";
+    public static final String UNICODE_WHITESPACE = 
+        "[\\p{Z}\\u000a\\u0009]";
+    public static final String UNICODE_UNKNOWN = 
+        "[^\\p{L}\\p{Sk}\\d\\p{P}\\p{Z}]";
+    
+    public static final String TOKENIZATION_PATTERN =
+        UNICODE_WORDSCHARS + "+|" +                 // Unicode letters
+        UNICODE_PUNCTUATION + "+|" +                // Unicode punctuation
+        UNICODE_WHITESPACE + "+|" +                 // Java whitespace (becase I can't figure out Unicode whitespace)
+        UNICODE_UNKNOWN + "+";                      // everything else (typically ignored).
+    
     /**
      * 
      * @param string
@@ -36,11 +49,11 @@ public class BasicToken implements Token {
      */
     public static Token.Type classify(String string) {
         Token.Type type = null;
-        if (string.matches("\\p{L}+")) {
+        if (string.matches(UNICODE_WORDSCHARS + "+")) {
             type = Token.Type.WORD;
-        } else if (string.matches("\\p{P}+")) {
+        } else if (string.matches(UNICODE_PUNCTUATION + "+")) {
             type = Token.Type.PUNCTUATION;
-        } else if (string.matches("\\p{javaWhitespace}+")) {
+        } else if (string.matches(UNICODE_WHITESPACE + "+")) {
             type = Token.Type.WHITESPACE;
         }
         

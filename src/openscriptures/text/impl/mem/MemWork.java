@@ -32,11 +32,7 @@ public class MemWork extends BasicWork implements MutableWork  {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(MemWork.class.getName());
 	
-	private static final String TOKENIZATION_PATTERN =
-        "\\p{L}+|" +                                // Unicode letters
-        "\\p{P}+|" +                                // Unicode punctuation
-        "\\p{javaWhitespace}+|" +                   // Java whitespace (becase I can't figure out Unicode whitespace)
-        "[^\\p{L}\\p{P}\\p{javaWhitespace}]+";      // everything else (typically ignored).
+	
 	
 //============================================================================================
 // MEMBER VARIABLES
@@ -86,7 +82,7 @@ public class MemWork extends BasicWork implements MutableWork  {
 	    
 	    Token t;
 	    List<Token> results = new ArrayList<Token>();
-	    Matcher mat = Pattern.compile(TOKENIZATION_PATTERN).matcher(text);
+	    Matcher mat = Pattern.compile(BasicToken.TOKENIZATION_PATTERN).matcher(text);
 	    
 	    synchronized (tokens) {
 	        while (mat.find()) {

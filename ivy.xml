@@ -19,8 +19,11 @@
   </configurations>
   
   <dependencies defaultconfmapping="compile->compile(*),master(*);runtime->runtime(*)">
+   <!-- 
     <dependency org="org.idch" name="IDCHCore" rev="latest.integration"/>
     <dependency org="com.googlecode.json-simple" name="json-simple" rev="1.1"/>
-    
+     --> 
+    <dependency org="org.apache.commons" name="commons-lang" rev="2.1"/>
+    <dependency org="freemarker" name="freemarker" rev="2.3.8"/>
   </dependencies>
 </ivy-module>

@@ -3,8 +3,7 @@
  */
 package org.nttext.mss;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -33,7 +32,7 @@ public class Manuscript {
 	 */
 	
 	/** MS designation (GA number, ver Soden, shelf number) */
-	private Map<String, Designation> designations = new HashMap<String, Designation>();
+	private Set<Designation> designations = new HashSet<Designation>();
 	
 	/** Provenance & ownership history, & current location */
 	private Provenance provenance = null;

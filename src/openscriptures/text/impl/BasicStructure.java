@@ -3,23 +3,25 @@
  */
 package openscriptures.text.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import openscriptures.text.AbstractTokenSequence;
+import openscriptures.text.InvalidTokenException;
 import openscriptures.text.Structure;
 import openscriptures.text.StructureAttribute;
 import openscriptures.text.Token;
-import openscriptures.text.TokenSequence;
 import openscriptures.text.Work;
 
 /**
  * @author Neal Audenaert
  */
-public class BasicStructure implements Structure {
+public class BasicStructure extends AbstractTokenSequence implements Structure {
 	
 	/** Maps input tag and/or structure names to output structures. This may be used to 
 	 * transform input structures from one schema to another as needed. */
@@ -150,56 +152,56 @@ public class BasicStructure implements Structure {
 //========================================================================================
 // MEMBER VARIABLES
 //========================================================================================
-	// TODO we should allow for relationships between structures, including hierarchical.  
+	// TODO comments are currently derived from Python reference implementation. need to 
+	//      be updated
 	
 	protected UUID uuid;
 	
 	/**
-	 * The name of the OSIS.
-	 * XXX This seems like it ought to be the name of the structure. Since this is a 
-	 * 	   standoff model, it seems like it ought to be something that can be extended 
-	 *     beyond the confines of OSIS.
+	 * The name of the structure. This roughly corresponds to the XML element name.
 	 */
-	protected String element;
+	protected String name;
 	
 	/**
-	 * The identifier for this strcuture. 
-	 * XXX Does it have to be an OSIS id? Do all structures have to have an OSIS id?
+	 * A locally unique identifier for this structure. This is (optionally) used to provides 
+	 * access to domain specific identifiers (e.g., OSIS ids for books, chapters and verses).
 	 */
-	protected String osisId;
+	protected String id;
+	
+	/** The work this structure pertains to. This must be same as the start and end tokens. */
+	protected Work work;
 	
 	/** 
-	 * Must be same as start/end_*_token.work. Must not be a variant work; use the 
-	 * variant_bits to select for it
-	 */
-	protected String work;
-	
-	/** URL for where this structure came from; used for base to Token.relative_source_url */
-	protected String sourceUrl;
-	
-	/** The order where this appears in the work. Note that this does not need to be unique
-	 *  since two structures could start at the same position. */
-	protected String position;
-	
-	// FIXME we need some sort of payload. 
-	
-	/** The token that starts the structure's content; this may or may not include the
-	 *  start_marker, like quotation marks. <del>If null, then tokens should be discovered 
-	 *  via StructureToken.</del>
+	 * The token that starts the structure's content; this may or may not include the
+	 * startMarker, like quotation marks. 
+	 * 
+	 * NOTE we are currently evaluating the relevance of 'startMarker' and support for this 
+	 *      feature is not currently implemented. It will likely be included in a 
+	 *      future version.
 	 */
 	protected Token startToken;
 	
-	/** Same as start_token, but for the end. */
+	/** Same as startToken, but for the end. */
 	protected Token endToken;
 	
+    protected String content;
+    
+    protected Structure parent = null;
+    protected List<Structure> children = new ArrayList<Structure>();
+    protected String perspective;
+
+    protected Map<String, StructureAttribute> attributes = 
+        new HashMap<String, StructureAttribute>();
+    
+    
 	/**
 	 * The optional token that marks the start of the structure. This marker may be included
-	 * (inside) in the start_token/end_token range as in the example of quotation marks, or 
+	 * (inside) in the startToken/endToken range as in the example of quotation marks, or 
 	 * it may excluded (outside) as in the case of paragraph markers which are double 
 	 * linebreaks. Outside markers may overlap (be shared) among multiple paragraphs' 
 	 * start/end_markers, whereas inside markers may not.
 	 * 
-	 * TODO this is really unclear to me. I think the quatation marks make sense, but the
+	 * TODO this is really unclear to me. I think the quotation marks make sense, but the
 	 *      paragraph seems like that should be a display issue. Assuming that we are 
 	 *      normalizing spaces on import, we shouldn't end up with multiple line breaks in the 
 	 *      token sequence. 
@@ -214,16 +216,20 @@ public class BasicStructure implements Structure {
 	 *  
 	 *  @deprecated This should use the attributes instead
 	 */
+	@Deprecated
 	protected String numericalStart;
 	
 	/**
 	 * If the structure spans multiple numerical designations, this is used
 	 * @deprecated This should use the attributes instead
 	 */
+	@Deprecated
 	protected String numericalEnd;
 	
-	protected Map<String, StructureAttribute> attributes = 
-		new HashMap<String, StructureAttribute>();
+	/** URL for where this structure came from; used for base to Token.relative_source_url */
+    protected String sourceUrl;
+    
+	
 	
 //========================================================================================
 // CONSTRUCTORS
@@ -232,205 +238,280 @@ public class BasicStructure implements Structure {
 	/**
 	 * 
 	 */
-	public BasicStructure() {
-		
+	protected BasicStructure() {
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
-	public TokenSequence getTokens() {
-		return null;
+	public BasicStructure(Work work, String name, Token start, Token end) {
+	    // TODO for now, I've made this public. May need to re-evaluate this if I want
+	    //      to force people to use a specific sub-class
+	    this.uuid = UUID.randomUUID();
+	    
+	    this.name = name;
+	    this.work = work;
+	    this.startToken = start;
+	    this.endToken = end;
 	}
 	
-	public StructureAttribute getAttribute(String name) {
-		return attributes.get(name);
+	protected void checkWork(Token t) throws InvalidTokenException {
+	    if (t.getWork().getId().equals(this.work.getId()))
+	        throw new InvalidTokenException(
+	                "The token's work does not match this structure.", t);
 	}
 	
-	public String setAttribute(String name, String value) {
-		StructureAttribute previous = 
-			attributes.put(name, new StructureAttribute(name, value));
-		
-		return (previous != null) ? previous.getValue() : null;
+	protected void checkOrder(Token s, Token e) throws InvalidTokenException {
+	    if (e != null && e.getPosition() < s.getPosition()) {
+            throw new InvalidTokenException(
+                    "The start token cannot come after the end token");
+        }
 	}
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#getText()
-     */
-    @Override
-    public String getText() {
-        // TODO Auto-generated method stub
-        return null;
+	
+	public int getStart() {
+        return this.startToken.getPosition();
     }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#contains(openscriptures.text.Token)
-     */
-    @Override
-    public boolean contains(Token o) {
-        // TODO Auto-generated method stub
-        return false;
+     
+	public int getEnd() {
+        return this.endToken != null  
+                ? this.endToken.getPosition() + 1
+                : this.getStart();
     }
+	
+//========================================================================================
+// ACCESSORS
+//========================================================================================
 
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#get(int)
-     */
-    @Override
-    public Token get(int index) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#isEmpty()
-     */
-    @Override
-    public boolean isEmpty() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#size()
-     */
-    @Override
-    public int size() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#iterator()
-     */
-    @Override
-    public Iterator<Token> iterator() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#iterator(int)
-     */
-    @Override
-    public Iterator<Token> iterator(int startAt) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#listIterator()
-     */
-    @Override
-    public ListIterator<Token> listIterator() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#listIterator(int)
-     */
-    @Override
-    public ListIterator<Token> listIterator(int index) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#indexOf(openscriptures.text.Token)
-     */
-    @Override
-    public int indexOf(Token token) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#subSequence(int, int)
-     */
-    @Override
-    public TokenSequence subSequence(int fromIndex, int toIndex) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#toArray()
-     */
-    @Override
-    public Token[] toArray() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#toArray(openscriptures.text.Token[])
-     */
-    @Override
-    public Token[] toArray(Token[] a) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.Structure#getUUID()
+	
+	/** 
+	 *  Returns the unique identifier for this <tt>Structure</tt> 
+     *  @see openscriptures.text.Structure#getUUID()
      */
     @Override
     public UUID getUUID() {
         return uuid;
     }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.Structure#getOsisId()
-     */
-    @Override
-    public String getOsisId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.Structure#getStructureName()
-     */
-    @Override
-    public String getStructureName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.Structure#getWork()
+    
+    /*
+    /** 
+     *  Returns the <tt>Work</tt> that this structure is found in. 
+     *  @see openscriptures.text.Structure#getWork()
      */
     @Override
     public Work getWork() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.work;
     }
 
-    /* (non-Javadoc)
+    /** 
+     * Returns a locally unique identifier for this structure. This is (optionally) used to 
+     * provide access to domain specific identification schemes for structures, especially 
+     * those that may need to be referenced across different texts (e.g., OSIS ids for 
+     * books, chapters and verses).
+     *   
+     * @see openscriptures.text.Structure#getId()
+     */
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    /** Return the name of this structure. This corresponds to an element name 
+     *  in an XML document.
+     * @see openscriptures.text.Structure#getName()
+     */
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    /** Returns the token at which this structure starts.
      * @see openscriptures.text.Structure#getStartToken()
      */
     @Override
     public Token getStartToken() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.startToken;
     }
 
-    /* (non-Javadoc)
+    /* Returns the last token in this 
      * @see openscriptures.text.Structure#getEndToken()
      */
     @Override
     public Token getEndToken() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.endToken;
     }
+    
+    //========================================================================================
+    // MUTATORS
+    //========================================================================================
+    /**
+     * Sets the locally unique ID for this structure. Note that the uniqueness of this name
+     * is not enforced.
+     * 
+     * @param value The id value
+     *  
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public void setId(String value) throws UnsupportedOperationException {
+        this.id = value;
+    }
+    
+    /**
+     * 
+     * @param value
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public void setName(String value) throws UnsupportedOperationException {
+        this.name = value;
+    }
+    
+    /**
+     * Sets the start token for this structure.
+     * 
+     * @param token The token to set
+     * 
+     * @throws UnsupportedOperationException If this operation is not implemented for a 
+     *         particular structure (e.g. for a structure accessed via a REST API that 
+     *         doesn't support updates).
+     * @throws InvalidTokenException If the supplied token is invalid. This might be because
+     *         the token's work does not match this structure's work or because the token 
+     *         does not occur before the end token.
+     */
+    @Override
+    public void setStartToken(Token token) 
+    throws UnsupportedOperationException, InvalidTokenException {
+        if (this.endToken != null) 
+            checkOrder(token, this.endToken);
+        checkWork(token); 
+        
+        this.startToken = token;
+    }
+    
+    /**
+     * Sets the end token for this structure.
+     * 
+     * @param token The token to set
+     * 
+     * @throws UnsupportedOperationException If this operation is not implemented for a 
+     *         particular structure (e.g. for a structure accessed via a REST API that 
+     *         doesn't support updates).
+     * @throws InvalidTokenException If the supplied token is invalid. This might be because
+     *         the token's work does not match this structure's work or because the token 
+     *         does not occur after the start token.
+     *         
+     */
+    @Override
+    public void setEndToken(Token token) 
+    throws UnsupportedOperationException, InvalidTokenException {
+        checkOrder(this.startToken, token);
+        if (token != null) 
+            checkWork(token);
+                
+        this.endToken = token;
+    }
+    
+    /**
+     * Sets the start and end tokens for this structure.
+     * 
+     * @param start The start token to set
+     * @param end The end token to set
+     * 
+     * @throws UnsupportedOperationException If this operation is not implemented for a 
+     *         particular structure (e.g. for a structure accessed via a REST API that 
+     *         doesn't support updates).
+     * @throws InvalidTokenException If the supplied token is invalid. This might be because
+     *         the token's work does not match this structure's work or because the start 
+     *         token does not occur before the end token.
+     *         
+     */
+    @Override
+    public void setTokens(Token start, Token end) 
+    throws UnsupportedOperationException, InvalidTokenException {
+        checkOrder(start, end);
+        checkWork(start); 
+        if (end != null) 
+            checkWork(end);
+        
+        this.startToken = start;
+        this.endToken = end;
+    }
+    
+//========================================================================================
+// METHODS FOR REPRESENTING ATTRIBUTES, CONTENT, AND HIERARCHICAL STRUCTURES
+//========================================================================================
+    /*
+     * 
+     */
+    @Override
+	public String getAttribute(String name) {
+		StructureAttribute attr = attributes.get(name);
+		
+		return (attr == null) ? null : attr.getValue();
+	}
 
     /* (non-Javadoc)
      * @see openscriptures.text.Structure#listAttributes()
      */
     @Override
-    public List<String> listAttributes() {
-        // TODO Auto-generated method stub
-        return null;
+    public Set<String> listAttributes() {
+        return this.attributes.keySet();
     }
+    
+    /**
+     * 
+     * @param name
+     * @param value
+     * @return
+     */
+    @Override
+    public String setAttribute(String name, String value) {
+        StructureAttribute previous = 
+            attributes.put(name, new StructureAttribute(name, value));
+        
+        return (previous != null) ? previous.getValue() : null;
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    public String getContent() {
+        return this.content;
+    }
+   
+    @Override
+    public void setContent(String value) {
+        this.content = value;
+    }
+    
+    /**
+     * Retrieves the parent of this structure. This along with {@see #getChildren()} 
+     * allows for the hierarchical nesting of structures. While the structures within
+     * a text are not strictly or exclusively hierarcical, hierarchies do represent an 
+     * important set of relationships between structures. For example, verses are not 
+     * simply structures that happen to be found only within chapters, verses are 
+     * specifically a sub-division
+     *   
+     * @return
+     */
+    @Override
+    public Structure getParent() { 
+        return this.parent;
+    }
+
+    /**
+     * 
+     */
+    @Override
+    public List<Structure> listChildren() {
+        return Collections.unmodifiableList(children);
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    public String getPerspective() {
+        return this.perspective;
+    }
+
+   
 }

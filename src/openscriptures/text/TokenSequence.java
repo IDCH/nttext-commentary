@@ -14,6 +14,12 @@ public interface TokenSequence {
 	public String getText();
 	
 	public Work getWork();
+	
+	/** Return the start position (inclusive) in the underlying <tt>Work</tt>'s token stream. */
+	abstract int getStart();
+    
+	/** Return the end position (exclusive) in the underlying <tt>Work</tt>'s token stream. */
+    abstract int getEnd();
 
 	/* (non-Javadoc)
 	 * @see java.util.List#contains(java.lang.Object)

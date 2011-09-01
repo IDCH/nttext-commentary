@@ -8,6 +8,11 @@ package openscriptures.text;
  */
 public class InvalidTokenException extends RuntimeException {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8404931272777227773L;
+
     private final Token t;
     
     @SuppressWarnings("unused")

@@ -470,19 +470,6 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
     }
     
     /**
-     * 
-     */
-    @Override
-    public String getContent() {
-        return this.content;
-    }
-   
-    @Override
-    public void setContent(String value) {
-        this.content = value;
-    }
-    
-    /**
      * Retrieves the parent of this structure. This along with {@see #getChildren()} 
      * allows for the hierarchical nesting of structures. While the structures within
      * a text are not strictly or exclusively hierarcical, hierarchies do represent an 

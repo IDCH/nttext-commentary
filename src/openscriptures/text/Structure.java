@@ -146,10 +146,6 @@ public interface Structure extends TokenSequence {
 	
 	public String setAttribute(String name, String value);
 	
-	public String getContent();
-	
-	public void setContent(String value) throws UnsupportedOperationException;
-	
 	/**
 	 * Retrieves the parent of this structure. This along with {@see #getChildren()} 
 	 * allows for the hierarchical nesting of structures. While the structures within

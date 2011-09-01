@@ -208,15 +208,7 @@ public abstract class StructureWrapper extends AbstractTokenSequence implements 
     public Set<String> listAttributes() {
         return me.listAttributes();
     }
-    
-    public String getContent() {
-        return me.getContent();
-    }
-    
-    public void setContent(String value) {
-        me.setContent(value);
-    }
-    
+        
     /**
      * Retrieves the parent of this structure. This along with {@see #getChildren()} 
      * allows for the hierarchical nesting of structures. While the structures within

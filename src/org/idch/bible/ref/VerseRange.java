@@ -4,12 +4,14 @@
 package org.idch.bible.ref;
 
 import org.apache.commons.lang.StringUtils;
-import org.idch.util.LogService;
+import org.apache.log4j.Logger;
 
 /**
  * @author Neal Audenaert
  */
 public class VerseRange extends Passage {
+    private static final Logger LOGGER = Logger.getLogger(VerseRange.class);
+    
 	// TODO implements Comparable<VerseRange>
 	//      add in overlap tests, add in merge operation
 	
@@ -29,7 +31,7 @@ public class VerseRange extends Passage {
 	public VerseRange(BookOrder order, String ref) {
 		super(order);
 		
-		LogService.logDebug("Parsing verse range: " + ref, LOGGER);
+		LOGGER.debug("Parsing verse range: " + ref);
 		
 		String TWO_VS_REQUIRED = "A verse range must have two verse " +
 				"references separated by exactly one '-'.";

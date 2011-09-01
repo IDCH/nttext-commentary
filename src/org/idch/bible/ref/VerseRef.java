@@ -4,7 +4,7 @@
 package org.idch.bible.ref;
 
 import org.apache.commons.lang.StringUtils;
-import org.idch.util.LogService;
+import org.apache.log4j.Logger;
 
 /**
  * Maintains a reference to a single verse or to a point within a verse. 
@@ -30,6 +30,8 @@ import org.idch.util.LogService;
  * @author Neal Audenaert
  */
 public class VerseRef extends Passage {
+    private static final Logger LOGGER = Logger.getLogger(VerseRef.class);
+    
 	private Integer book = null;
 	private Integer chapter = null;
 	private Integer verse = null;
@@ -102,7 +104,8 @@ public class VerseRef extends Passage {
 			
 			grain = ref.substring(ix + 1);
 			remainder = ref.substring(0, ix);
-			LogService.logDebug("Extracted grain '" + grain + "' from referecne '" + ref + "'.", LOGGER);
+			
+			LOGGER.debug("Extracted grain '" + grain + "' from referecne '" + ref + "'.");
 		}
 		
 		return remainder;
@@ -116,7 +119,7 @@ public class VerseRef extends Passage {
 			
 			this.ext = ref.substring(ix + 1);
 			remainder = ref.substring(0, ix);
-			LogService.logDebug("Extracted extension '" + this.ext + "' from referecne '" + ref + "'.", LOGGER);
+			LOGGER.debug("Extracted extension '" + this.ext + "' from referecne '" + ref + "'.");
 		}
 		
 		return remainder;
@@ -158,7 +161,7 @@ public class VerseRef extends Passage {
 			this.verse = (len > 2) ? Integer.parseInt(segments[2]) : null;
 			
 			if (len > 3) {
-				LogService.logWarn("Bad verse reference (" + ref + "): trailing segments.", LOGGER);
+			    LOGGER.warn("Bad verse reference (" + ref + "): trailing segments.");
 			}
 			
 		} else {
@@ -174,14 +177,14 @@ public class VerseRef extends Passage {
 			}
 			
 			if (len > 2) {
-				LogService.logWarn("Bad verse reference (" + ref + "): too many numeric " +
-						"identifiers. Expected reference in the form of 'ch.vs'.", LOGGER);
+			    LOGGER.warn("Bad verse reference (" + ref + "): too many numeric " +
+                      "identifiers. Expected reference in the form of 'ch.vs'.");
 			}
 		}
 		
-		LogService.logDebug("Book Index: " + this.book, LOGGER);
-		LogService.logDebug("Chapter:    " + this.chapter, LOGGER);
-		LogService.logDebug("Verse:      " + this.verse, LOGGER);
+		LOGGER.debug("Book Index: " + this.book);
+		LOGGER.debug("Chapter:    " + this.chapter);
+		LOGGER.debug("Verse:      " + this.verse);
 		
 	}
 	
@@ -265,7 +268,7 @@ public class VerseRef extends Passage {
 	 */
 	public boolean isValid() {
 		// TODO right now, this just checks to see if we know about the verse. It 
-		//      needs to be extened to see if the chapter and verse are valid for the 
+		//      needs to be extended to see if the chapter and verse are valid for the 
 		//		give book according to the specified reference system. 
 		
 		// make sure that we have a valid book, given our reference system
@@ -306,7 +309,4 @@ public class VerseRef extends Passage {
 		
 		return sb.toString();
 	}
-	
-	
-	
 }

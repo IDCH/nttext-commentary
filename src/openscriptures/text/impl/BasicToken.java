@@ -9,7 +9,7 @@ import openscriptures.text.Token;
 import openscriptures.text.Work;
 
 /**
- * An atomic unit of text, such as a word, punctuation mark, or whitespace line break. 
+ * An atomic unit of text, such as a word, punctuation mark, or whitespace. 
  * Corresponds to OSIS w elements.
  * 
  * What to do about tokens that don't appear in a verse? i.e. when an osisID isn't fully 
@@ -65,7 +65,7 @@ public class BasicToken implements Token {
 	private Work work;
 	private Type type;
 	private String value;
-	private long position;
+	private int position;
 	
 	/**
 	 * 
@@ -104,7 +104,7 @@ public class BasicToken implements Token {
      * @see openscriptures.text.Token#getPosition()
      */
     @Override
-    public long getPosition() { 
+    public int getPosition() { 
         return this.position; 
     }
 
@@ -119,6 +119,10 @@ public class BasicToken implements Token {
     /** Returns the textual value of this token. */
     @Override
     public String getText() {
+        return this.value;
+    }
+    
+    public String toString() {
         return this.value;
     }
 }

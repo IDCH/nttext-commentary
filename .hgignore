@@ -2,6 +2,8 @@
 syntax: regexp
 ^.classpath$
 syntax: regexp
+^.pydevproject$
+syntax: regexp
 ^.project$
 syntax: regexp
 ^.settings$
@@ -9,3 +11,16 @@ syntax: regexp
 ^lib$
 syntax: regexp
 ^WebContent/WEB-INF/lib$
+
+syntax: regexp
+^data/BibleOrg$
+syntax: regexp
+^data/nt$
+syntax: regexp
+^get_vs_range\.xsl$
+syntax: regexp
+^log4j\.properties$
+syntax: regexp
+^models\.py$
+syntax: regexp
+^sblgnt_importer\.py$

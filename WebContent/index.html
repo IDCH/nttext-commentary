@@ -30,10 +30,10 @@
   <div id="header-wrapper">
     <div id="header">
       <h1 class="title"><abbr title="H. Milton Haggard Center for New Testament Textual Studies"><a href="http://www.nttext.org/" title="Visit the HCNTTS website" class="hcntts-link">HCNTTS</a></abbr> |  <a href="#" title="Return to the commentary homepage" class="home-link">New Testament Textual Commentary</a></h1>
-      <img src="assets/images/icon_preview.png" alt="Preview" style="margin:22px 0 0;">
+      <img id="preview_btn" class="button" src="assets/images/icon_preview.png" alt="Preview" style="margin:22px 0 0;cursor:pointer">
       
-      <!-- TODO make this a popup. 
-      <div class="blue-notification"><a href="#" title="Close this notification" class="close">Close</a>
+      <!-- TODO make this a popup. -->
+      <div class="blue-notification"><a href="#" title="Close this notification" id="close-bn" class="close button">Close</a>
         <p>
           <strong>During our preview phase</strong>, the Textual Commentary is limited to 
           searches in the book of 1 Peter and Philippians. We are constantly adding more 
@@ -42,10 +42,11 @@
           <a href="#" title="Sign up for email updates">Notify me of updates &#8250;</a>
         </p>
       </div>
-      -->
-      <div id="user-account">
-        <a href="#" id="user-link" title="View and change your account settings">Username</a> <span>|</span>
-        <a href="#" title="Sign out of your account">Sign out</a>
+      
+      <div id="user-account" class="not-signed-in">
+        <a href="#" id="user-link" class="button" title="View and change your account settings">Username</a> <span>|</span>
+        <a href="#" id="signout" class="button" title="Sign out of your account">Sign out</a>
+        <a href="#" id="signin" class="button" title="Sign into your account">Sign in</a>
       </div>
     </div>
   </div>
@@ -82,7 +83,7 @@
           </div>
           <div class="mid-col">
             <h2>What is this?</h2>
-            <p>This unique online resource enables you to understand the New Testament as seen through the eyes of ancient scribes. </p>
+            <p>This enables you to see the New Testament through the eyes of ancient scribes. </p>
             <p>It shows how information from the manuscripts reveals early understandings of the text.</p>
           </div>
           <div class="right-col">
@@ -180,22 +181,24 @@
         <form>
           <input type="text" name="search">
         </form>
-        <a href="#" title="Search" id="small-search-btn">Search</a> <a href="#" title="Next verse" id="small-next-verse-btn" class="small-next-verse-btn-inactive">&#8250;</a> <a href="#" title="Next chapter" id="small-next-chap-btn" class="small-next-chap-btn-inactive">&raquo;</a> </div>
+        <a href="#" title="Search" id="small-search-btn" class="search-btn">Search</a> <a href="#" title="Next verse" id="small-next-verse-btn" class="small-next-verse-btn-inactive">&#8250;</a> <a href="#" title="Next chapter" id="small-next-chap-btn" class="small-next-chap-btn-inactive">&raquo;</a> </div>
       <div id="footer-search-links"><a href="#" title="Email us about problems with the commentary">Report a problem</a>&nbsp; or &nbsp;<a href="#" title="Share your great ideas with us!">Suggest a feature</a></div>
     </div>
     
     
   </div> <!-- End Body Block -->
   
- <!-- ===============================  
-  == PAGE FOOTER 
-  == =============================== -->
+  <!-- ===============================  
+    == PAGE FOOTER 
+    == =============================== -->
   <div id="footer">
-    <p class="copyright">© Copyright 2011 New Testament Textual Studies Foundation. All rights reserved. &nbsp; • &nbsp; In collaboration with <a href="http://digitalchristianheritage.org" title="Technical support for digital projects by the Institute for Digital Christian Heritage" target="_blank">IDCH</a> &nbsp; • &nbsp; Designed by <a href="http://www.gurrydesign.com/" title="Hand-crafted web and graphic design from Peter Gurry" target="_blank"><strong>Gurry Design</strong></a></p>
+    <p class="copyright">© Copyright 2011 New Testament Textual Studies Foundation. All rights reserved. &nbsp; • &nbsp; 
+    In collaboration with <a href="http://digitalchristianheritage.org" title="Preserving Christianity's history and making it accessible to new audiences" target="_blank">IDCH</a> &nbsp; • &nbsp; 
+    Designed by <a href="http://www.gurrydesign.com/" title="Hand-crafted web and graphic design from Peter Gurry" target="_blank"><strong>Gurry Design</strong></a></p>
   </div>
 </div>
 
-<script src="http://yui.yahooapis.com/3.3.0/build/yui/yui-min.js" charset="utf-8"></script>
+<script src="http://yui.yahooapis.com/3.4.0/build/yui/yui-min.js" charset="utf-8"></script>
 <script>
 
 // power the tabview display
@@ -208,8 +211,45 @@ YUI().use('tabview', function(Y) {
 });
 
 // power the interactive links on the page 
-YUI().use('widget', function(Y) {
+YUI().use('node', 'widget', function(Y) {
+    // TODO preview widget
     
+    // ENABLE HEADER BUTTONS
+    Y.delegate('click', function(e) {
+        var buttonID = e.currentTarget.get('id');
+         
+        if (buttonID === 'preview_btn') {
+            Y.Node.one("div.blue-notification").setStyle('display', 'block');
+            e.preventDefault();
+        } else if (buttonID == 'close-bn') {
+        	Y.Node.one("div.blue-notification").setStyle('display', 'none');
+        	e.preventDefault();
+        } else if (buttonID == 'signin') {
+        	// TODO this needs to actually log in the user
+        	Y.Node.one("#user-account").removeClass("not-signed-in");
+        	Y.Node.one("#user-account").addClass("signed-in");
+        } else if (buttonID == 'signout') {
+            Y.Node.one("#user-account").removeClass("signed-in");
+        	Y.Node.one("#user-account").addClass("not-signed-in");
+        } else if (buttonID == 'user-link') {
+        	alert("Ack! Please Implement Me");
+        }
+        
+        // TODO Signup for updates
+    }, document, '#header .button');
+    
+    
+    
+    // TODO help widget
+//     var help = Y.Node.one("#help-container");
+//     help.hide();
+    
+//     Y.delegate('click', function(e) {
+//     	alert('expand-topic');
+//     	e.stop();
+//     }, document, '.help-module .expand-topic');
+    
+    Y.delegate('click', function(e) { }, document, '')
 });
     
   </script>

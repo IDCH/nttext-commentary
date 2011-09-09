@@ -359,6 +359,17 @@ a:hover {
 	padding-left:15px;
 	background:url(images/icon_user.png) no-repeat left center;
 }
+
+#user-account.not-signed-in a#user-link,
+#user-account.not-signed-in a#signout, 
+#user-account.not-signed-in span { 
+    display:none; 
+}
+
+#user-account.signed-in a#signin {
+    display:none; 
+}
+ 
 a#help-btn {
 	height:40px;
 	width:67px;
@@ -459,7 +470,11 @@ h1.title a.home-link {
 	position:absolute;
 	top:3px;
 	right:113px;
+	display : none;
 }
+
+.hidden { display : none; }
+
 .blue-notification p {
 	padding-bottom:10px;
 	color:#e6eaf2;
@@ -613,8 +628,16 @@ a#large-search-btn:hover {
 a#large-search-btn:active {
 	background-position:left -124px;
 }
+
+/* search button */
+a.search-btn {
+    text-indent:-500000px;
+    position:relative;
+    z-index:5;
+}
+
 /* medium search button */
-a#med-search-btn {
+#top-search a.search-btn {
 	background:url(images/btn_sprite_search.png) no-repeat left 2px;
 	width:40px;
 	height:40px;
@@ -622,25 +645,22 @@ a#med-search-btn {
 	position:relative;
 	z-index:5;
 }
-a#med-search-btn:hover {
+#top-search a.search-btn:hover {
 	background-position:left -38px;
 }
-a#med-search-btn:active {
+#top-search a.search-btn:active {
 	background-position:left -78px;
 }
 /* small search button */
-a#small-search-btn {
+#footer-search a.search-btn {
 	background:url(images/btn_sprite_search.png) no-repeat left -121px;
-	text-indent:-50000px;
-	position:relative;
-	z-index:10;
 	width:32px;
 	height:32px;
 }
-a#small-search-btn:hover {
+#footer-search a.search-btn:hover {
 	background-position:left -153px;
 }
-a#small-search-btn:active {
+#footer-search a.search-btn:active {
 	background-position:left -185px;
 }
 
@@ -674,55 +694,55 @@ a#large-next-chap-btn {
 
 /* medium navigation button - PREVIOUS */
 
-a#med-prev-chap-btn {
+#top-search a.prev-chap-btn {
 	background:url(images/btn_sprite_nav.png) no-repeat left top;
 	width:30px;
 	text-indent:-500000px;
 }
-a#med-prev-chap-btn:hover {
+#top-search a.prev-chap-btn:hover {
 	background-position:left -40px;
 }
-a#med-prev-chap-btn:active {
+#top-search a.prev-chap-btn:active {
 	background-position:left -80px;
 }
 a.med-prev-chap-btn-inactive {
 	background-position:left -120px !important;
 	cursor:default;
 }
-a#med-prev-verse-btn {
+#top-search a.prev-verse-btn {
 	background:url(images/btn_sprite_nav.png) no-repeat -30px top;
 	width:24px;
 	text-indent:-500000px;
 }
-a#med-prev-verse-btn:hover {
+#top-search a.prev-verse-btn:hover {
 	background-position:-30px -40px;
 }
-a#med-prev-verse-btn:active {
+#top-search a.prev-verse-btn:active {
 	background-position:-30px -80px;
 }
-a.med-prev-verse-btn-inactive {
+#top-search a.prev-verse-btn-inactive {
 	background-position:-30px -120px !important;
 	cursor:default;
 }
 
 /* medium navigation button - NEXT */
 
-a#med-next-chap-btn {
+#top-search a.next-chap-btn {
 	background:url(images/btn_sprite_nav.png) no-repeat -83px top;
 	width:30px;
 	text-indent:-500000px;
 }
-a#med-next-chap-btn:hover {
+#top-search a.next-chap-btn:hover {
 	background-position:-83px -40px;
 }
-a#med-next-chap-btn:active {
+#top-search a.next-chap-btn:active {
 	background-position:-83px -80px;
 }
-a.med-next-chap-btn-inactive {
+#top-search a.next-chap-btn-inactive {
 	background-position:-83px -120px !important;
 	cursor:default;
 }
-a#med-next-verse-btn {
+#top-search a.next-verse-btn {
 	background:url(images/btn_sprite_nav.png) no-repeat -55px top;
 	width:28px;
 	text-indent:-500000px;
@@ -730,66 +750,66 @@ a#med-next-verse-btn {
 	position:relative;
 	z-index:3;
 }
-a#med-next-verse-btn:hover {
+#top-search a.next-verse-btn:hover {
 	background-position:-55px -40px;
 }
-a#med-next-verse-btn:active {
+#top-search a.next-verse-btn:active {
 	background-position:-55px -80px;
 }
-a.med-next-verse-btn-inactive {
+#top-search a.next-verse-btn-inactive {
 	background-position:-55px -120px !important;
 	cursor:default;
 }
 
 /* small navigation button - PREVIOUS */
 
-a#small-prev-chap-btn {
+#footer-search a.prev-chap-btn {
 	background:url(images/btn_sprite_nav.png) no-repeat left -160px;
 	text-indent:-500000px;
 	width:27px;
 }
-a#small-prev-chap-btn:hover {
+#footer-search a.prev-chap-btn:hover {
 	background-position:left -191px;
 }
-a#small-prev-chap-btn:active {
+#footer-search a.prev-chap-btn:active {
 	background-position:left -222px;
 }
-a.small-prev-chap-btn-inactive {
+#footer-search a.prev-chap-btn-inactive {
 	background-position:left -253px !important;
 	cursor:default;
 }
-a#small-prev-verse-btn {
+#footer-search a.prev-verse-btn {
 	background:url(images/btn_sprite_nav.png) no-repeat -27px -160px;
 	text-indent:-500000px;
 	width:21px;
 }
-a#small-prev-verse-btn:hover {
+#footer-search a.prev-verse-btn:hover {
 	background-position:-27px -191px;
 }
-a#small-prev-verse-btn:active {
+#footer-search a.prev-verse-btn:active {
 	background-position:-27px -222px;
 }
-a.small-prev-verse-btn-inactive {
+#footer-search a.prev-verse-btn-inactive {
 	background-position:-27px -253px !important;
 	cursor:default;
 }
 /* small navigation button - NEXT */
-a#small-next-chap-btn {
+#footer-search a.next-chap-btn {
 	background:url(images/btn_sprite_nav.png) no-repeat -72px -160px;
 	text-indent:-500000px;
 	width:27px;
 }
-a#small-next-chap-btn:hover {
+#footer-search a.next-chap-btn:hover {
 	background-position:-72px -191px;
 }
-a#small-next-chap-btn:active {
+#footer-search a.next-chap-btn:active {
 	background-position:-72px -222px;
 }
-a.small-next-chap-btn-inactive {
+#footer-search a.next-chap-btn-inactive {
 	background-position:-72px -253px !important;
 	cursor:default;
 }
-a#small-next-verse-btn {
+#footer-search a.next-verse-btn {
 	background:url(images/btn_sprite_nav.png) no-repeat -48px -160px;
 	text-indent:-500000px;
 	width:24px;
@@ -797,17 +817,17 @@ a#small-next-verse-btn {
 	position:relative;
 	z-index:3;
 }
-a#small-next-verse-btn:hover {
+#footer-search a.next-verse-btn:hover {
 	background-position:-48px -191px;
 }
-a#small-next-verse-btn:active {
+#footer-search a.next-verse-btn:active {
 	background-position:-48px -222px;
 }
-a.small-next-verse-btn-inactive {
+#footer-search a.small-next-verse-btn-inactive {
 	background-position:-48px -253px !important;
 	cursor:default;
 }
-#search-notice {
+.search-notice {
 	background-color:#f0dad9;
 	color:#554948;
 	border: 1px solid #c7a9a8;
@@ -816,12 +836,23 @@ a.small-next-verse-btn-inactive {
 	text-shadow:0 1px 0 #F7EBEA;
 	width:183px;
 	position:relative;
-	margin:44px 0 0 68px;
 	font-size:11px;
 	line-height:18px;
 	padding:15px;
 	border-radius:0 0 4px 4px;
 }
+#top-search .search-notice { 
+  margin:30px 0 0 54px;
+}
+#footer-search .search-notice { 
+  box-shadow:0 -2px 3px rgba(0,0,0,.3);
+  border-top-color:#c7a9a8;
+  border-bottom-color:#F7EBEA;
+  margin:-121px 0 0 48px;
+  width:150px;
+  border-radius:4px 4px 0 0 ;
+} 
+
 
 /*	=2b: Scripture
 --------------------------------------------------------- */
@@ -1292,6 +1323,9 @@ a.close:hover {
 	-moz-box-shadow:0 0 1px #fff inset;
 	-webkit-box-shadow:0 0 1px #fff inset;
 }
+#help-content div.help-module { 
+    padding-bottom:20px; 
+}
 #help-content h3, #help-header h3 {
 	font-family:corbel, Verdana, Arial, Helvetica, sans-serif;
 	text-transform:uppercase;
@@ -1317,6 +1351,7 @@ a.close:hover {
 #help-content ul, #help-content ol {
 	margin:10px 0 20px -24px;
 }
+
 #help-content ul:last-child, #help-content ol:last-child {
 	margin-bottom:0;
 }

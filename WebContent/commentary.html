@@ -1,42 +1,79 @@
 <!DOCTYPE html>
-<head>
-<meta name="author" content="Peter Gurry, www.gurrydesign.com" />
-<meta name="description" content="The H. Milton Haggard Center for New Testament Textual Studies (HCNTTS) is a research center devoted to the study of the Greek New Testament text. Founded in 1998, the Center has become one of the premier settings worldwide for studying the Greek New Testament text. Having created the world’s first comprehensive, searchable electronic database of variants in the entire Greek New Testament, the Center continues to develop scholars and tools to make New Testament manuscripts come to life. " />
-<meta name="keywords" content="new testament manuscripts, new testament, textual criticism, new testament textual criticism, h milton haggard, milton haggard, cntts, hcntts, center for new testament textual studies, textual studies, new testament textual tools, textual commentary, nt manuscripts, nt textual criticism, nt tc, william warren" />
-<meta name="author" content="Peter Gurry, www.gurrydesign.com" />
-<meta http-equiv="Content-Language" content="en-us" />
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
-<link type="text/css" href="assets/reset.css" rel="stylesheet" media="screen" />
-<link type="text/css" href="assets/screen.css" rel="stylesheet" media="screen" />
-<!--[if lt IE 9]>
-    <link href="assets/ie8.css" rel="stylesheet" type="text/css" media="screen"  />
-    <![endif]-->
-<!--[if lt IE 8]>
-    <link href="assets/ie7.css" rel="stylesheet" type="text/css" media="screen"  />
-    <![endif]-->
-<title>HCNTTS | New Testament Textual Commentary</title>
-</head>
-<body>
+
+<html>
+  <head>
+    <meta name="author" content="Peter Gurry, www.gurrydesign.com" />
+    <meta name="description" content="The H. Milton Haggard Center for New Testament Textual Studies (HCNTTS) is a research center devoted to the study of the Greek New Testament text. Founded in 1998, the Center has become one of the premier settings worldwide for studying the Greek New Testament text. Having created the world’s first comprehensive, searchable electronic database of variants in the entire Greek New Testament, the Center continues to develop scholars and tools to make New Testament manuscripts come to life. " />
+    <meta name="keywords" content="new testament manuscripts, new testament, textual criticism, new testament textual criticism, h milton haggard, milton haggard, cntts, hcntts, center for new testament textual studies, textual studies, new testament textual tools, textual commentary, nt manuscripts, nt textual criticism, nt tc, william warren" />
+    <meta name="author" content="Peter Gurry, www.gurrydesign.com" />
+    <meta http-equiv="Content-Language" content="en-us" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    
+    <link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
+    <link type="text/css" href="assets/reset.css" rel="stylesheet" media="screen" />
+    <link type="text/css" href="assets/screen.css" rel="stylesheet" media="screen" />
+    <!--[if lt IE 9]>
+        <link href="assets/ie8.css" rel="stylesheet" type="text/css" media="screen"  />
+        <![endif]-->
+    <!--[if lt IE 8]>
+        <link href="assets/ie7.css" rel="stylesheet" type="text/css" media="screen"  />
+        <![endif]-->
+    <title>HCNTTS | New Testament Textual Commentary</title>
+  </head>
+
+<body class="commentary">
 <div id="wrapper">
+    
+  <!-- ===============================  
+    == PAGE HEADER 
+    == =============================== -->
   <div id="header-wrapper">
     <div id="header">
-      <h1 class="title"><acronym title="H. Milton Haggard Center for New Testament Textual Studies"><a href="http://www.nttext.org/" title="Visit the HCNTTS website" class="hcntts-link">HCNTTS</a></acronym> |  <a href="#" title="Return to the commentary homepage" class="home-link">New Testament Textual Commentary</a></h1><img src="assets/images/icon_preview.png" alt="Preview" style="margin:22px 0 0;">
-      <div id="user-account"> <a href="#" id="user-link" title="View and change your account settings">Username</a> <span>|</span> <a href="#" title="Sign out of your account">Sign out</a></div>
+      <h1 class="title"><abbr title="H. Milton Haggard Center for New Testament Textual Studies"><a href="http://www.nttext.org/" title="Visit the HCNTTS website" class="hcntts-link">HCNTTS</a></abbr> |  <a href="#" title="Return to the commentary homepage" class="home-link">New Testament Textual Commentary</a></h1>
+      <img id="preview_btn" class="button" src="assets/images/icon_preview.png" alt="Preview" style="margin:22px 0 0;cursor:pointer">
+      
+      <!-- TODO make this a popup. -->
+      <div class="blue-notification"><a href="#" title="Close this notification" id="close-bn" class="close button">Close</a>
+        <p>
+          <strong>During our preview phase</strong>, the Textual Commentary is limited to 
+          searches in the book of 1 Peter and Philippians. We are constantly adding more 
+          commentary material to our database, so stay tuned. <br>
+        
+          <a href="#" title="Sign up for email updates">Notify me of updates &#8250;</a>
+        </p>
+      </div>
+      
+      <div id="user-account" class="not-signed-in">
+        <a href="#" id="user-link" class="button" title="View and change your account settings">Username</a> <span>|</span>
+        <a href="#" id="signout" class="button" title="Sign out of your account">Sign out</a>
+        <a href="#" id="signin" class="button" title="Sign into your account">Sign in</a>
+      </div>
     </div>
   </div>
+      
+      
   <div id="body">
     <div id="main-search">
+    
       <div id="top-search">
-			<div class="search-wrapper"> <a href="#" title="Previous chapter" id="med-prev-chap-btn">&laquo;</a> <a href="#" id="med-prev-verse-btn" title="Previous verse">&#8249;</a>
+        <div class="search-wrapper"> 
+          <a href="#" title="Previous chapter" class="prev-chap-btn">&laquo;</a> 
+          <a href="#" title="Previous verse" class="prev-verse-btn" >&#8249;</a>
           <form>
             <input type="text" name="search">
           </form>
-          </form>
-          <a href="#" title="Search" id="med-search-btn">Search</a> <a href="#" title="Next verse" id="med-next-verse-btn">&#8250;</a> <a href="#" title="Next chapter" id="med-next-chap-btn">&raquo;</a> </div>
+          <a href="#" title="Search" class="search-btn">Search</a>
+          <a href="#" title="Next verse" class="next-verse-btn">&#8250;</a> 
+          <a href="#" title="Next chapter" class="next-chap-btn">&raquo;</a>
+           
+		  <div class="search-notice">
+            <strong>Not found.</strong> During our preview phase only Philippians and 
+            1 Peter are available. More will be added in the future.
+          </div>
+        </div>
         <a id="help-btn" href="#" title="Confused? Get some help!">Help</a> 
-		<div id="search-notice"><strong>Not found.</strong> During our preview phase only Philippians and 1 Peter are available. More books will be added in the future.</div>
 	  </div>
+    
       <div id="scripture-wrapper">
         <div id="scripture">
           <h2>English <span class="version">(HCSB)</span></h2>
@@ -257,19 +294,30 @@
         </tbody>
       </table>
     </div>
+    
+    
     <div id="footer-search">
       <div class="search-wrapper"> 
-	  	<a href="#" title="Previous chapter" id="small-prev-chap-btn">&laquo;</a> 
-		<a href="#" id="small-prev-verse-btn" title="Previous verse">&#8249;</a>
+	  	<a href="#" title="Previous chapter" rel="prev" class="prev-chap-btn">&laquo;</a> 
+		<a href="#" title="Previous verse" rel="prev" class="prev-verse-btn">&#8249;</a>
         <form>
           <input type="text" name="search">
         </form>
-        </form>
-        <a href="#" title="Search" id="small-search-btn">Search</a> 
-		<a href="#" title="Next verse" id="small-next-verse-btn">&#8250;</a> 
-		<a href="#" title="Next chapter" id="small-next-chap-btn">&raquo;</a> 
-		</div>
-    	<div id="footer-search-links"><a href="#" title="Email us about problems with the commentary">Report a problem</a>&nbsp; or &nbsp;<a href="#" title="Share your great ideas with us!">Suggest a feature</a></div></div>
+        <a href="#" title="Search" rel="search" class="search-btn">Search</a> 
+		<a href="#" title="Next verse"  rel="next" class="next-verse-btn">&#8250;</a> 
+		<a href="#" title="Next chapter" rel="next"  class="next-chap-btn">&raquo;</a>
+        <div class="search-notice">
+          <strong>Not found.</strong> During our preview phase only Philippians and 
+          1 Peter are available. More will be added in the future.
+        </div>
+      </div>
+      
+       <div id="footer-search-links">
+         <a href="#" title="Email us about problems with the commentary">Report a problem</a>
+         &nbsp; or &nbsp;
+         <a href="#" title="Share your great ideas with us!">Suggest a feature</a>
+       </div>
+     </div>
     
   </div>
   <div id="footer">
@@ -277,4 +325,5 @@
   </div>
 </div>
 </body>
+
 </html>

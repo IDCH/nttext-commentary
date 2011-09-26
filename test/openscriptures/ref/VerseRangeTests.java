@@ -70,6 +70,10 @@ public class VerseRangeTests extends TestCase {
 		range = new VerseRange("John.3-5");
 		checkRef(range.getFirst(), "John", 3, null, null);
 		checkRef(range.getLast(), "John", 5, null, null);
+		
+		range = new VerseRange("John.3.16");
+        checkRef(range.getFirst(), "John", 3, 16, null);
+        checkRef(range.getLast(), "John", 3, 16, null);
 	}
 	
 	public void checkToString(String strRef) {

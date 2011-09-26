@@ -27,40 +27,22 @@ public abstract class Passage implements Comparable<Passage> {
 		return this.order;
 	}
 	
-	private int compareParts(Integer a, Integer b) {
-		if ((a != null) && (b != null)) {
-			int ch = a - b;
-			return ch;
-		} else {
-			return (a == b) ? 0 
-					: (a == null) ? -1 : 1;
-		}
+	private int nullSafeCompareTo(VerseRef a, VerseRef b) {
+	    if ((a != null) && (b != null)) {
+            return a.compareTo(b);
+        } else {
+            return (a == b) ? 0 
+                    : (a == null) ? -1 : 1;
+        }
 	}
 	
 	public int compareTo(Passage passage) {
-		// TODO need to make sure that we're using the same book order.
-		//      figure out how to order them if we aren't.
-		// TODO possible null pointer errors
-		
-		VerseRef a = this.getFirst();
-		VerseRef b = passage.getFirst();
-		
-		int result = compareParts(a.getBookIndex(), b.getBookIndex());
-		if (result != 0) return result;
-			
-		result = compareParts(a.getChapter(), b.getChapter());
-		if (result != 0) return result;
-		
-		result = compareParts(a.getVerse(), b.getVerse());
-		if (result != 0) return result;
-		
-		
-		String extA = a.getExtension();
-		String extB = b.getExtension();
-		
-		extA = (extA == null) ? "" : extA.toLowerCase();
-	    extB = (extB == null) ? "" : extB.toLowerCase();
-		
-		return extA.compareTo(extB);
+		int result = nullSafeCompareTo(this.getFirst(), passage.getFirst());
+		return (result != 0) ? result 
+                : nullSafeCompareTo(this.getLast(), passage.getLast());
+	}
+	
+	public boolean equals(Object o) {
+	    return this.compareTo((Passage)o) == 0;
 	}
 }

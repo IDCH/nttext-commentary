@@ -140,8 +140,10 @@ public class VerseRange extends Passage {
 	 * Returns a string representation of this verse range.
 	 */
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		if (this.start.equals(this.end)) 
+		    return this.start.toString();
 		
+		StringBuilder sb = new StringBuilder();
 		sb.append(this.start.toString()).append("-");
 		
 		if (start.getBookIndex() != end.getBookIndex()) {
@@ -164,7 +166,7 @@ public class VerseRange extends Passage {
 				if (ext != null)
 					sb.append("!").append(ext);
 			} else if (start.getExtension() != ext) {
-				sb.append(vs);
+				sb.append(ext);
 			} else {
 				// TODO handle error.
 			}

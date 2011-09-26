@@ -138,7 +138,7 @@ public abstract class AbstractTokenSequence implements TokenSequence {
      */
     @Override
     public Iterator<Token> iterator() {
-        return new StructureIterator(this);
+        return new TokenSequenceIterator(this);
     }
 
     /* (non-Javadoc)
@@ -146,7 +146,7 @@ public abstract class AbstractTokenSequence implements TokenSequence {
      */
     @Override
     public Iterator<Token> iterator(int startAt) {
-        return new StructureIterator(this, startAt);
+        return new TokenSequenceIterator(this, startAt);
     }
 
     /* (non-Javadoc)
@@ -154,7 +154,7 @@ public abstract class AbstractTokenSequence implements TokenSequence {
      */
     @Override
     public ListIterator<Token> listIterator() {
-        return new StructureIterator(this);
+        return new TokenSequenceIterator(this);
     }
 
     /* (non-Javadoc)
@@ -162,7 +162,7 @@ public abstract class AbstractTokenSequence implements TokenSequence {
      */
     @Override
     public ListIterator<Token> listIterator(int startAt) {
-        return new StructureIterator(this, startAt);
+        return new TokenSequenceIterator(this, startAt);
     }
 
     
@@ -239,7 +239,7 @@ public abstract class AbstractTokenSequence implements TokenSequence {
      * 
      * @author Neal Audenaert
      */
-    protected static class StructureIterator implements ListIterator<Token> {
+    protected static class TokenSequenceIterator implements ListIterator<Token> {
 
     //========================================================================================
     // MEMBER VARIABLES
@@ -252,11 +252,11 @@ public abstract class AbstractTokenSequence implements TokenSequence {
      // CONSTRUCTORS
      //========================================================================================
 
-         StructureIterator(TokenSequence s) {
+         TokenSequenceIterator(TokenSequence s) {
              this.s = s;
          }
          
-         StructureIterator(TokenSequence s, int startAt) {
+         TokenSequenceIterator(TokenSequence s, int startAt) {
              this.s = s;
              this.ix = startAt;
              

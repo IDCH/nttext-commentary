@@ -55,8 +55,11 @@ public abstract class Passage implements Comparable<Passage> {
 		if (result != 0) return result;
 		
 		
-		String extA = a.getExtension().toLowerCase();
-		String extB = b.getExtension().toLowerCase();
+		String extA = a.getExtension();
+		String extB = b.getExtension();
+		
+		extA = (extA == null) ? "" : extA.toLowerCase();
+	    extB = (extB == null) ? "" : extB.toLowerCase();
 		
 		return extA.compareTo(extB);
 	}

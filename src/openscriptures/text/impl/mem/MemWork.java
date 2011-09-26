@@ -60,7 +60,7 @@ public class MemWork extends BasicWork implements MutableWork  {
 	public Token addToken(String token) {
 	    Token t;
 	    synchronized (tokens) {
-	        t = new MemToken(this, tokens.size(), token);
+	        t = new BasicToken(this, tokens.size(), token);
 	        tokens.add(t);
 	    }
 	    
@@ -84,7 +84,7 @@ public class MemWork extends BasicWork implements MutableWork  {
 	            if (BasicToken.classify(token) == null && skipUnrecognizedTokens)
 	                continue;
 	            
-	            t = new MemToken(this, tokens.size(), token);
+	            t = new BasicToken(this, tokens.size(), token);
 	            tokens.add(t);
 	            results.add(t);
 	        }

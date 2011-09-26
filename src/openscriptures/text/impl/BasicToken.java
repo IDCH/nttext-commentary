@@ -73,7 +73,7 @@ public class BasicToken implements Token {
 	 * @param position
 	 * @param text
 	 */
-	protected BasicToken(Work work, int position, String text) {
+	public BasicToken(Work work, int position, String text) {
 		this.uuid = UUID.randomUUID();
 		
 		this.work = work;

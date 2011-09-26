@@ -4,11 +4,8 @@
 package openscriptures.text.impl.mem;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -17,7 +14,6 @@ import java.util.regex.Pattern;
 import openscriptures.text.MutableWork;
 import openscriptures.text.Structure;
 import openscriptures.text.Token;
-import openscriptures.text.TokenSequence;
 import openscriptures.text.WorkId;
 import openscriptures.text.impl.BasicToken;
 import openscriptures.text.impl.BasicWork;
@@ -31,8 +27,6 @@ import openscriptures.utils.License;
 public class MemWork extends BasicWork implements MutableWork  {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(MemWork.class.getName());
-	
-	
 	
 //============================================================================================
 // MEMBER VARIABLES
@@ -108,9 +102,6 @@ public class MemWork extends BasicWork implements MutableWork  {
 //============================================================================================
 // MUTATORS
 //============================================================================================
-	
-	
-	// MUTATORS
 
 	/** Sets the title. */
 	@Override
@@ -230,101 +221,11 @@ public class MemWork extends BasicWork implements MutableWork  {
 //============================================================================================
 // TOKEN SEQUENCE METHODS
 //============================================================================================
-    
-	/* (non-Javadoc)
-	 */
-	@Override
-	public boolean contains(Token t) {
-	    return this.tokens.contains(t);
-	}
 
-
-	/* (non-Javadoc)
-	 */
+	/** Returns the token at the specified index. */
 	@Override
 	public Token get(int index) {
 	    return this.tokens.get(index);
 	}
-
-	/* (non-Javadoc)
-	 */
-	@Override
-	public int indexOf(Token t) {
-	    return this.tokens.indexOf(t);
-	}
-
-	/* (non-Javadoc)
-	 */
-	@Override
-	public boolean isEmpty() {
-	    return this.tokens.isEmpty();
-	}
-
-	/* (non-Javadoc)
-	 */
-	@Override
-	public Iterator<Token> iterator() {
-	    return Collections.unmodifiableList(this.tokens).iterator();
-	}
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.TokenSequence#iterator(int)
-     */
-    @Override
-    public Iterator<Token> iterator(int startAt) {
-        return this.listIterator(startAt);
-    }
-    
-	/* (non-Javadoc)
-	 * @see java.util.List#listIterator()
-	 */
-	@Override
-	public ListIterator<Token> listIterator() {
-	    return Collections.unmodifiableList(this.tokens).listIterator();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.util.List#listIterator(int)
-	 */
-	@Override
-	public ListIterator<Token> listIterator(int index) {
-	    return Collections.unmodifiableList(this.tokens).listIterator(index);
-	}
-
-	/* (non-Javadoc)
-	 * @see java.util.List#size()
-	 */
-	@Override
-	public int size() {
-	    return tokens.size();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.util.List#subList(int, int)
-	 */
-	@Override
-	public TokenSequence subSequence(int fromIndex, int toIndex) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.util.List#toArray()
-	 */
-	@Override
-	public Token[] toArray() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.util.List#toArray(T[])
-	 */
-	@Override
-	public Token[] toArray(Token[] a) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 
 }

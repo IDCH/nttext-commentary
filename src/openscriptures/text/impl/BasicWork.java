@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import openscriptures.text.AbstractTokenSequence;
 import openscriptures.text.Token;
 import openscriptures.text.Work;
 import openscriptures.text.WorkId;
@@ -23,7 +24,7 @@ import openscriptures.utils.License;
  * 
  * @author Neal Audenaert
  */
-public abstract class BasicWork implements Work {
+public abstract class BasicWork extends AbstractTokenSequence implements Work {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(Work.class.getName());
 	

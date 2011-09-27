@@ -276,7 +276,7 @@ public class SBLGNTImporter extends DefaultHandler {
             
             Iterator<Token> i = work.iterator();
             int ix = 0;
-            while (i.hasNext() && ix++ < 1000) {
+            while (i.hasNext() && ix++ < 10) {
                 System.out.print(i.next());
             }
         } catch (Exception ex) {

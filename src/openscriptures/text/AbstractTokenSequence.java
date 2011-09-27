@@ -62,7 +62,7 @@ public abstract class AbstractTokenSequence implements TokenSequence {
      */
     @Override
     public boolean isEmpty() {
-        return this.getStart() == this.getEnd();
+        return this.size() == 0;
     }
     
     /**

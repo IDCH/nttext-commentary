@@ -221,7 +221,22 @@ public class MemWork extends BasicWork implements MutableWork  {
 //============================================================================================
 // TOKEN SEQUENCE METHODS
 //============================================================================================
-
+    /** 
+     * Return the start position (inclusive) in the underlying <tt>Work</tt>'s token 
+     * stream. This will always be <tt>0</tt>. 
+     */
+    public int getStart() {
+        return 0;
+    }
+    
+    /** 
+     * Return the end position (exclusive) in the underlying <tt>Work</tt>'s token stream.  
+     */
+    @Override
+    public int getEnd() { 
+        return this.tokens.size();
+    }
+    
 	/** Returns the token at the specified index. */
 	@Override
 	public Token get(int index) {

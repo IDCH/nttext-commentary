@@ -96,23 +96,6 @@ public abstract class BasicWork extends AbstractTokenSequence implements Work {
 	@Override
 	public WorkId getWorkId() { return this.osisID; }
 	
-	/** 
-     * Return the start position (inclusive) in the underlying <tt>Work</tt>'s token 
-     * stream. This will always be <tt>0</tt>. 
-     */
-	public int getStart() {
-	    return 0;
-	}
-	
-	/** 
-	 * Return the end position (inclusive) in the underlying <tt>Work</tt>'s token 
-	 * stream. This will always be <tt>this.size()</tt>. 
-	 */
-    @Override
-	public int getEnd() { 
-	    return this.size();
-	}
-	
 	/** The title of this work. */
 	@Override
 	public String getTitle() { return title; }

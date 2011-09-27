@@ -219,18 +219,22 @@ public abstract class StructureWrapper extends AbstractTokenSequence implements 
      *   
      * @return
      */
+    @Override
     public Structure getParent() {
         return me.getParent();
     }
 
+    @Override
     public List<Structure> listChildren() {
         return me.listChildren();
     }
     
+    @Override
     public String getPerspective() {
         return me.getPerspective();
     }
     
+    @Override
     public void setPerspective(String perspective) {
         me.setPerspective(perspective);
     }

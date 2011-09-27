@@ -147,7 +147,7 @@ public interface Structure extends TokenSequence {
 	public String setAttribute(String name, String value);
 	
 	/**
-	 * Retrieves the parent of this structure. This along with {@see #getChildren()} 
+	 * Retrieves the parent of this structure. This along with {@see #listChildren()} 
 	 * allows for the hierarchical nesting of structures. While the structures within
 	 * a text are not strictly or exclusively hierarcical, hierarchies do represent an 
 	 * important set of relationships between structures. For example, verses are not 
@@ -159,7 +159,7 @@ public interface Structure extends TokenSequence {
 	public Structure getParent();
 
 	public List<Structure> listChildren();
-	
+
 	public String getPerspective();
 	
 	public void setPerspective(String perspective);

@@ -3,6 +3,7 @@
  */
 package openscriptures.text.impl;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import openscriptures.text.Token;
@@ -108,6 +109,69 @@ public class BasicToken implements Token {
         return this.position; 
     }
 
+    @Override
+    public boolean hasNext() {
+        return position < (work.getEnd() - 1);
+    }
+    
+    @Override
+    public Token next() {
+        if (!this.hasNext())
+            return null;
+        
+        return work.get(position + 1);
+    }
+    
+    @Override
+    public Token next(boolean ignoreWhitespace) {
+        if (!ignoreWhitespace) 
+            return this.next();
+        
+        Token t = this;
+        while (t.hasNext()) {
+            t = t.next();
+            
+            if (t.getType() != Token.Type.WHITESPACE) 
+                return t;
+            
+        }
+        
+        return null;
+    }
+    
+    @Override
+    public boolean hasPrev() {
+        return position > 0;
+    }
+    
+    @Override
+    public Token prev() {
+        if (!this.hasPrev())
+            return null;
+        
+        return work.get(position - 1);
+    }
+    
+    @Override
+    public Token prev(boolean ignoreWhitespace) {
+        if (!ignoreWhitespace) 
+            return this.prev();
+        
+        Token t = this;
+        while (t.hasPrev()) {
+            t = t.prev();
+            
+            if (t.getType() != Token.Type.WHITESPACE) 
+                return t;
+            
+        }
+        
+        return null;
+    }
+    
+    
+    
+    
     /* (non-Javadoc)
      * @see openscriptures.text.Token#getType()
      */

@@ -3,7 +3,6 @@
  */
 package openscriptures.text;
 
-
 /**
  * @author Neal Audenaert
  */
@@ -29,5 +28,17 @@ public interface Token extends Comparable<Token> {
 	public Type getType();
 	
 	public String getText();
+	
+	public boolean hasNext();
+    
+    public Token next();
+    
+    public Token next(boolean ignoreWhitespace);
+    
+    public boolean hasPrev();
+    
+    public Token prev();
+    
+    public Token prev(boolean ignoreWhitespace);
 	
 }

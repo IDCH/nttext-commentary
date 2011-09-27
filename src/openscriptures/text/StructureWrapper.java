@@ -230,6 +230,10 @@ public abstract class StructureWrapper extends AbstractTokenSequence implements 
     public String getPerspective() {
         return me.getPerspective();
     }
+    
+    public void setPerspective(String perspective) {
+        me.setPerspective(perspective);
+    }
 
     /**
      * 

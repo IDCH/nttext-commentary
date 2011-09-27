@@ -162,4 +162,6 @@ public interface Structure extends TokenSequence {
 	
 	public String getPerspective();
 	
+	public void setPerspective(String perspective);
+	
 }

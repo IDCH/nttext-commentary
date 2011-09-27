@@ -500,5 +500,9 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
         return this.perspective;
     }
 
+    @Override
+    public void setPerspective(String perspective) {
+        this.perspective = perspective;
+    }
    
 }

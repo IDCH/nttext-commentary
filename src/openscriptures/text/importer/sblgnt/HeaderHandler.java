@@ -16,6 +16,11 @@ public class HeaderHandler extends StructureHandler {
         public HeaderHandler() {
         }
         
+        @Override
+        public String getName() {
+            return "BibleHeader";
+        }
+        
         public boolean matchesStart(PathElement p) {
             return p.toPath().matches("/osis/osisText/header");
         }

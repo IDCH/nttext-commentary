@@ -16,6 +16,11 @@ public class VerseHandler extends StructureHandler {
         return p.getName().equals("verse");
     }
     
+    @Override
+    public String getName() {
+        return "BibleVerse";
+    }
+    
     public void start(PathElement p) {
         if (p.hasAttribute("osisID")) {         // starting verse milestone marker
             this.vs = p.getAttribute("osisID");

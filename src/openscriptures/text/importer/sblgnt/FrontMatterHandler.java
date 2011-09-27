@@ -10,6 +10,11 @@ public class FrontMatterHandler extends StructureHandler {
     public FrontMatterHandler() {
     }
     
+    @Override
+    public String getName() {
+        return "FrontMatter";
+    }
+    
     public boolean matchesStart(PathElement p) {
         return p.getName().equals("div") && p.hasAttribute("div", "front");
     }

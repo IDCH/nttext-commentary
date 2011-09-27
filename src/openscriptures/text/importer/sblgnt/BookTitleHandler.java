@@ -10,6 +10,10 @@ public class BookTitleHandler extends StructureHandler {
         public BookTitleHandler() {
         }
         
+        @Override
+        public String getName() {
+            return "BookTitle";
+        }
         public boolean matchesStart(PathElement p) {
             return ctx.check(BookHandler.BOOK) && p.getName().equals("title");
         }

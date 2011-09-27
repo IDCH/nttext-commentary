@@ -11,6 +11,10 @@ public class ChapterHandler extends StructureHandler {
     public ChapterHandler() {
     }
     
+    @Override
+    public String getName() {
+        return "BibleChapter";
+    }
     public boolean matchesStart(PathElement p) {
         return p.getName().equals("chapter");
     }

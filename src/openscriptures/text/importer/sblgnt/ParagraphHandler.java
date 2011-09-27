@@ -12,6 +12,11 @@ public class ParagraphHandler extends StructureHandler {
     public ParagraphHandler() {
     }
     
+    @Override
+    public String getName() {
+        return "Paragraph";
+    }
+    
     public boolean matchesStart(PathElement p) {
         return p.getName().equals("p");
         

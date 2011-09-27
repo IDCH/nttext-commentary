@@ -18,6 +18,7 @@ public abstract class StructureHandler {
         return this.matchesStart(p);
     }
     
+    public abstract String getName();
     public abstract boolean matchesStart(PathElement p);
     public abstract void start(PathElement p); 
     public abstract void end(PathElement p);

@@ -31,12 +31,17 @@ public abstract class StructureWrapper extends AbstractTokenSequence implements 
 	 * 
 	 */
 	protected StructureWrapper(Structure structure) {
+	    if (!accepts(structure)) {
+            throw new InvalidStructureException(structure);
+        }
+	    
 		me = structure;
 	}
 	
 	/** 
 	 * Determines whether the supplied structure is an acceptable instance of this
-	 * wrapper.
+	 * wrapper. This will be called as the first step in construction (before member variables
+	 * have been initialized). If this returns false, the constructor will throw an exception.
 	 *  
 	 * @param sturcture The structure being used to create this wrapper.
 	 * @return <tt>true</tt> if the supplied structure is an acceptable instance of this 
@@ -248,4 +253,20 @@ public abstract class StructureWrapper extends AbstractTokenSequence implements 
     public String setAttribute(String name, String value) {
         return me.setAttribute(name, value);
 	}
+    
+    public static class InvalidStructureException extends RuntimeException {
+        private static final long serialVersionUID = 6909912872812332032L;
+        
+        private Structure s;
+        
+        InvalidStructureException(Structure s) {
+            super("Cannot create a WrappedStructure. The supplied structure instance (" +
+            		s.getName() + ") is not acceptd.");
+        }
+        
+        public Structure getStructureInstance() {
+            return s;
+        }
+        
+    }
 }

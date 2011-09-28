@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,26 +27,33 @@ import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.ProcessingPath;
 import openscriptures.text.importer.StructureHandler;
 
+import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
+ * Main driver class for importing XML encoded documents into a tokenized structure. This 
+ * implements the SAX <tt>DefaultHandler</tt> API in turn invokes a chain of 
+ * <tt>StructureHandler</tt> implementations that are used to in order to govern how the 
+ * XML document text is tokenized and to create <tt>Structure</tt>s over the tokenized 
+ * text.  
+ * 
+ * 
  * @author Neal Audenaert
  */
 public class Importer extends DefaultHandler {
-    static final Logger LOGGER = Logger.getLogger(Importer.class.getName());
+//=====================================================================================
+// SYMBOLIC CONSTANTS
+//=====================================================================================
+    private static final Logger LOGGER = Logger.getLogger(Importer.class);
 
-    public static final String ATTR_OSIS_REF_WORK = "osisRefWork";
-    public static final String ATTR_LANG = "lang";
     public static final String ATTR_OSIS_ID_WORK = "osisIDWork";
-
-    public static final String EL_OSIS_TEXT = "osisText";
-    public static final String EL_HEADER = "header";
-
-    public static final String EL_WORK = "work";
     
+//=====================================================================================
+// STATIC METHODS
+//=====================================================================================
     /**
      * TODO move to org.idch.utils.Filenames
      * @param filename
@@ -68,32 +74,59 @@ public class Importer extends DefaultHandler {
 // MEMBER VARIABLES
 //========================================================================================
 
+    /** The supplied name of the file to import. */
+    private String filename;
+    
+    /** Used to keeps track of the XML document hierarchy during processing. */
     private ProcessingPath path = new ProcessingPath();
 
+    /**
+     * The import context. This is used to share state information between structure 
+     * handlers and to control how tokens are generated (tokens are generated only if
+     * the 'inText' flag is true.
+     */
+    private Context context = new Context();
+    
+    /** 
+     * The <tt>StructureHandler</tt>s to be used to control how the source document 
+     * is tokenized and to create structures as needed over the imported token stream.
+     */
+    private List<StructureHandler> handlerChain = new ArrayList<StructureHandler>();
+    
+    /** The <tt>Work</tt> object that is being created by this importer. */
     private MutableWork work = null;
     
+    /** 
+     * Flag used for whitespace normalization that indicates whether the last token
+     * processed was a whitespace token.
+     */
+    private boolean lastTokenWasWhitespace = false;
 
-    String lastToken = null;
-    boolean lastTokenWasWhitespace = false;
-    
+    /** Used to keep track of unrecognized tokens for error reporting.  */
     Set<String> badTokens = new HashSet<String>();
-    
-    Context context = new Context();
-    
-    List<StructureHandler> structureHandlers = new ArrayList<StructureHandler>();
-    
 
-    String filename;
 //========================================================================================
 // CONSTRUCTORS
 //========================================================================================
 
+    /**
+     * Creates a new Importer for the specified file.
+     */
     public Importer(String filename) {
         this.filename = filename;
     }
     
+    /**
+     * Starts the import process.
+     *  
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
     public void parse() throws ParserConfigurationException, SAXException, IOException {
         String url = convertToFileURL(filename);
+        LOGGER.info("Importing XML file: " + url);
+        
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
 
@@ -101,45 +134,61 @@ public class Importer extends DefaultHandler {
         XMLReader xmlReader = saxParser.getXMLReader();
         xmlReader.setContentHandler(this);
         xmlReader.parse(url);
+        
+        LOGGER.info("Finished importing: " + url);
     }
 
+    /** 
+     * Returns the work being constructed by this importer.
+     * 
+     * @return
+     */
     public Work getWork() {
         return this.work;
     }
 
-    public void addHandler(StructureHandler h) { 
+    /**
+     * Adds a new <tt>StructureHandler</tt> to the end of the handler chain.
+     * 
+     * @param h The handler to add
+     */
+    public void addHandler(StructureHandler h) {
+        // TODO need to validate that the handler's name is unique
         h.setContext(this.context);
-        this.structureHandlers.add(h);
+        this.handlerChain.add(h);
     }
     
 //========================================================================================
 // SAX Handlers
 //========================================================================================
     
-//    private boolean inBook = false;
-    
+    /**
+     * Handle all initialization once the start of the document is found.
+     */
     public void startDocument() throws SAXException {
-        
     }
     
    
     /**
-     * 
+     * SAX handler for start element tags. This invokes the first handler from the 
+     * handler chain whose <tt>{@link StructureHandler#matchesStart(PathElement)}</tt>
+     * method returns true.
      */
     public void startElement(
             String nsURI, String name, String qName, Attributes attrs)
     throws SAXException {
         
-        boolean handled = false;
         
         PathElement el = this.path.push(nsURI, name, qName, attrs);
         if (context.inHeader || context.inFront) {
+            // FIXME this seems really ad hoc
             // do nothing (we'll process these at the end tag)
             return;
         }
 
         // invoke appropriate handler
-        for (StructureHandler h : structureHandlers) {
+        boolean handled = false;
+        for (StructureHandler h : handlerChain) {
             if (h.matchesStart(el)) {
                 h.start(el);
                 handled = true;
@@ -148,9 +197,9 @@ public class Importer extends DefaultHandler {
         }
         
         if (!handled) {
-            //===============
-            // PROCESS META INFO ABOUT THE WORK
-            //===============    
+            // TODO this is very specific to OSIS texts. What about TEI, etc. We need to 
+            //      delegate this to the normal handler mechanisms and create the new work
+            //      when the document is created.
             if (name.equals("osisText") && this.work == null) {
                 // create an instance of the work.
                 // TODO Need to migrate to JPA backed work.
@@ -161,35 +210,55 @@ public class Importer extends DefaultHandler {
                 LOGGER.info("Ingesting new work: " + this.work.getWorkId());
 
             } else {
-                //            System.out.println(path);
+                LOGGER.info("Unhandled start tag: " + this.path);
             }
         }
     }
     
-    
     /**
-     * 
+     * SAX handler for end element tags. This invokes the first handler from the 
+     * handler chain whose <tt>{@link StructureHandler#matchesEnd(PathElement)}</tt>
+     * method returns true.
      */
     public void endElement(String namespaceURI, String name, String qName)
     throws SAXException {
         PathElement el = this.path.pop();
         if (!el.getName().equals(name)) {
-            System.err.println("Badly nested elements.\n" +
-                    "  Found: " + name + "\n" +
-                    "  Expected: " + el);
-            
+            LOGGER.error("Badly nested elements: Found '" + name + "' Expected '" + el + "'");
         }
         
         // invoke the appropriate end handler
-        for (StructureHandler h : structureHandlers) {
+        boolean handled = false;
+        for (StructureHandler h : handlerChain) {
             if (h.matchesEnd(el)) {
                 h.end(el);
+                handled = true;
                 break;
             }
         }
+        
+        if (!handled) {
+            LOGGER.info("Unhandled end tag: " + this.path);
+        }
     }
 
-    
+    /** 
+     * Tokenizes the source text. This method is called by SAX processor when characters 
+     * from the text (as opposed to mark up characters) are encountered. If the import 
+     * context's <tt>inText</tt> flag is currently set to true, this creates tokens based on 
+     * the encountered text. This also invokes the 
+     * <tt>{@link ProcessingPath#characters(char[], int, int)}</tt> to record all characters
+     * that are encountered. The <tt>ProcessingPath</tt> and <tt>{@link PathElement}</tt> 
+     * objects can be used to access this text regardless of whether the text was tokenized. 
+     * This is useful, for example, to handle notes that are included inline in the XML but
+     * are not strictly speaking part of the main text being imported in order to create 
+     * stand-off markup notes.   
+     * 
+     * <p>
+     * TODO Under the current implementation, markup that splits a single word will result
+     *      in multiple word tokens being created. We need to think about whether this is 
+     *      the appropriate behavior.
+     */
     public void characters(char[] ch, int start, int length) {
         // This allows us to retrieve the text of any arbitrary element or between two 
         // different elements. It collects all text in the source file, including both
@@ -206,17 +275,13 @@ public class Importer extends DefaultHandler {
                 if (type == null) {
                     badTokens.add(token);
                     continue;
+                    
                 } else if (type == Token.Type.WHITESPACE) {
-                    // normalize whitespace.
-                    if (lastTokenWasWhitespace) {
-                        // ignore this one
-                    } else { 
-                        lastTokenWasWhitespace = true;
-                        if (work.size() > 0) {
-                            // don't start with whitespace
-                            work.addToken(" ");
-                        }
+                    if (!lastTokenWasWhitespace && (work.size() > 0)) { // normalize whitespace.
+                        work.addToken(" ");
                     }
+                    
+                    lastTokenWasWhitespace = true;
                 } else {
                     lastTokenWasWhitespace = false;
                     work.addToken(token);
@@ -225,25 +290,10 @@ public class Importer extends DefaultHandler {
         } 
     }
     
+    /**
+     * Handle any final clean up once the end of the document is encountered.
+     */
     public void endDocument() throws SAXException {
-//         for (String token : badTokens) {
-             // We need to extract these TC symbols from the text and add them 
-             //    as editorial markup.
-             // SEE http://unicode.org/charts/nameslist/n_2E00.html
-             // U2E00 - Right_Angle_Substitution_Marker
-             // U2E01 - Right_Angle_Dotted_Substitution_Marker
-             // U2E02 - Left_Substitution_Bracket
-             // U2E03 - Right_Substitution_Bracket
-             // U2E04 - Left_Dotted_Substitution_Bracket
-             // U2E05 - Right_Dotted_Substitution_Bracket
-             
-//             for (int i = 0; i < token.length(); i++) {
-//                 char ch = token.charAt(i);
-//                 String hex = Integer.toHexString(ch | 0x10000).substring(1);
-//                 System.out.println(ch + " :: " + "\\u" +  hex);
-//             }
-//             if (ch == 0x2E00)
-//             System.out.println(token + " :: " + value);
-//         }
+        // TODO notify all handlers of the end of document.
     }
 }

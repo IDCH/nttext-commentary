@@ -56,6 +56,26 @@ public class Context {
     //=====================================================================================
     
     /**
+     * Updates the context to indicate that the parser is in a text segment (this 
+     * will enable tokenization until <tt>{@link #notInText()}</tt> is called).
+     */
+    public void inText() {
+        this.inText = true;
+    }
+    
+    /**
+     * Updates the context to indicate that the parser is not in a text segment (this 
+     * will prevent tokenization until <tt>{@link #inText()}</tt> is called).
+     */
+    public void notInText() {
+        this.inText = false;
+    }
+    
+    public boolean isInText() {
+        return this.inText;
+    }
+    
+    /**
      * Sets a numeric property of the context.
      *  
      * @param key The key for the property to set.

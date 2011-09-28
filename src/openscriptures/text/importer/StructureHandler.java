@@ -3,6 +3,12 @@
  */
 package openscriptures.text.importer;
 
+import org.apache.log4j.Logger;
+
+import openscriptures.text.Structure;
+import openscriptures.text.Token;
+import openscriptures.text.impl.BasicStructure;
+
 /**
  * Helper class to facilitate structure creation during SAX based importing of XML documents. 
  * This class abstracts the process of creating individual structures in response to the 
@@ -40,6 +46,7 @@ package openscriptures.text.importer;
  * @see {@link Context}
  */
 public abstract class StructureHandler {
+    private final static Logger LOGGER = Logger.getLogger(StructureHandler.class);
     
     protected Context ctx;
     protected String name;
@@ -72,6 +79,10 @@ public abstract class StructureHandler {
     void setContext(Context context) {
         this.ctx = context;
     }
+    
+    //========================================================================================
+    // PARSING METHODS
+    //========================================================================================    
     
     /** 
      * Indicates whether this <tt>StructureHandler</tt> should be invoked for the start tag
@@ -152,4 +163,104 @@ public abstract class StructureHandler {
      */
     public abstract void end(PathElement p);
 
+    //========================================================================================
+    // STRUCTURE CREATION METHODS
+    //========================================================================================
+    
+    protected Structure activeStructure = null;
+    protected int startAfterIndex = 0;
+    
+    /**
+     * The typical structure creation work flow involves creating a new structure when a 
+     * particular marker (start or end tag) is encountered and closing it when another 
+     * marker is encountered. In this work flow, when the structure is first created, the
+     * start token for the new structure should be set to be the next non-whitespace token. 
+     * The end token for the structure should be set to the last non-whitespace token 
+     * encountered before the end marker. 
+     *  
+     * @param p
+     * @return
+     */
+    public Structure createStructure(String name) {
+        LOGGER.info("creating structure: " + name);
+        
+        if (activeStructure != null) {
+            LOGGER.info("autoclosing open structure: " + activeStructure.getName());
+            this.closeActiveStructure();
+        }
+        
+        startAfterIndex = ctx.work.getEnd();
+        this.activeStructure = new BasicStructure(ctx.work, name, null, null);
+
+        ctx.setHandler(this);
+
+        return activeStructure;
+    }
+    
+    /**
+     * TODO add comment
+     * @return
+     */
+    public Structure closeActiveStructure() {
+        String warning = this.getName() + " - There was a problem closing a structure ";
+        
+        Structure structure = this.activeStructure;
+        if (structure != null) {
+            warning += "(" + structure.getName() + "): ";
+            
+            // get the start token
+            Token start = ctx.work.get(startAfterIndex);
+            if (start.getType() == Token.Type.WHITESPACE)
+                start = start.next(true);
+            
+            // get the end token
+            int lastPos = ctx.work.getEnd() - 1;
+            Token end = ctx.work.get(lastPos);
+            if (end.getType() == Token.Type.WHITESPACE)
+                end = end.prev(true);
+            
+            // handle errors
+            if (start == null) {
+                warning += "Could not locate start token from  position " + startAfterIndex;
+                LOGGER.warn(warning);
+                
+                // TODO this is bad. We can't recover from this.
+            } else if (end == null) {
+                warning += "Could not locate end token from  position " + lastPos;
+                LOGGER.warn(warning);
+                
+                // TODO this is bad. I don't think we can recover from this.
+            } else if (end.getPosition() < start.getPosition()) {
+                end = start;
+                warning += "End token came before start token. Setting end = start.";
+                LOGGER.warn(warning);
+            }
+            
+            structure.setStartToken(start);
+            structure.setStartToken(end);
+
+            this.close(structure);
+            
+            ctx.clearHandler(this.getName());
+            LOGGER.info("closed structure: " + structure.getName());
+        } else {
+            warning += "No active structure.";
+            LOGGER.warn(warning);
+        }
+        
+        this.activeStructure = null;
+        return structure;
+    }
+    
+    /**
+     * Allows subclasses to perform any additional steps required to close an active
+     * structure prior to unregistring this handler. The start and end tokens for 
+     * the active structure will have been updated by the time this method is invoked.
+     * 
+     * @param s
+     */
+    protected void close(Structure s) {
+        // by default, do nothing
+    }
+    
 }

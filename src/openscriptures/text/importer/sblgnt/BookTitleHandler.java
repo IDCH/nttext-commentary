@@ -14,15 +14,17 @@ public class BookTitleHandler extends StructureHandler {
         }
         
         public boolean matchesStart(PathElement p) {
-            return ctx.check(BookHandler.BOOK) && p.getName().equals("title");
+            StructureHandler bookHandler = ctx.getHandler(BookHandler.NAME);
+            
+            return (bookHandler != null) && p.getName().equals("title");
         }
         
         public void start(PathElement p) {
-            ctx.inText = false;        // titles are paratextual information
+            ctx.notInText();
         }
         
         public void end(PathElement p) {
-            ctx.inText = true;
+            ctx.inText();
             
             // TODO need to handle Mark weirdness
 //            Other Endings of Mark

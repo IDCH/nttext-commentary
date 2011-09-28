@@ -6,20 +6,19 @@ package openscriptures.text.importer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import openscriptures.text.MutableWork;
 
 /**
  * Provides a shared context for use by both the main <tt>Importer</tt> and individual 
- * structure handlers. This is designed as a lightweight class that provides direct access to
- * its member variables. Use with care.
+ * <tt>StructureHandler</tt> implementations. This is designed as a lightweight class 
+ * that provides direct access to its member variables. Use with care.
  * 
  * @author Neal Audenaert
  */
 public class Context {
-    
-    private Map<String, Boolean> flags = new HashMap<String, Boolean>();
-    
-    private Map<String, String> props = new HashMap<String, String>();
+    private static final Logger LOGGER = Logger.getLogger(Context.class);
     
     /** The <tt>Work</tt> that is being imported. */
     public MutableWork work = null;
@@ -36,8 +35,25 @@ public class Context {
     public boolean inText = false;
     
  
-    public int currentVerse = 0;
-    public int currentChapter = 0;
+    //=====================================================================================
+    // PRIVATE STATE VARIABLES
+    //=====================================================================================
+    // TODO we can probably simplify a lot of this by just tracking active/closed handlers.
+    //      for example, the BookHandler could maintain information about the current 
+    //      chapter number, we are 'inHeader' if there is a header handler, etc.
+    
+    /** Boolean state flags. */
+    private Map<String, Boolean> flags = new HashMap<String, Boolean>();
+    
+    /** State property values. */ 
+    private Map<String, String> props = new HashMap<String, String>();
+    
+    /** Structures that are currently being processed. */
+    private Map<String, StructureHandler> handler = new HashMap<String, StructureHandler>();
+    
+    //=====================================================================================
+    // ACCESSORS & MUTATORS
+    //=====================================================================================
     
     /**
      * Sets a numeric property of the context.
@@ -48,6 +64,7 @@ public class Context {
      * @return The previous value for this property.
      */
     public String set(String key, double value) {
+        LOGGER.debug("Set numeric property: '" + key + "'=" + value + "");
         return this.props.put(key, Double.toString(value));
     }
 
@@ -60,6 +77,7 @@ public class Context {
      * @return The previous value for this property.
      */
     public String set(String key, String value) {
+        LOGGER.debug("Set property: '" + key + "'='" + value + "'");
         return this.props.put(key, value);
     }
     
@@ -70,7 +88,10 @@ public class Context {
      * @return 
      */
     public String get(String key) {
-        return this.props.get(key);
+        String v = this.props.get(key);
+        
+        LOGGER.debug("Retreived property: '" + key + "'='" + v + "'");
+        return v;
     }
     
     /**
@@ -80,27 +101,96 @@ public class Context {
      * @return The set value or <tt>Double.NaN</tt> if the set value is null.
      */
     public double getn(String key) {
+        LOGGER.debug("Retreiving property '" + key + "'");
+        
         double d = Double.NaN;
         String value = this.props.get(key);
         if (value != null) {
             try {
                 d = Double.parseDouble(value);
             } catch (NumberFormatException nfe) {
-                // TODO log warning
+                LOGGER.warn("Could not retrieve numeric property (" + key + "). The " +
+                		"stored value '" + value + "' is not a number."); 
                 d = Double.NaN;
             }
         }
         
+        LOGGER.debug("Retreived numeric property: '" + key + "'=" + d);
         return d;
     }
     
+    /**
+     * Returns the named structure currently being processed by an importer. Note that this 
+     * does not currently allow for multiple structures with the same name to be processed 
+     * concurrently, and expects that structure handlers are well behaved in cleaning up 
+     * structures after they have been created. 
+     *  
+     * @param name
+     * @return
+     */
+    public StructureHandler getHandler(String name) {
+        StructureHandler h = this.handler.get(name);
+        
+        LOGGER.debug("Retreived handler (" + name + ")" + 
+                ((h == null) ? ": handler not active." : ""));
+        return h;
+    }
+    
+    /**
+     * Sets the current structure being processed by an importer. This is used by content
+     * handlers to make the structures that they are responsible for creating accessible 
+     * to other handlers. Note, this assumes that structures with the same name do not 
+     * overlap.
+     * 
+     * @param struct The structure to set.
+     * @return The previous structure with this name, or <tt>null</tt> if there was no
+     *      previous structure.
+     */
+    public StructureHandler setHandler(StructureHandler struct) {
+        LOGGER.debug("Setting handler (" + struct.getName() + ")"); 
+        return this.handler.put(struct.getName(), struct);
+    }
+    
+    /**
+     * Clears a structure handler currently being processed by an importer. This typically 
+     * occurs when a structure is closed by the importer (e.g. when a verse is closed at an 
+     * verse end tag or else by closing a chapter. 
+     * 
+     * @param name The name of the structure to be cleared.
+     * @return The cleared structure or <tt>null</tt> if there was no current structure for 
+     *      this name.
+     */
+    public StructureHandler clearHandler(String name) {
+        LOGGER.debug("Clearing handler (" + name + ")");
+        return this.handler.remove(name);
+    }
+    
+    /**
+     * Sets a boolean state flag, for example, to indicate that the parser is in the 
+     * document header.
+     * 
+     * @param state The flag to set.
+     * @param value The value to set.
+     */
     public void flag(String state, Boolean value) {
+        if (value)
+            LOGGER.debug("Setting flag (" + state + ")");
+        else 
+            LOGGER.debug("Clearing flag (" + state + ")");
         flags.put(state, value);
     }
     
+    /** 
+     * Checks the value of a state flag.
+     * @param state The state flag to check.
+     * @return the value of this flag.
+     */
     public boolean check(String state) {
-        return flags.containsKey(state) 
+        boolean flag = flags.containsKey(state) 
                ? flags.get(state) 
                : false;
+        
+        LOGGER.debug("Checking flag: '" + state + "'=" + flag);   
+        return flag;
     }
 }

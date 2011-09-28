@@ -7,13 +7,12 @@ import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.StructureHandler;
 
 public class BookTitleHandler extends StructureHandler {
+        public static final String NAME = "BookTitle";
+        
         public BookTitleHandler() {
+            super(NAME);
         }
         
-        @Override
-        public String getName() {
-            return "BookTitle";
-        }
         public boolean matchesStart(PathElement p) {
             return ctx.check(BookHandler.BOOK) && p.getName().equals("title");
         }

@@ -7,15 +7,18 @@ import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.StructureHandler;
 
 public class WordHandler extends StructureHandler {
+
+    public static final String NAME = "BookTitle";
+    
     public static final String WORD = "w";
+    
+    
+    public WordHandler() {
+        super(NAME);
+    }
     
     public boolean matchesStart(PathElement p) {
         return p.getName().equals("w");
-    }
-    
-    @Override
-    public String getName() {
-        return "Word";
     }
     
     @Override

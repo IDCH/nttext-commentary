@@ -7,14 +7,13 @@ import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.StructureHandler;
 
 public class ChapterHandler extends StructureHandler {
+    public static final String NAME = "BibleChapter";
     public static final String CHAPTER = "chapter";
+
     public ChapterHandler() {
+        super(NAME);
     }
     
-    @Override
-    public String getName() {
-        return "BibleChapter";
-    }
     public boolean matchesStart(PathElement p) {
         return p.getName().equals("chapter");
     }

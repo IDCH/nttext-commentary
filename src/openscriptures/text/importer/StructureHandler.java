@@ -44,10 +44,6 @@ public abstract class StructureHandler {
     protected Context ctx;
     protected String name;
     
-    @Deprecated
-    public StructureHandler() {
-    }
-    
     /**
      * Instantiates a new <tt>StructureHandler</tt> with the specified name.
      * @param name The name of this handler.

@@ -7,18 +7,19 @@ import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.StructureHandler;
 
 public class VerseHandler extends StructureHandler {
+
+    public static final String NAME = "BibleVerse";
+    
     public static final String VERSE = "verse";
     
     private String vs;
     
+    public VerseHandler() {
+        super(NAME);
+    }
     
     public boolean matchesStart(PathElement p) {
         return p.getName().equals("verse");
-    }
-    
-    @Override
-    public String getName() {
-        return "BibleVerse";
     }
     
     public void start(PathElement p) {

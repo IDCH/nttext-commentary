@@ -7,14 +7,13 @@ import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.StructureHandler;
 
 public class ParagraphHandler extends StructureHandler {
+    public static final String NAME = "Paragraph";
+    
     public static String PARAGRAPH = "p";
+
     
     public ParagraphHandler() {
-    }
-    
-    @Override
-    public String getName() {
-        return "Paragraph";
+        super(NAME);
     }
     
     public boolean matchesStart(PathElement p) {

@@ -7,12 +7,11 @@ import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.StructureHandler;
 
 public class FrontMatterHandler extends StructureHandler {
-    public FrontMatterHandler() {
-    }
+
+    public static final String NAME = "FrontMatter";
     
-    @Override
-    public String getName() {
-        return "FrontMatter";
+    public FrontMatterHandler() {
+        super(NAME);
     }
     
     public boolean matchesStart(PathElement p) {

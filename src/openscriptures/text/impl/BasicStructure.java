@@ -1,4 +1,4 @@
-/**
+/*
  * 
  */
 package openscriptures.text.impl;
@@ -186,8 +186,9 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
 	
     protected String content;
     
-    protected Structure parent = null;
-    protected List<Structure> children = new ArrayList<Structure>();
+    protected BasicStructure parent = null;
+    protected List<BasicStructure> children = new ArrayList<BasicStructure>();
+    
     protected String perspective;
 
     protected Map<String, StructureAttribute> attributes = 
@@ -253,7 +254,7 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
 	}
 	
 	protected void checkWork(Token t) throws InvalidTokenException {
-	    if (t.getWork().getId().equals(this.work.getId()))
+	    if (!t.getWork().getId().equals(this.work.getId()))
 	        throw new InvalidTokenException(
 	                "The token's work does not match this structure.", t);
 	}
@@ -483,13 +484,24 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
     public Structure getParent() { 
         return this.parent;
     }
-
+    
+    public void setParent(BasicStructure parent) {
+        // TODO find a way to check to see if structures are properly nested
+        if (this.parent != null) {
+            this.parent.children.remove(this);
+        }
+        
+        this.parent = parent;
+        if (parent != null)
+            parent.children.add(this);
+    }
+    
     /**
      * 
      */
     @Override
     public List<Structure> listChildren() {
-        return Collections.unmodifiableList(children);
+        return Collections.unmodifiableList((List<? extends Structure>)children);
     }
     
     /**

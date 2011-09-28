@@ -245,7 +245,7 @@ public abstract class AbstractTokenSequence implements TokenSequence {
     // MEMBER VARIABLES
     //========================================================================================
 
-         private int ix = 0;
+         private int ix = -1;
          private TokenSequence s = null;
          
      //========================================================================================

@@ -65,6 +65,8 @@ public abstract class BasicWork extends AbstractTokenSequence implements Work {
 	}
 	
 	public BasicWork(WorkId id) {
+	    this.id = UUID.randomUUID();
+	    
 		this.osisID = id;
 	}
 	

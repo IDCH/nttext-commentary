@@ -237,7 +237,7 @@ public abstract class StructureHandler {
             }
             
             structure.setStartToken(start);
-            structure.setStartToken(end);
+            structure.setEndToken(end);
 
             this.close(structure);
             
@@ -250,6 +250,24 @@ public abstract class StructureHandler {
         
         this.activeStructure = null;
         return structure;
+    }
+    
+    /** 
+     * Utility error handling function checks to ensure that a structure being closed
+     * matches the book structure that the handler thinks it is processing. 
+     * 
+     * TODO needs to throw an exception if a mismatch occurs.
+     */
+    protected boolean ensureMatchingStructure(Structure local, Structure closing) {
+        assert local.getUUID().equals(closing.getUUID());
+        if (!local.getUUID().equals(closing.getUUID())) {
+            // TODO throw exception.
+            LOGGER.error("Mismatched structures. Attempted to close " + closing.getUUID() + 
+                    " but subclass had reference to " + local.getUUID());
+            return false;
+        }
+        
+        return true;
     }
     
     /**

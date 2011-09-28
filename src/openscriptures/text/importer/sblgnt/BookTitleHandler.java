@@ -16,6 +16,8 @@ public class BookTitleHandler extends StructureHandler {
         public boolean matchesStart(PathElement p) {
             StructureHandler bookHandler = ctx.getHandler(BookHandler.NAME);
             
+            // This needs to be a bit smarter about what title it is encountering - might 
+            //      be a book but it might also be a chapter or section title.
             return (bookHandler != null) && p.getName().equals("title");
         }
         

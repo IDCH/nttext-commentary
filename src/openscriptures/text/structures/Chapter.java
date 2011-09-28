@@ -9,33 +9,36 @@ import openscriptures.text.StructureWrapper;
 /**
  * @author Neal Audenaert
  */
-public class Book extends StructureWrapper {
+public class Chapter extends StructureWrapper {
     
-    public static final String STRUCTURE_NAME = "book"; 
+    public static final String STRUCTURE_NAME = "chapter"; 
     public static final String STRUCTURE_PERSPECTIVE = "bcv";       // book, chapter, verse 
     
     public static final String ATTR_OSIS_ID = "osisId";
-    public static final String ATTR_TITLE = "title";
+    public static final String ATTR_TITLE = "title";   // ?? is this relevant - probably
+    public static final String ATTR_NUMBER = "n";
     
     /**
-     * Initializes a newly created structure with the parameters for a book. Note that 
-     * this should be called only once to initialize a new book structure, not as a means 
-     * of creating wrapped version of a book. 
+     * Initializes a newly created structure with the parameters for a chapter. Note that 
+     * this should be called only once to initialize a new chapter structure, not as a means 
+     * of creating wrapped version of a chapter. 
      * 
      * @param structure
      * @param osisId
      * @return
      */
-    public static Book init(Structure structure, String osisId) {
-        Book book = new Book(structure);
+    public static Chapter init(Structure structure, String osisId) {
+        Chapter chapter = new Chapter(structure);
         
         structure.setPerspective(STRUCTURE_PERSPECTIVE);
         structure.setAttribute(ATTR_OSIS_ID, osisId);
         
-        return book;
+        // TODO set chapter number
+        
+        return chapter;
     }
     
-    public static boolean isBook(Structure s) {
+    public static boolean isChapter(Structure s) {
         return s.getName().equals(STRUCTURE_NAME);
     }
     
@@ -43,7 +46,7 @@ public class Book extends StructureWrapper {
     // CONSTRUCTORS
     //======================================================================================
 
-    public Book(Structure s) {
+    public Chapter(Structure s) {
         super(s);
     }
 
@@ -74,5 +77,16 @@ public class Book extends StructureWrapper {
     
     public String setTitle(String title) {
         return this.setAttribute(ATTR_TITLE, title);
+    }
+    
+    public int getChapterNumber() {
+        // NOTE we're assuming numeric chapter numbers. That might need to change to be more
+        //      general, but this is intended to be sequential. 
+        String n = this.getAttribute(ATTR_NUMBER);
+        return Integer.parseInt(n);
+    }
+    
+    public void setChapterNumber(int num) {
+        this.setAttribute(ATTR_NUMBER, Integer.toString(num));
     }
 }

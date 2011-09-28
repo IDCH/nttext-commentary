@@ -11,15 +11,10 @@ import openscriptures.text.importer.StructureHandler;
 import openscriptures.text.structures.Book;
 
 public class BookHandler extends StructureHandler {
-    
     private static final Logger LOGGER = Logger.getLogger(BookHandler.class);
     
     public static final String NAME     = "BookOfTheBible";
-    
-    public static final String BOOK     = "book";
-    public static final String CHPT_NUM = "chptNum";
-    public static final String VS_NUM   = "vsNum";
-    public static final String BOOK_ID  = "bookId";
+    public static final String ATTR_BOOK     = "book";
     
     /** The book currently being processed. */
     private Book book = null;
@@ -29,39 +24,43 @@ public class BookHandler extends StructureHandler {
         super(NAME);
     }
     
+    /** Matches div elements with a <tt>type="book"</tt>. */
     public boolean matchesStart(PathElement p) {
-        return p.getName().equals("div") && p.hasAttribute("type", "book");
+        return p.getName().equals("div") && p.hasAttribute("type", ATTR_BOOK);
     }
     
+    /** Create a new book structure, marks the importer as being in a text segment. */
     public void start(PathElement p) {
         ctx.inText();
         String osisId = p.getAttribute("osisID");
         
         Structure struct = createStructure(Book.STRUCTURE_NAME);
-        book = new Book(struct);
-        this.book.setOsisId(osisId);
+        book = Book.init(struct, osisId);       // initializes the 
+        
+        LOGGER.info("Creating book: " + book.getOsisId());
     }
     
+    /** Close the book structure on exit. */
     public void end(PathElement p) {
         this.closeActiveStructure();
     }
     
+    /** 
+     * Called by the main handler class to perform final clean up. Marks the importer as 
+     * no longer in the text of the document and closes any open chapters or verses.
+     */
     public void close(Structure s) {
-        // sanity checks
-        assert book.getUUID().equals(s.getUUID());
-        if (!book.getUUID().equals(s.getUUID())) {
-            // TODO throw exception.
-            LOGGER.error("Mismatched structures. Attempted to close " + s.getUUID() + 
-                    " but subclass had reference to " + book.getUUID());
-            this.book = null;
-            return;
-        }
+        if (!ensureMatchingStructure(book, s)) return;
         
-        LOGGER.info("End of Book: " + book.getOsisId());
+        LOGGER.info("Finished creating book: " + book.getOsisId());
         
         // TODO clean up any open chapters and verses.
         
         ctx.notInText();
         this.book = null;
     }
+    
+   
+    
+    
 }

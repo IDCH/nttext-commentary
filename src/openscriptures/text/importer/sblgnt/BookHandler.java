@@ -6,8 +6,6 @@ package openscriptures.text.importer.sblgnt;
 import org.apache.log4j.Logger;
 
 import openscriptures.text.Structure;
-import openscriptures.text.Token;
-import openscriptures.text.importer.Context;
 import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.StructureHandler;
 import openscriptures.text.structures.Book;
@@ -31,35 +29,12 @@ public class BookHandler extends StructureHandler {
         super(NAME);
     }
     
-    private void closeContext() {
-        // This seems like a bad idea.
-//        ctx.set(CHPT_NUM, 0);
-//        ctx.set(VS_NUM, 0);
-//        
-//        ctx.set(BOOK_ID, null);
-//        ctx.clearHandler(this.getName());
-//        
-//        this.book = null;
-//        this.start = -1;
-    }
-    
-    
-    
     public boolean matchesStart(PathElement p) {
         return p.getName().equals("div") && p.hasAttribute("type", "book");
     }
     
     public void start(PathElement p) {
         ctx.inText();
-        
-//        ctx.flag(BOOK, true);
-//        
-//        ctx.set(CHPT_NUM, 0);
-//        ctx.set(VS_NUM, 0);
-//        
-//        String osisId = p.getAttribute("osisID");
-//        ctx.set(BOOK_ID, osisId);
-        
         String osisId = p.getAttribute("osisID");
         
         Structure struct = createStructure(Book.STRUCTURE_NAME);
@@ -86,7 +61,6 @@ public class BookHandler extends StructureHandler {
         
         // TODO clean up any open chapters and verses.
         
-//        closeContext();
         ctx.notInText();
         this.book = null;
     }

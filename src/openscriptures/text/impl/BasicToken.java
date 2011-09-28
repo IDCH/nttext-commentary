@@ -3,7 +3,6 @@
  */
 package openscriptures.text.impl;
 
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import openscriptures.text.Token;

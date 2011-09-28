@@ -29,6 +29,7 @@ public class SBLGNTImporter {
             importer.addHandler(new FrontMatterHandler());
             importer.addHandler(new WordHandler());
             importer.addHandler(new ParagraphHandler());
+            importer.addHandler(new VerseHandler());
             importer.addHandler(new ChapterHandler());
             importer.addHandler(new BookHandler());
             importer.addHandler(new BookTitleHandler());

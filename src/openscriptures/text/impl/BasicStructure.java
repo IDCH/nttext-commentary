@@ -194,7 +194,10 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
     protected Map<String, StructureAttribute> attributes = 
         new HashMap<String, StructureAttribute>();
     
-    
+//========================================================================================
+// MISC PROPERTIES, CURRENTLY UNUSED
+//========================================================================================
+     
 	/**
 	 * The optional token that marks the start of the structure. This marker may be included
 	 * (inside) in the startToken/endToken range as in the example of quotation marks, or 
@@ -212,25 +215,9 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
 	/** Same as start_marker, but for the end. */
 	protected Token endMarker;
 
-	/** A number that may be associated with this structure, such as a chapter or verse number;
-	 *  corresponds to OSIS @n attribute.
-	 *  
-	 *  @deprecated This should use the attributes instead
-	 */
-	@Deprecated
-	protected String numericalStart;
-	
-	/**
-	 * If the structure spans multiple numerical designations, this is used
-	 * @deprecated This should use the attributes instead
-	 */
-	@Deprecated
-	protected String numericalEnd;
-	
 	/** URL for where this structure came from; used for base to Token.relative_source_url */
     protected String sourceUrl;
     
-	
 	
 //========================================================================================
 // CONSTRUCTORS
@@ -517,4 +504,31 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
         this.perspective = perspective;
     }
    
+    @Override
+    public boolean equals(Object obj) {
+        Structure s = (Structure)obj;
+        return (s.getUUID().equals(this.getUUID()));
+    }
+    
+    /** 
+     * Two structures are equivalent if they mark the same same span of tokens, 
+     * in the same text and have the same name. Equivalent structures may exist, for 
+     * example, because two different repositories have marked the same structure in a
+     * text (possibly with different attributes or other metadata). These structures
+     * should be understood as being equivalent even though they have distinct propreties.
+     *  
+     * @param s
+     * @return
+     */
+    public boolean equivalent(Structure s) {
+        if (equals(s))
+            return true;
+        
+        if (!s.getWork().getId().equals(this.getWork().getId()))
+            return false;
+        
+        return (s.getStart() == this.getStart()) &&         
+               (s.getEnd() == this.getEnd()) &&             
+               s.getName().equals(this.getName());
+    }
 }

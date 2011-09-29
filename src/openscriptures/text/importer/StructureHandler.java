@@ -6,8 +6,8 @@ package openscriptures.text.importer;
 import org.apache.log4j.Logger;
 
 import openscriptures.text.Structure;
+import openscriptures.text.StructureFactory;
 import openscriptures.text.Token;
-import openscriptures.text.impl.BasicStructure;
 
 /**
  * Helper class to facilitate structure creation during SAX based importing of XML documents. 
@@ -189,8 +189,10 @@ public abstract class StructureHandler {
             this.closeActiveStructure();
         }
         
+        // TODO use facade
+        StructureFactory factory = ctx.structureFactory;
         startAfterIndex = ctx.work.getEnd();
-        this.activeStructure = new BasicStructure(ctx.work, name, null, null);
+        this.activeStructure = factory.createStructure(ctx.work, name, null, null);
 
         ctx.setHandler(this);
 
@@ -240,6 +242,7 @@ public abstract class StructureHandler {
             structure.setEndToken(end);
 
             this.close(structure);
+            ctx.structureFactory.save(structure);
             
             ctx.clearHandler(this.getName());
             LOGGER.info("closed structure: " + structure.getName());

@@ -254,7 +254,9 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
 	}
 	
 	public int getStart() {
-        return this.startToken.getPosition();
+        return (startToken != null)  
+                ? this.startToken.getPosition()
+                : -1;
     }
      
 	public int getEnd() {

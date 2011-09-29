@@ -4,10 +4,15 @@
 package openscriptures.text.importer.sblgnt;
 
 import java.util.Iterator;
+import java.util.SortedSet;
 import java.util.logging.Logger;
 
+import openscriptures.text.Structure;
+import openscriptures.text.StructureFacade;
+import openscriptures.text.StructureFactory;
 import openscriptures.text.Token;
 import openscriptures.text.Work;
+import openscriptures.text.impl.mem.MemStructureFactory;
 import openscriptures.text.importer.Importer;
 
 
@@ -23,7 +28,8 @@ public class SBLGNTImporter {
 
         long start = System.currentTimeMillis();
         try {
-            Importer importer = new Importer(filename);
+            StructureFactory factory = new MemStructureFactory();
+            Importer importer = new Importer(filename, factory);
             
             importer.addHandler(new HeaderHandler());
             importer.addHandler(new FrontMatterHandler());
@@ -38,11 +44,19 @@ public class SBLGNTImporter {
             
             Work work = importer.getWork();
             
-            Iterator<Token> i = work.iterator();
-            int ix = 0;
-            while (i.hasNext() && ix++ < 10) {
-                System.out.print(i.next());
-            }
+            StructureFacade facade = factory.getStructureFacade(work);
+            SortedSet<Structure> books = facade.find("book");
+            System.out.println("Number of Books: " + books.size());
+            
+            
+            SortedSet<Structure> chapters = facade.find("chapter", books.first());
+            System.out.println("Number of Chapters: " + chapters.size());
+            
+//            Iterator<Token> i = work.iterator();
+//            int ix = 0;
+//            while (i.hasNext() && ix++ < 10) {
+//                System.out.print(i.next());
+//            }
         } catch (Exception ex) {
             System.out.println(ex);
             ex.printStackTrace();

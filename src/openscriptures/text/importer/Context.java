@@ -9,6 +9,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import openscriptures.text.MutableWork;
+import openscriptures.text.StructureFactory;
+import openscriptures.text.impl.mem.MemStructureFactory;
 
 /**
  * Provides a shared context for use by both the main <tt>Importer</tt> and individual 
@@ -34,7 +36,11 @@ public class Context {
      *  it encounters. */
     public boolean inText = false;
     
- 
+    /** Used to create structure instances. 
+     *  FIXME we need to implement some way to discover this.
+     */
+    StructureFactory structureFactory = new MemStructureFactory();
+    
     //=====================================================================================
     // PRIVATE STATE VARIABLES
     //=====================================================================================
@@ -50,6 +56,23 @@ public class Context {
     
     /** Structures that are currently being processed. */
     private Map<String, StructureHandler> handler = new HashMap<String, StructureHandler>();
+    
+    //=====================================================================================
+    // CONSTRUCTORS
+    //=====================================================================================
+    
+    /**
+     * Instantiates a new Context.  
+     * @param factory The structure factory to use to create and retrieve structure 
+     *      objects. 
+     *      
+     *      TODO we need to come up with a more robust set of tools to define the  
+     *           how objects are created and retrieved.
+     *      
+     */
+    Context(StructureFactory factory) {
+        this.structureFactory = factory;
+    }
     
     //=====================================================================================
     // ACCESSORS & MUTATORS

@@ -17,6 +17,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import openscriptures.text.MutableWork;
+import openscriptures.text.StructureFactory;
 import openscriptures.text.Token;
 import openscriptures.text.Work;
 import openscriptures.text.WorkId;
@@ -85,7 +86,7 @@ public class Importer extends DefaultHandler {
      * handlers and to control how tokens are generated (tokens are generated only if
      * the 'inText' flag is true.
      */
-    private Context context = new Context();
+    private Context context = null;
     
     /** 
      * The <tt>StructureHandler</tt>s to be used to control how the source document 
@@ -112,7 +113,8 @@ public class Importer extends DefaultHandler {
     /**
      * Creates a new Importer for the specified file.
      */
-    public Importer(String filename) {
+    public Importer(String filename, StructureFactory factory) {
+        this.context = new Context(factory);
         this.filename = filename;
     }
     

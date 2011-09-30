@@ -9,8 +9,9 @@ import java.util.TreeSet;
 /**
  * @author Neal Audenaert
  */
-public class VerseSet extends Passage {
+public class VerseSet {
 	
+    protected BookOrder order = BookOrder.KJV;
 	private SortedSet<Passage> passages = new TreeSet<Passage>();
 	
 	public VerseSet(String ref) {
@@ -18,7 +19,7 @@ public class VerseSet extends Passage {
 	}
 	
 	public VerseSet(BookOrder order, String ref) {
-		super(order);
+		this.order = order;
 		
 		Passage p = null;
 		String[] references = ref.split("[,;]");
@@ -30,13 +31,11 @@ public class VerseSet extends Passage {
 			
 			this.passages.add(p);
 		}
-		
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.idch.bibleref.Passage#getFirst()
 	 */
-	@Override
 	public VerseRef getFirst() {
 		return passages.first().getFirst();
 	}
@@ -44,7 +43,6 @@ public class VerseSet extends Passage {
 	/* (non-Javadoc)
 	 * @see org.idch.bibleref.Passage#getLast()
 	 */
-	@Override
 	public VerseRef getLast() {
 		return passages.last().getLast();
 	}

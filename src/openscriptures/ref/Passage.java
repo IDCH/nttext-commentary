@@ -20,7 +20,24 @@ public abstract class Passage implements Comparable<Passage> {
 	
 	public abstract VerseRef getLast();
 	
-//	public abstract boolean contains(VerseRef ref);
+	/**
+	 * Indicates whether this passage is contained within the supplied passage.
+	 * 
+	 * @param ref The candidate super-passage to text.
+	 * @return <tt>true</tt> if this passage starts after or at the same verse as the 
+	 *         candidate parent passage and ends before at at the same ending verse as
+	 *         the candidate.
+	 */
+	public boolean isSubPassageOf(Passage ref) {
+	    VerseRef firstSuper = ref.getFirst();
+	    VerseRef firstSub = this.getFirst();
+	    
+	    VerseRef lastSuper = ref.getLast();
+	    VerseRef lastSub = this.getLast();
+
+	    // TODO TEST ME
+	    return (firstSub.compareTo(firstSuper) >= 0) && (lastSub.compareTo(lastSuper) <= 0);
+	}
 	
 
 	public BookOrder getBookOrder() {

@@ -54,6 +54,7 @@ public class Location {
 	private String name = "";
 	
 	// TODO add GIS(ish) related data, either X/Y or shape.
+	// TODO add relational information such as contains/contained by (Paris is in France)
 	
 	Location(String name) {
 		this.name = name;

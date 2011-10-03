@@ -3,7 +3,8 @@
  */
 package org.nttext.mss;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,8 +32,10 @@ public class Manuscript {
 
 	 */
 	
+    private Long id;
+    
 	/** MS designation (GA number, ver Soden, shelf number) */
-	private Set<Designation> designations = new HashSet<Designation>();
+	private Map<String, Designation> designations = new HashMap<String, Designation>();
 	
 	/** Provenance & ownership history, & current location */
 	private Provenance provenance = null;
@@ -42,4 +45,34 @@ public class Manuscript {
 	/** Quire collation if available */
 	private String quireCollation;
 
+	
+	public Manuscript() {
+	    
+	}
+	
+	public boolean hasDesignation(String scheme) {
+	    return this.designations.containsKey(scheme);
+	}
+	
+	public Designation getDesignation(String scheme) {
+	    return this.designations.get(scheme);
+	}
+	
+	public Designation addDesignation(String scheme, String id) {
+	    // TODO figure out where the catalog came from
+	    // TODO synchronize access to designations
+	    
+	    Catalog cat = new Catalog();
+	    Designation d = cat.createMSDesignation(scheme, id);
+	    this.designations.put(scheme, d);
+	    return d;
+	}
+	
+	public void addDesignation(Designation d) {
+	    this.designations.put(d.getScheme(), d);
+	}
+	
+	public void removeDesignation(String scheme) {
+	    
+	}
 }

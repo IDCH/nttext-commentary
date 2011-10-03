@@ -1,0 +1,12 @@
+# The IDCH system relies on the filenames.properties file to specify the 
+# location of some configuration resources. This properties file relies on 
+# machine specific configuration information and should not be checked into 
+# source control. Instead, this sample properties file defines the properties
+# used and provides dummy paths to these files. 
+#
+# When new code introduces a need for new entries in this file, those entries
+# should be documented in this sample file.
+
+# Path to Log4J configuration file
+log4j=/path/to/log4j.properties
+

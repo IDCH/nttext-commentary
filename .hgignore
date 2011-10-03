@@ -24,3 +24,8 @@ syntax: regexp
 ^models\.py$
 syntax: regexp
 ^sblgnt_importer\.py$
+
+syntax: regexp
+^src/log4j\.properties$
+syntax: regexp
+^data/logs$

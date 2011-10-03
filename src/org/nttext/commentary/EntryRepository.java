@@ -3,6 +3,8 @@
  */
 package org.nttext.commentary;
 
+import openscriptures.ref.Passage;
+
 /**
  * Defines the methods for creating, retrieving and deleting entries from the commentary.
  * 
@@ -10,4 +12,9 @@ package org.nttext.commentary;
  */
 public interface EntryRepository {
 
+    public Entry create(Passage passage);
+    
+    public Entry lookup(Passage passage);
+    
+    public Entry remove(Entry entry);
 }

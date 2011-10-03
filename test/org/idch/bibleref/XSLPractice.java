@@ -15,7 +15,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.nttext.utils.Filenames;
+import org.idch.util.Filenames;
 
 /**
  * @author Neal Audenaert

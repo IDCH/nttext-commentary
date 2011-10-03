@@ -10,7 +10,7 @@
 //			 system for JavaScript components.
 var NTTEXT_config = {
 	modules : {
-		nttcc   : { fullpath : '/nttext/scripts/pg-controls.js', requires : ['widget', 'substitute']}
+		nttcc   : { fullpath : '/nttext/commentary/scripts/pg-controls.js', requires : ['widget', 'substitute']}
 	}
 };
 

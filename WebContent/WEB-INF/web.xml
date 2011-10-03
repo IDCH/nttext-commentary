@@ -15,7 +15,7 @@
     
     <servlet-mapping> 
       <servlet-name>CommentaryEntry</servlet-name> 
-      <url-pattern>/commentary/entry</url-pattern> 
+      <url-pattern>/commentary/entry/*</url-pattern> 
     </servlet-mapping>
     
     <welcome-file-list>

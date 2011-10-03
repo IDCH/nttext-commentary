@@ -6,10 +6,32 @@
   <body class="commentary">
     <div id="wrapper">
       <#include "header.html">
+      
+      <div id="body">
+        <div id="main-search">
+          <div id="top-search">
+            <#include "search-control.html">
+          </div> 
+        </div>
+        
+        <#include "commentary-header.html">
+        <#include "commentary-body.html">
+        
+        <div id="footer-search">
+          <#include "search-control.html">
+         
+          <div id="footer-search-links">
+            <a href="#" title="Email us about problems with the commentary">Report a problem</a>
+            &nbsp; or &nbsp;
+            <a href="#" title="Share your great ideas with us!">Suggest a feature</a>
+          </div>
+        </div>
+      </div>
+      
+      
       <#include "footer.html"> 
     </div>
     
      <#include "final-scripts.html">
   </body>
-
 </html>

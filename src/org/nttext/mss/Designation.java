@@ -3,6 +3,12 @@
  */
 package org.nttext.mss;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * Represents a designated identifier for this manuscript according to some specified 
  * reference scheme (GA number, ver Soden, shelf number). A single manuscript may have 
@@ -10,6 +16,8 @@ package org.nttext.mss;
  * 
  * @author Neal Audenaert
  */
+@Entity
+@Table(name="MS_DESIGNATION")
 public class Designation {
 	
     /**
@@ -26,6 +34,14 @@ public class Designation {
 	 *  Gregory Alland. */
 	private String scheme;
 	
+	//======================================================================================
+	// CONSTRUCTORS
+	//======================================================================================
+	
+	Designation() {
+	    
+	}
+	
 	/**
 	 * 
 	 * @param scheme
@@ -36,13 +52,42 @@ public class Designation {
 		this.id = id;
 	}
 	
+	//======================================================================================
+    // ACCESSORS & MUTATORS
+    //====================================================================================== 
+
+	/**
+	 * 
+	 * @return
+	 */
+	@Id
+	@Column(name="id")
+    @GeneratedValue
+	Long getPersistentId() {
+	    return pId;
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 */
+	void setPersistentId(Long id) {
+	    this.pId = id;
+	}
+	
+	
 	/** Returns a short identifier for the naming scheme of this identifier, for example, 
 	 * <tt>GA</tt> for Gregory Alland numbers.
 	 * 
 	 * @return The naming scheme for this designation.
 	 */
+	@Column(name="scheme")
 	public String getScheme() {
 		return scheme;
+	}
+	
+	void setScheme(String value) {
+	    this.scheme = value;
 	}
 	
 	/**
@@ -50,9 +95,24 @@ public class Designation {
 	 * 
 	 * @return The identifier for this designation.
 	 */
+	@Column(name="designatedId")
 	public String getId() {
 		return id;
 	}
+	
+	/**
+	 * Sets the ID of the 
+	 * @param id
+	 */
+	void setId(String id) {
+	    this.id = id;
+	}
+	
+	
+	//======================================================================================
+    // EQUALITY METHOS
+    //====================================================================================== 
+
 	
 	public String toString() {
 	    return this.scheme + " " + this.id;

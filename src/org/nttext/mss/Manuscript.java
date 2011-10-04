@@ -16,9 +16,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.nttext.util.Institution;
 
 /**
  * @author Neal Audenaert
@@ -50,6 +54,7 @@ public class Manuscript {
     // MEMBER VARIABLES 
     //=======================================================================================
     
+    
     private Long id;
     
 	/** MS designation (GA number, ver Soden, shelf number) */
@@ -62,13 +67,19 @@ public class Manuscript {
 	
 	private String contents = null;
 	
-	/** Provenance & ownership history, & current location */
-	private Provenance provenance = null;
+	private Institution currentInstitution;
 	
-	private Set<DigitizationInfo> digiInfo;
+	private Set<Institution> previousInstitutions = new HashSet<Institution>();
 	
-	/** Quire collation if available */
-	private String quireCollation;
+//	TODO refactor currentInstitution and previousInstitions into Provenance class.
+//	
+//	/** Provenance & ownership history, & current location */
+//	private Provenance provenance = null;
+//	
+//	private Set<DigitizationInfo> digiInfo;
+//	
+//	/** Quire collation if available */
+//	private String quireCollation;
 
 	//=======================================================================================
     // CONSCTRUCTORS 
@@ -183,6 +194,30 @@ public class Manuscript {
 	/** Sets a description of the contents of this manuscript. */
 	public void setContents(String value) {
 	    this.contents = value;
+	}
+	
+	
+	@ManyToOne
+	@JoinColumn(name="currentInst_fk")
+	public Institution getCurrentInstitution() {
+	    return currentInstitution;
+	}
+	
+	public void setCurrentInstitution(Institution inst) {
+	    this.currentInstitution = inst;
+    }
+	
+	public boolean addPreviousInstitution(Institution inst) {
+	    return this.previousInstitutions.add(inst);
+	}
+	
+	@ManyToMany
+	public Set<Institution> getPreviousInstitutions() {
+	    return this.previousInstitutions;
+	}
+	
+	void setPreviousInstitutions(Set<Institution> insts) {
+	    this.previousInstitutions = insts;
 	}
 	
 }

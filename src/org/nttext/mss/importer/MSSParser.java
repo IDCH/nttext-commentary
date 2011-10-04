@@ -22,6 +22,9 @@ import org.nttext.mss.HistoricalDate;
 import org.nttext.mss.HistoricalDate.Certainty;
 import org.nttext.mss.HistoricalDate.Precision;
 import org.nttext.mss.Manuscript;
+import org.nttext.util.Institution;
+import org.nttext.util.InstitutionRepository;
+import org.nttext.util.jpa.InstitutionRepositoryImpl;
 
 /**
  * 
@@ -111,6 +114,8 @@ public class MSSParser {
 	private static int unparsedDateCt = 0;
 	private boolean debug = false; 
 	
+	InstitutionRepository institutionRepo = null;
+	
 	private EntityManager em;
 	//=======================================================================================
 	// CONSTRUCTORS
@@ -118,6 +123,7 @@ public class MSSParser {
 	
 	private MSSParser(EntityManager em, String[] csvRecord) {
 	    this.em = em;
+	    institutionRepo = new InstitutionRepositoryImpl(em.getEntityManagerFactory());
 	    
 		this.identifier  = csvRecord[0];
 		this.contents    = csvRecord[1]; 
@@ -216,7 +222,7 @@ public class MSSParser {
 	 */
 	private String extractContents(String desc) {
 		Pattern p = Pattern.compile(
-				"(an? (.*?)(?: of (.*))?)(?:,|\\s*located)");
+				"((?:an?|the) (.*?)(?: of (.*))?)(?:,|\\s*located)");
 		Pattern p2 = Pattern.compile(
 			"((incomplete .*?)(?: of (.*))?)(?:,|\\s*located)");
 		
@@ -236,11 +242,14 @@ public class MSSParser {
 			String contents = desc.substring(mat.start(1), end);			
 			result = desc.substring(0, start) + desc.substring(end);
 			
-			if (debug) System.out.println("       Contents: " + contents);
+			contents = StringUtils.trimToEmpty(contents);
+			if (contents.lastIndexOf(",") == contents.length() - 1) {
+			    contents = contents.substring(0, contents.length() - 1);
+			}
+			ms.setContents(contents);
+			LOGGER.debug("       Contents: " + contents);
 			
-		} else { 
-//			System.out.println(description);
-		}
+		} 
 		
 		return result;
 	}
@@ -261,14 +270,15 @@ public class MSSParser {
 		
 		String result = desc;
 		Matcher mat = locationPattern.matcher(desc);
-		boolean found = false;
-		int locct = 0;
 		while (mat.find()) {
-			found = true;
 			String location = mat.group(2);
+			
+			Institution inst = institutionRepo.findOrCreate(location);
+//			em.merge(inst);
+			ms.setCurrentInstitution(inst);
+			
 			result = desc.substring(0, mat.start()) + desc.substring(mat.end());
-			if (debug) System.out.println("       Location: " + location);
-			locct++;
+			LOGGER.debug("       Location: " + location);
 		}
 		
 		Pattern oldLocationPattern = 
@@ -279,17 +289,16 @@ public class MSSParser {
 		
 		mat = oldLocationPattern.matcher(result);
 		while (mat.find()) {
-			found = true;
-			String location = mat.group(1);
+			String institution = mat.group(1);
+			Institution inst = institutionRepo.findOrCreate(institution);
+			System.out.println(institution);
+//			em.merge(inst);
+            ms.addPreviousInstitution(inst);
+			
 			result = result.substring(0, mat.start()) + result.substring(mat.end());
-			if (debug) System.out.println("Former Location: " + location);
+			LOGGER.debug("Former Location: " + institution);
 		}
 			
-		if (!found) {
-//			System.out.println(desc);
-		}
-		
-		
 		return result;
 	}
 	
@@ -383,6 +392,7 @@ public class MSSParser {
 		if (mat.find() && (mat.start() == 0)) {
 			HistoricalDate date = new HistoricalDate(mat.group(1));
 			em.persist(date);
+			ms.setDate(date);
 			
 			result = desc.substring(mat.end());
 			if (date.getText().matches(UNKNOWN_DATE_RE)) {
@@ -417,7 +427,7 @@ public class MSSParser {
 			
 			setStartDate(firstDate, date);
 			setEndDate(firstDate, lastDate, separator, date);
-			if (debug) System.out.println("           Date: " + date.getText());
+			LOGGER.debug("           Date: " + date.getText());
 		} else {
 //			System.out.println(desc);
 		}
@@ -487,8 +497,8 @@ public class MSSParser {
 		try {
 			CSVParser parser = 
 //				new CSVParser(new FileReader(FNAME_PAP), CSVStrategy.EXCEL_STRATEGY);
-				new CSVParser(new FileReader(FNAME_MAJ), CSVStrategy.EXCEL_STRATEGY);
-//				new CSVParser(new FileReader(FNAME_MIN), CSVStrategy.EXCEL_STRATEGY);
+//				new CSVParser(new FileReader(FNAME_MAJ), CSVStrategy.EXCEL_STRATEGY);
+				new CSVParser(new FileReader(FNAME_MIN), CSVStrategy.EXCEL_STRATEGY);
 //				new CSVParser(new FileReader(FNAME_LECT), CSVStrategy.EXCEL_STRATEGY);
 
 			int rCt = 0;
@@ -506,6 +516,7 @@ public class MSSParser {
 				em = emf.createEntityManager();
 				tx = em.getTransaction();
 				
+				tx.begin();
 				MSSParser ms = new MSSParser(em, record);
 				ms.parse();
 				

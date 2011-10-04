@@ -42,6 +42,7 @@ public class InstitutionRepositoryImpl implements InstitutionRepository {
         try {
             institutions = (List<Institution>)session.createCriteria(Institution.class)
                                 .add(Restrictions.eq("name", name)).list();
+            tx.commit();
         } finally {
             if (tx.isActive())
                 tx.rollback();
@@ -89,6 +90,7 @@ public class InstitutionRepositoryImpl implements InstitutionRepository {
                 em.persist(inst);
             }
             
+            tx.commit();
         } finally {
             if (tx.isActive())
                 tx.rollback();

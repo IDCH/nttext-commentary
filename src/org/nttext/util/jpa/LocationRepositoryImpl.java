@@ -43,6 +43,7 @@ public class LocationRepositoryImpl implements LocationRepository {
         try {
             locations = (List<Location>)session.createCriteria(Location.class)
                                 .add(Restrictions.eq("name", name)).list();
+            tx.commit();
         } finally {
             if (tx.isActive())
                 tx.rollback();
@@ -90,6 +91,7 @@ public class LocationRepositoryImpl implements LocationRepository {
                 em.persist(loc);
             }
             
+            tx.commit();
         } finally {
             if (tx.isActive())
                 tx.rollback();

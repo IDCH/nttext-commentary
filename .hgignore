@@ -29,3 +29,5 @@ syntax: regexp
 ^src/log4j\.properties$
 syntax: regexp
 ^data/logs$
+syntax: regexp
+^build\.properties$

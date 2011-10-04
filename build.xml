@@ -24,8 +24,13 @@
 <project name="nttext" default="package" basedir=".">
 
   <!-- Import the basic default project -->
-  <property name="lib.dir" value="WebContent/WEB-INF/lib"/>
-  <property name="classfile.dir" value="WebContent/WEB-INF/classes"/>
+  <property name="build.properties" value="${basedir}/build.properties"/>
+  
   <import file="${basedir}/../build-tools/basic.xml"/>
+  <import file="${basedir}/../build-tools/hibernate.xml"/>
+  <import file="${basedir}/../build-tools/dbutils.xml"/>
 
+  <target name="run" description="Executes the indexer" depends="compile, copy-metafiles">
+    <java classname="org.nttext.mss.importer.MSSParser" classpathref="test.path" fork="${junit.fork}"/>
+  </target>
 </project>

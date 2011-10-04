@@ -1,0 +1,61 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0">
+             
+<!-- ==================================================================================== ==>
+<!== The configuration for entity managers both inside an application server and in a 
+<!== standalone application reside in a persistence archive. A persistence archive is a  
+<!== JAR file which must define a persistence.xml file that resides in the META-INF 
+<!== folder. All properly annotated classes included in the archive (ie. having an 
+<!== @Entity annotation), all annotated packages and all Hibernate hbm.xml files included 
+<!== in the archive will be added to the persistence unit configuration.
+<!== 
+<!== For more details on how to use this configuration file, please see: 
+<!== http://docs.jboss.org/hibernate/entitymanager/3.6/reference/en/html/configuration.html 
+<!== ==================================================================================== -->
+        
+   <persistence-unit name="nttext">
+      <!-- For use when we can look up a data source on JNDI. We'll leave this off for testing
+           but need to move to this approach as we get things figured out.  
+      <jta-data-source>java:/DefaultDS</jta-data-source>
+       -->
+      <class>org.nttext.mss.Manuscript</class>
+      <class>org.nttext.mss.Designation</class>
+      <class>org.nttext.mss.HistoricalDate</class>
+      <class>org.nttext.util.Institution</class>
+<!--       <class>org.nttext.mss.Location</class> -->
+      
+      <properties>
+      
+        <!-- JDBC connection details. These can only be used in a JavaSE environment 
+             where JNDI is not available. In general, we should be using the JNDI provided 
+             with Tomcat or else use the modular version of JBoss. -->
+             
+        <property name="javax.persistence.jdbc.driver"   value="org.hsqldb.jdbcDriver"/>
+        <property name="javax.persistence.jdbc.url"      value="jdbc:hsqldb:hsql://localhost/nttext"/>
+        <property name="javax.persistence.jdbc.user"     value="sa"/>
+        <property name="javax.persistence.jdbc.password" value=""/>
+        
+        <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
+        
+        <property name="hibernate.c3p0.min_size" value="5"/>
+        <property name="hibernate.c3p0.max_size" value="20"/>
+        <property name="hibernate.c3p0.timeout" value="300"/>
+        <property name="hibernate.c3p0.max_statements" value="50"/>
+        <property name="hibernate.c3p0.idle_test_period" value="3000"/>
+
+        <property name="hibernate.hbm2ddl.auto" value="create"/>
+        
+        <!-- Show and print nice SQL on stdout 
+        <property name="hibernate.show_sql" value="false"/>
+        <property name="hibernate.format_sql" value="false"/>
+        -->
+         
+         <!-- alternatively to <class> and <property> declarations, you can use a regular hibernate.cfg.xml file -->
+         <!-- property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/ -->
+      
+      </properties>
+   </persistence-unit>
+
+</persistence>

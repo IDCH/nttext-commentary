@@ -7,6 +7,8 @@ import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
+import org.nttext.util.Institution;
+
 /**
  * @author Neal Audenaert
  */

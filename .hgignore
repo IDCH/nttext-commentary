@@ -31,3 +31,5 @@ syntax: regexp
 ^data/logs$
 syntax: regexp
 ^build\.properties$
+syntax: regexp
+^data/db$

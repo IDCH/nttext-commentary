@@ -23,7 +23,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import openscriptures.text.Work;
-import openscriptures.text.impl.TokenRepository;
 import openscriptures.utils.Contributor;
 import openscriptures.utils.Language;
 import openscriptures.utils.License;

@@ -1,15 +1,10 @@
 /**
  * 
  */
-package openscriptures.text.impl;
+package openscriptures.text;
 
 import java.util.SortedSet;
 
-import openscriptures.text.Structure;
-import openscriptures.text.StructureFacade;
-import openscriptures.text.Token;
-import openscriptures.text.TokenSequence;
-import openscriptures.text.Work;
 
 /**
  * @author Neal Audenaert

@@ -19,6 +19,7 @@ import org.hibernate.criterion.Restrictions;
 
 import openscriptures.text.Structure;
 import openscriptures.text.Token;
+import openscriptures.text.TokenRepository;
 import openscriptures.text.Work;
 
 /**

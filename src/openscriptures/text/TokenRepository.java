@@ -1,14 +1,11 @@
 /**
  * 
  */
-package openscriptures.text.impl;
+package openscriptures.text;
 
 import java.util.List;
 import java.util.UUID;
 
-import openscriptures.text.Structure;
-import openscriptures.text.Token;
-import openscriptures.text.Work;
 
 /**
  * @author Neal Audenaert

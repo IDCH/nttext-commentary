@@ -3,11 +3,21 @@
  */
 package openscriptures.utils;
 
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * A human language, either ancient or modern.
  *  
  * @author Neal Audenaert
  */
+@Entity
+@Table(name="languages")
 public class Language implements Comparable<Language> {
 	public enum Direction {
 		// also needing vertical directions, see CSS writing-mode
@@ -19,19 +29,40 @@ public class Language implements Comparable<Language> {
 		return new Language("", code);
 	}
 	
+	//==============================================================================
+	// MEMBER VARIABLES
+	//==============================================================================
+	
+	@Id @GeneratedValue private Long id = null;
+	
 	/** Display name of the language. 
 	 * 
 	 * TODO For now, this is assumed to be in English, but we need to support 
 	 *      internationalization.
 	 */
-	private String name;
+	@Basic private String name;
 	
 	
 	/** ISO 639-3 language code */
-	private String code;
+	@Basic private String code;
 	
-	private Direction direction = Direction.LTR; 
+	@Enumerated(EnumType.STRING) private Direction direction = Direction.LTR; 
 	
+	//==============================================================================
+    // CONSTRUCTORS
+    //==============================================================================
+    
+	/**
+	 */
+	Language() {
+	    
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @param code
+	 */
 	public Language(String name, String code) {
 		this.name = name;
 		this.code = code;
@@ -45,6 +76,16 @@ public class Language implements Comparable<Language> {
 		this.direction = dir;
 	}
 	
+	//==============================================================================
+    // ACCESSORS
+    //==============================================================================
+    
+	/** Returns the unique identifier used by the persistence layer. */
+	Long getId() {
+	    return id;
+	}
+	
+	/** Returns the display name of this language (in English). */
 	public String getName() {
 		return this.name;
 	}
@@ -57,9 +98,12 @@ public class Language implements Comparable<Language> {
 		return this.direction;
 	}
 	
-	/**
-	 * 
-	 */
+	   
+    //==============================================================================
+    // UTILITY METHODS
+    //==============================================================================
+    
+	/** Compares this language to another language or language code for equality. */
 	public boolean equals(Object o) {
 	    if (o instanceof String) {
 	        return this.code.equalsIgnoreCase((String)o);

@@ -53,7 +53,6 @@ public class License {
 			"When a work is in the public domain, it is free for use by anyone for any purpose without restriction under copyright law. Public domain is the purest form of open/free, since no one owns or controls the material in any way.",
 			"http://wiki.creativecommons.org/Public_domain",
 			false /* by */, false /* sa */, false /* nd */, false /* nc */);
-		
 	
 	private String name;
 	private String abbreviation;
@@ -75,8 +74,7 @@ public class License {
 	
 	/** If this is true, then this work can be displayed independently. Otherwise, it 
 	 *  must only be displayed in conjunction with other works. Important condition 
-	 *  for fair use license.
-	 */
+	 *  for fair use license. */
 	Boolean isolateable = null;
 	
 	/**

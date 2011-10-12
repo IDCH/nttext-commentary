@@ -24,8 +24,8 @@ public abstract class AbstractTokenSequence implements TokenSequence {
      * @return
      */
     private boolean isSameWork(Token t) {
-        UUID myId = this.getWork().getId();
-        UUID tId = t.getWork().getId();
+        UUID myId = this.getWork().getUUID();
+        UUID tId = t.getWork().getUUID();
         
         return tId.equals(myId);
     }

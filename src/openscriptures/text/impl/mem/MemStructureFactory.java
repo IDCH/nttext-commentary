@@ -61,7 +61,7 @@ public class MemStructureFactory implements StructureFactory {
      */
     @Override
     public boolean save(Structure s) {
-        UUID id = s.getWork().getId();
+        UUID id = s.getWork().getUUID();
         StructureCollection collection; 
         synchronized (collections) {
             collection = collections.get(id.toString());
@@ -84,7 +84,7 @@ public class MemStructureFactory implements StructureFactory {
     public boolean hasStructuresFor(Work work) {
         boolean haveStructures;
         synchronized (collections) {
-            haveStructures = collections.containsKey(work.getId().toString());
+            haveStructures = collections.containsKey(work.getUUID().toString());
         }
         
         return haveStructures;
@@ -92,7 +92,7 @@ public class MemStructureFactory implements StructureFactory {
     
     @Override
     public StructureFacade getStructureFacade(Work w) {
-        if (collections.containsKey(w.getId().toString()))
+        if (collections.containsKey(w.getUUID().toString()))
             return new MemStructureFacade(w, this);
         else return null;
     }
@@ -149,7 +149,6 @@ public class MemStructureFactory implements StructureFactory {
                 nameIndex.put(s.getName(), set);
             }
         }
-        
     }
     
 //=======================================================================================
@@ -172,7 +171,7 @@ public class MemStructureFactory implements StructureFactory {
          */
         @Override
         public UUID getWorkId() {
-            return this.work.getId();
+            return this.work.getUUID();
         }
 
         @Override
@@ -190,7 +189,7 @@ public class MemStructureFactory implements StructureFactory {
          */
         @Override
         public SortedSet<Structure> find(String name) {
-            StructureCollection collection = factory.getCollection(work.getId().toString());
+            StructureCollection collection = factory.getCollection(work.getUUID().toString());
             SortedSet<Structure> structures = collection.nameIndex.get(name);
             
             return Collections.unmodifiableSortedSet(structures);
@@ -244,7 +243,7 @@ public class MemStructureFactory implements StructureFactory {
         @Override
         public SortedSet<Structure> find(int position) {
             // FIXME this has really poor performance
-            StructureCollection collection = factory.collections.get(work.getId());
+            StructureCollection collection = factory.collections.get(work.getUUID());
             SortedSet<Structure> result = new TreeSet<Structure>(new StructureComparator());
             for (Structure s : collection.structures) {
                 if (s.getEnd() <= position)

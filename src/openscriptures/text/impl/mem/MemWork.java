@@ -154,8 +154,8 @@ public class MemWork extends BasicWork implements MutableWork  {
 
     /** Sets the primary language used in this work. */
     @Override
-    public void setLanguage(Language value) {
-        this.language = value;
+    public void setLanguage(Language lg) {
+        this.language = lg.getCode();
     }
     
 	/** Sets the copyright holder of this work. */

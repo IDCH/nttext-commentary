@@ -11,6 +11,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import openscriptures.text.AbstractTokenSequence;
 import openscriptures.text.InvalidTokenException;
 import openscriptures.text.Structure;
@@ -21,6 +26,8 @@ import openscriptures.text.Work;
 /**
  * @author Neal Audenaert
  */
+@Entity
+@Table(name="OpenS_Structures")
 public class BasicStructure extends AbstractTokenSequence implements Structure {
 	
 	/** Maps input tag and/or structure names to output structures. This may be used to 
@@ -172,17 +179,23 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
 	protected Work work;
 	
 	/** 
-	 * The token that starts the structure's content; this may or may not include the
-	 * startMarker, like quotation marks. 
-	 * 
-	 * NOTE we are currently evaluating the relevance of 'startMarker' and support for this 
-	 *      feature is not currently implemented. It will likely be included in a 
-	 *      future version.
-	 */
-	protected Token startToken;
+     * The position of the token that starts the structure's content; this may or may not 
+     * include the startMarker, such as a quotation mark. 
+     * 
+     * NOTE we are currently evaluating the relevance of 'startMarker' and support for this 
+     *      feature is not currently implemented. It will likely be included in a 
+     *      future version.
+     */
+	protected Integer startTokenPosition = null;
+	
+	/** Same as startTokenPosition, but for the end. */
+	protected Integer endTokenPosition = null;
+	
+	/** The token that starts the structure's content. This is used for caching purposes. */
+	private Token startToken = null;
 	
 	/** Same as startToken, but for the end. */
-	protected Token endToken;
+	private Token endToken = null;
 	
     protected String content;
     
@@ -236,12 +249,11 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
 	    
 	    this.name = name;
 	    this.work = work;
-	    this.startToken = start;
-	    this.endToken = end;
+	    this.setTokens(start, end);
 	}
 	
 	protected void checkWork(Token t) throws InvalidTokenException {
-	    if (!t.getWork().getId().equals(this.work.getId()))
+	    if (!t.getWork().getUUID().equals(this.work.getUUID()))
 	        throw new InvalidTokenException(
 	                "The token's work does not match this structure.", t);
 	}
@@ -253,18 +265,6 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
         }
 	}
 	
-	public int getStart() {
-        return (startToken != null)  
-                ? this.startToken.getPosition()
-                : -1;
-    }
-     
-	public int getEnd() {
-        return this.endToken != null  
-                ? this.endToken.getPosition() + 1
-                : this.getStart();
-    }
-	
 //========================================================================================
 // ACCESSORS
 //========================================================================================
@@ -275,6 +275,7 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
      *  @see openscriptures.text.Structure#getUUID()
      */
     @Override
+    @Transient
     public UUID getUUID() {
         return uuid;
     }
@@ -284,7 +285,8 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
      *  Returns the <tt>Work</tt> that this structure is found in. 
      *  @see openscriptures.text.Structure#getWork()
      */
-    @Override
+    @Override 
+    @Transient // TODO make persistent
     public Work getWork() {
         return this.work;
     }
@@ -295,10 +297,11 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
      * those that may need to be referenced across different texts (e.g., OSIS ids for 
      * books, chapters and verses).
      *   
-     * @see openscriptures.text.Structure#getId()
+     * @see openscriptures.text.Structure#getLocalId()
      */
-    @Override
-    public String getId() {
+    @Override 
+    @Basic
+    public String getLocalId() {
         return this.id;
     }
 
@@ -306,7 +309,8 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
      *  in an XML document.
      * @see openscriptures.text.Structure#getName()
      */
-    @Override
+    @Override 
+    @Basic
     public String getName() {
         return this.name;
     }
@@ -314,18 +318,77 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
     /** Returns the token at which this structure starts.
      * @see openscriptures.text.Structure#getStartToken()
      */
-    @Override
+    @Override 
+    @Transient
     public Token getStartToken() {
-        return this.startToken;
+        Integer start = this.startTokenPosition;
+        
+        Token t = null;
+        if ((this.startToken != null) && 
+            (this.startToken.getPosition() == start.intValue())) {
+            t = startToken;
+            
+        } else if (start != null && start >= 0) {
+            t = this.work.get(start);
+            this.startToken = t;
+        }
+        
+        return t;
+    }
+    
+    @Basic
+    Integer getStartTokenPosition() {
+        return this.startTokenPosition;
     }
 
+
+    @Transient
+    public int getStart() {
+        return (startTokenPosition != null)  
+                ? startTokenPosition
+                : -1;
+    }
+     
     /* Returns the last token in this 
      * @see openscriptures.text.Structure#getEndToken()
      */
-    @Override
+    @Override @Transient
     public Token getEndToken() {
-        return this.endToken;
+        Integer end = this.startTokenPosition;
+        
+        Token t = null;
+        if ((this.endToken != null) && 
+            (this.endToken.getPosition() == end.intValue())) {
+            t = endToken;
+            
+        } else if (end != null && end >= 0) {
+            t = this.work.get(end);
+            this.endToken = t;
+        }
+        
+        return t;
     }
+    
+    @Basic
+    Integer getEndTokenPosition() {
+        return this.endTokenPosition;
+    }
+    
+    @Transient
+    public int getEnd() {
+        return endTokenPosition != null  
+                ? endTokenPosition + 1
+                : this.getStart();
+    }
+    
+    /**
+     * 
+     */
+    @Override @Basic
+    public String getPerspective() {
+        return this.perspective;
+    }
+    
     
     //========================================================================================
     // MUTATORS
@@ -339,7 +402,7 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
      * @throws UnsupportedOperationException
      */
     @Override
-    public void setId(String value) throws UnsupportedOperationException {
+    public void setLocalId(String value) throws UnsupportedOperationException {
         this.id = value;
     }
     
@@ -368,11 +431,12 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
     @Override
     public void setStartToken(Token token) 
     throws UnsupportedOperationException, InvalidTokenException {
-        if (this.endToken != null) 
-            checkOrder(token, this.endToken);
+        Token end = this.getEndToken();
+        if (end != null) 
+            checkOrder(token, end);
         checkWork(token); 
         
-        this.startToken = token;
+        this.startTokenPosition = (token != null) ? token.getPosition() : null;
     }
     
     /**
@@ -391,11 +455,11 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
     @Override
     public void setEndToken(Token token) 
     throws UnsupportedOperationException, InvalidTokenException {
-        checkOrder(this.startToken, token);
+        checkOrder(this.getStartToken(), token);
         if (token != null) 
             checkWork(token);
                 
-        this.endToken = token;
+        this.endTokenPosition = (token != null) ? token.getPosition() : null;
     }
     
     /**
@@ -420,8 +484,13 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
         if (end != null) 
             checkWork(end);
         
-        this.startToken = start;
-        this.endToken = end;
+        this.startTokenPosition = (start != null) ? start.getPosition() : null;
+        this.endTokenPosition = (end != null) ? end.getPosition() : null;
+    }
+    
+    @Override
+    public void setPerspective(String perspective) {
+        this.perspective = perspective;
     }
     
 //========================================================================================
@@ -493,18 +562,10 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
         return Collections.unmodifiableList((List<? extends Structure>)children);
     }
     
-    /**
-     * 
-     */
-    @Override
-    public String getPerspective() {
-        return this.perspective;
-    }
-
-    @Override
-    public void setPerspective(String perspective) {
-        this.perspective = perspective;
-    }
+   
+    //========================================================================================
+    // UTILITY METHODS 
+    //========================================================================================
    
     @Override
     public boolean equals(Object obj) {
@@ -526,7 +587,7 @@ public class BasicStructure extends AbstractTokenSequence implements Structure {
         if (equals(s))
             return true;
         
-        if (!s.getWork().getId().equals(this.getWork().getId()))
+        if (!s.getWork().getUUID().equals(this.getWork().getUUID()))
             return false;
         
         return (s.getStart() == this.getStart()) &&         

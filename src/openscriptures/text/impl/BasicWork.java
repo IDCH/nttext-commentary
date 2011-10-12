@@ -7,11 +7,25 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
 import openscriptures.text.AbstractTokenSequence;
+import openscriptures.text.ApplicationContext;
+import openscriptures.text.MutableWork;
+import openscriptures.text.Structure;
 import openscriptures.text.Token;
 import openscriptures.text.Work;
 import openscriptures.text.WorkId;
@@ -24,54 +38,61 @@ import openscriptures.utils.License;
  * 
  * @author Neal Audenaert
  */
-public abstract class BasicWork extends AbstractTokenSequence implements Work {
+@Entity
+@Table(name="OpenS_Works")
+public class BasicWork extends AbstractTokenSequence implements Work, MutableWork {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(Work.class.getName());
 	
-	// TODO We need to factor this into an Inteface with a DB backed implementation and
-	//		a RESTful web-based implementation
-	
-	protected UUID id;
 
+	//============================================================================================
+	// MEMBER VARIABLES
+	//============================================================================================  
+	    
+	protected Long id;
+	protected UUID uuid;
 	protected WorkId osisID;
-		
-	protected String title;
-	protected String abbreviation;
-	protected String description;
 	
-	protected String creator;		    // TODO Make this a list? 
-	protected String publisher;
+	protected String title;             /** The title of this work. */
+	protected String abbreviation;      /** An abbreviated title for this work. */
+	protected String description;       /** A description of this work. */
+	
+	protected String creator;		    /** The individual or institution primarily responsible for creating this work. */ 
+	protected String publisher;         /** The publisher of this work */
+	protected String language;          /** The primary language of this work. */
+	protected String type;              /** The type of this work (e.g., Bible, Commentary, Quran). TODO need better semantics for this. */
+	protected String copyright;         /** A copyright statement for this work. */	
+	protected String scope;             /** The scope of this work (e.g. Gen-Rev, New Testament) */
+	protected String refSystem;         /** The reference system used to identify and resolve passages. */
+	protected String sourceUrl;         /** URL where this resource was originally obtained. */
+	
 	protected Date publicationDate;
-	protected Language language;
-	protected String type;
-	protected Set<Contributor> contributors = new HashSet<Contributor>();
-	protected String copyright;	
-	protected License license;	
-	protected String scope;
-	protected String refSystem;
-	
-	/** URL where this resource was originally obtained. */
-	protected String sourceUrl;		// URL where this resource was originally obtained.  
-	
 	protected Date importDate;
-	// TODO need to implement servers.
+	
+	// create as embeddable class? This is currently very simplified. 
+	protected Set<Contributor> contributors = new HashSet<Contributor>();
+	
+	// TODO need to implement support for providing license definitions. 
+	protected License license;	
+	
+	private TokenRepository tokenRepo = null;
 
 //============================================================================================
-// MEMBER VARIABLES
+// CONSTRUCTORS
 //============================================================================================	
-	
+    	
 	public BasicWork() {
 		
 	}
 	
 	public BasicWork(WorkId id) {
-	    this.id = UUID.randomUUID();
+	    this.uuid = UUID.randomUUID();
 	    
 		this.osisID = id;
 	}
 	
 	public BasicWork(WorkId id, String title, String abbr, String desc) {
-		this.id = UUID.randomUUID();
+		this.uuid = UUID.randomUUID();
 		
 		this.osisID = id;
 		this.title = title;
@@ -79,11 +100,46 @@ public abstract class BasicWork extends AbstractTokenSequence implements Work {
 		this.description = desc;
 	}
 	
+	/** 
+	 * Sets the token repository to be used to obtain tokens for this work.
+	 * @param repo
+	 */
+	public void setTokenRepository(TokenRepository repo) {
+	    this.tokenRepo = repo;
+	}
+
+	//============================================================================================
+	// METHODS TO CREATE AND QUERY THE CONTENTS OF THIS WORK
+	//============================================================================================
+
+	@Deprecated
+    public Token addToken(String token) {
+        return this.tokenRepo.createToken(this, token);
+    }
+    
+    /**
+     * 
+     * @param text
+     * @return
+     */
+	@Deprecated
+    public List<Token> tokenize(String text) {
+        return this.tokenRepo.tokenize(this, text);
+    }
+	
+	@Deprecated
+	public Structure createStructure(Token start, Token end) {
+        return null;
+    }
+	
 //============================================================================================
 // ACCESSORS AND MUTATORS
 //============================================================================================
 	
-	// ACCESSORS
+	/** Returns the unique persistent identifier for this work. */
+	@Id @GeneratedValue Long getId() { return this.id; }
+	/** Sets the unique persistent identifier for this work. */
+	void setId(Long id) { this.id = id; }
 	
 	/**
 	 * Internal ID used to represent a specific local instance of a work. Note that a single 
@@ -91,74 +147,138 @@ public abstract class BasicWork extends AbstractTokenSequence implements Work {
 	 * have multiple representations in the system if, for example, it was imported at 
 	 * different times or with different import strategies.
 	 */
-	@Override
-	public UUID getId() { return this.id; }
+	@Transient public UUID getUUID() { return this.uuid; }
+	
+	/** Returns the UUID as a string. Intended to be used by the persistence framework. */
+	@Basic String getUuidString() { return this.uuid.toString(); }
+	/** Sets the UUID as a string. Intended to be used by the persistence framework. */
+	void setIdString(String id) { this.uuid = UUID.fromString(id); }
 		
 	/** The <tt>WorkId</tt> of this work. */
-	@Override
-	public WorkId getWorkId() { return this.osisID; }
+	@Transient public WorkId getWorkId() { return this.osisID; }
+	
+	/** Returns a string representation of this work's OSIS id. @see #getWorkId() */
+	@Basic public String getOsisId() { return this.osisID.toString(); }
+	/** Sets the work id of this Work. @see #getWorkId() */
+	void setOsisId(String id) { this.osisID = new WorkId(id); }
 	
 	/** The title of this work. */
-	@Override
-	public String getTitle() { return title; }
-	
+	@Basic public String getTitle() { return title; }
+	 /** Sets the title. */
+    public void setTitle(String title) { this.title = title; }
+
 	/** An abbreviation of this work's title. */
-	@Override
-	public String getAbbreviation() { return this.abbreviation; }
+	@Basic public String getAbbreviation() { return this.abbreviation; }
+	/** Sets the abbreviated form of the title. */
+    public void setAbbreviation(String abbr) { this.abbreviation = abbr; }
 	
 	/** A description of this work. */
-	@Override
-	public String getDescription() { return this.description; }
-	
+	@Lob public String getDescription() { return this.description; }
+	/** Sets the description of this work. */
+    public void setDescription(String desc) {  this.description = desc; }
+
 	/** The URL where this resource was originally obtained. */
-	@Override
-	public String getSourceURL() {  return this.sourceUrl; }
-
+	@Basic public String getSourceURL() {  return this.sourceUrl; }
+	 /** Sets the URL where this resource was originally obtained. */ 
+    public void setSourceURL(String url) {  this.sourceUrl = url; }
+    
 	/** The individual or organization responsible for creating this work. */
-	@Override
-	public String getCreator() { return this.creator; }
-	
-	/** Returns a description of the copyright holder. */
-	@Override
-	public String getCopyright() { return copyright; }
-	
-	/** Returns a license under which this work is made available.  */
-	@Override
-	public License getLicense() { return license; }
-	
-	/** Return the date that this version of the work was imported. */
-	@Override
-	public Date getImportDate() { return importDate; }
-	
-	/** Returns an unmodifiable <tt>Set</tt> of the contributors to this work. */
-	@Override
-	public Set<Contributor> getContributors() { 
-		return Collections.unmodifiableSet(this.contributors); 
-	}
-	
-    /** Returns the date this work was published. */
-    @Override
-    public Date getPublicationDate() { return this.publicationDate; }
-
+	@Basic public String getCreator() { return this.creator; }
+	/** Sets the creator of this work. */
+    public void setCreator(String creator) {  this.creator = creator; }
+    
     /** Return the publisher of this work. */
-    @Override
-    public String getPublisher() { return this.publisher; }
+    @Basic public String getPublisher() { return this.publisher; }
+    /** Sets the publisher of this work. */
+    public void setPublisher(String value) { this.publisher = value; }
+    
+    /** Returns the date this work was published. */
+    @Temporal(TemporalType.DATE) 
+    public Date getPublicationDate() { return this.publicationDate; }
+    /** Sets the date this work was published. */
+    public void setPublicationDate(Date date) { this.publicationDate = date; }
 
+	/** Returns a description of the copyright holder. */
+	@Basic public String getCopyright() { return copyright; }
+	 /** Sets the copyright holder of this work. */
+    public void setCopyright(String copyright) {  this.copyright = copyright; }
+
+	/** Returns a license under which this work is made available.  */
+	@Transient public License getLicense() { return license; }
+	/** Sets the license under which this work is made available. */
+    public void setLicense(License license) { this.license = license; }
+    
+	/** Return the date that this version of the work was imported. */
+	@Temporal(TemporalType.DATE) 
+	public Date getImportDate() { return importDate; }
+	 /** Sets the date that this version of the work was imported. */
+    public void setImportDate(Date importDate) { this.importDate = importDate; }
+    
     /** Returns the type of this work (e.g., Bible, Quran, etc.) */
-    @Override
-    public String getType() { return this.type; }
-
+    @Basic public String getType() { return this.type; }
+    /** Sets the type of work (e.g., Bible, Quran, Commentary) of this work. */
+    public void setType(String value) { this.type = value; } 
+    
     /** Returns the primary language used in this work. */
-    @Override
-    public Language getLanguage() { return this.language; }
+    @Transient
+    public Language getLanguage() { 
+        ApplicationContext ac = ApplicationContext.getApplicationContext();
+        return ac.getLanguage(this.language); 
+    }
+    /** Sets the primary language used in this work. */
+    public void setLanguage(Language lg) { this.language = lg.getCode(); }
+    
+    /** Returns the language code. */
+    @Basic public String getLgCode() { return this.language; }
+    /** Sets the language code. Primarily intended for use by the persistence layer. */
+    void setLgCode(String lgCode) { this.language = lgCode; }
 
     /** Returns the scope (e.g., scripture range) of this work. */
-    @Override
-    public String getScope() { return this.scope; }
+    @Basic public String getScope() { return this.scope; }
+    /** Sets the scope (e.g. range of scripture) covered by this work. */
+    public void setScope(String value) { this.scope = value; }
 
     /** Returns the reference system used by this work. */
-    @Override
-    public String getRefSystem() { return this.refSystem; }
+    @Basic public String getRefSystem() { return this.refSystem; }
+    /** Sets the reference system used by this work. */
+    public void setRefSystem(String value) { this.refSystem = value; }
+    
+//============================================================================================
+// CONTRIBUTOR METHODS
+//============================================================================================
+    
+    /** Returns an unmodifiable <tt>Set</tt> of the contributors to this work. */
+    @Transient
+    public Set<Contributor> getContributors() { 
+        return Collections.unmodifiableSet(this.contributors); 
+    }
+    
+    /**
+     * Adds the indicated contributor. 
+     * 
+     * @param contributor The contributor to add.
+     * @return <tt>true</tt> if the set of contributors was modified (that is, if the 
+     *      contributor was not already in the set of contributors).
+     */
+    public boolean addContribotr(Contributor contributor) {
+        return this.contributors.add(contributor);
+    }
+    
+    /** 
+     * Removes the indicated contributor. 
+     * 
+     * @param contributor The contributor to remove.
+     * @return <tt>true</tt> if the set of contributors was modified (that is, if the 
+     *      contributor was in the set of contributors).
+     */
+    public boolean removeContributor(Contributor contributor) {
+        return this.contributors.remove(contributor);
+    }
+    
+    /** Sets the contributors to this work. */
+    protected void setContributors(Set<Contributor> contributors) {
+        this.contributors = contributors;
+    }
     
 //============================================================================================
 // TOKEN SEQUENCE METHODS
@@ -168,7 +288,7 @@ public abstract class BasicWork extends AbstractTokenSequence implements Work {
     /* (non-Javadoc)
      * @see openscriptures.text.TokenSequence#getWork()
      */
-    @Override
+    @Transient 
     public Work getWork() {
         return this;
     }
@@ -177,7 +297,7 @@ public abstract class BasicWork extends AbstractTokenSequence implements Work {
     /* (non-Javadoc)
      * @see openscriptures.text.TokenSequence#getText()
      */
-    @Override
+    @Transient
     public String getText() {
         StringBuilder sb = new StringBuilder();
         
@@ -187,6 +307,28 @@ public abstract class BasicWork extends AbstractTokenSequence implements Work {
         }
         
         return sb.toString();
+    }
+
+    /** 
+     * Return the start position (inclusive) in the underlying <tt>Work</tt>'s token 
+     * stream. This will always be <tt>0</tt>. 
+     */
+    @Transient
+    public int getStart() {
+        return 0;
+    }
+     
+    /** 
+     * Return the end position (exclusive) in the underlying <tt>Work</tt>'s token stream.  
+     */
+    @Transient
+    public int getEnd() { 
+        return this.tokenRepo.getMaxPosition(this) + 1;
+    }
+     
+    /** Returns the token at the specified index. */
+    public Token get(int index) {
+        return this.tokenRepo.find(this, index);
     }
 
 	

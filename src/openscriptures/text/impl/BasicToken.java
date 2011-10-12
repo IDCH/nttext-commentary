@@ -5,6 +5,14 @@ package openscriptures.text.impl;
 
 import java.util.UUID;
 
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import openscriptures.text.Token;
 import openscriptures.text.Work;
 
@@ -25,23 +33,42 @@ import openscriptures.text.Work;
  * 
  * @author Neal Audenaert
  */
+@Entity
+@Table(name="OpenS_Tokens")
 public class BasicToken implements Token {
+    
+    //====================================================================================
+    // SYMBOLIC CONSTANTS
+    //====================================================================================
 
+    /** RegEx for representing Unicode word characters. */
     public static final String UNICODE_WORDSCHARS = 
         "[\\p{L}\\p{Sk}\\d]";
+    
+    /** RegEx for representing Unicode punctuation characters. */
     public static final String UNICODE_PUNCTUATION = 
         "[\\p{P}]";
+    
+    /** RegEx for representing Unicode whitespace characters. */
     public static final String UNICODE_WHITESPACE = 
         "[\\p{Z}\\u000a\\u0009]";
+    
+    /** RegEx for representing unknown characters (not words, whitespace or punctuation). */
     public static final String UNICODE_UNKNOWN = 
         "[^\\p{L}\\p{Sk}\\d\\p{P}\\p{Z}]";
     
+    /** RegEx for tokenizing text. */
     public static final String TOKENIZATION_PATTERN =
         UNICODE_WORDSCHARS + "+|" +                 // Unicode letters
         UNICODE_PUNCTUATION + "+|" +                // Unicode punctuation
         UNICODE_WHITESPACE + "+|" +                 // Java whitespace (becase I can't figure out Unicode whitespace)
         UNICODE_UNKNOWN + "+";                      // everything else (typically ignored).
     
+
+    //====================================================================================
+    // STATIC METHODS
+    //====================================================================================
+
     /**
      * 
      * @param string
@@ -60,6 +87,10 @@ public class BasicToken implements Token {
         return type;
     }
     
+    //====================================================================================
+    // MEMBER VARIABLES
+    //====================================================================================
+    
 	private UUID uuid;
 	
 	private Work work;
@@ -67,6 +98,17 @@ public class BasicToken implements Token {
 	private String value;
 	private int position;
 	
+	//====================================================================================
+    // CONSTRUCTORS
+    //====================================================================================
+	
+	/**
+	 * 
+	 */
+	BasicToken() {
+	    
+	}
+
 	/**
 	 * 
 	 * @param work
@@ -82,37 +124,87 @@ public class BasicToken implements Token {
 		this.position = position;
 	}
 	
-	public Work getWork() {
-	    return work;
-	}
-
+	
+	//====================================================================================
+    // ACCESSORS & MUTATORS
+    //====================================================================================
+	
+	/** Returns the unique identifier for this token. */
+	@Transient
 	public UUID getUUID() {
 	    return this.uuid;
 	}
 	
-    /* (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
-    @Override
-    public int compareTo(Token token) {
-        if (this.position < token.getPosition()) return -1;
-        else if (this.position > token.getPosition()) return 1;
-        else return 0;
+	/** Returns the unique identifier for this token as a string. */
+	@Id
+	public String getId() {
+	    return this.uuid.toString();
+	}
+	
+	/** Used by the persistence framework to set the unique identifier for this token. */
+	public void setId(String value) {
+	    this.uuid = UUID.fromString(value);
+	}
+	
+	// TODO persist this
+	@Transient
+	public Work getWork() {
+	    return work;
+	}
+	
+	
+	/** Returns the textual value of this token. */
+    @Override @Basic
+    public String getText() {
+        return this.value;
     }
-
-    /* (non-Javadoc)
+    
+    /** Used by the persistence layer to set this token's textual value. */
+    void setText(String value) {
+        this.value = value;
+    }
+    
+    /** 
+     * Returns the position of this token in the associated work's token stream. 
      * @see openscriptures.text.Token#getPosition()
      */
-    @Override
+    @Override @Basic
     public int getPosition() { 
         return this.position; 
     }
+    
+    /** Used by persistence layer to set the position of this token in the token stream. */
+    void setPosition(int pos) {
+        this.position = pos;
+    }
 
+    /**
+     * Returns the type of work.
+     * 
+     * @see openscriptures.text.Token#getType()
+     * @see openscriptures.text.Token.Type
+     */
+    @Override @Enumerated(EnumType.STRING) 
+    public Type getType() { 
+        return this.type; 
+    }
+
+    /** Used by the persistence layer to set this token's type. */
+    void setType(Type t) {
+        this.type = t;
+    }
+    
+    //====================================================================================
+    // NEXT & PREV METHODS
+    //====================================================================================
+    
+    /** Checks to see if there are more tokens following this one in the associated work. */
     @Override
     public boolean hasNext() {
         return position < (work.getEnd() - 1);
     }
     
+    /** Returns the next token in this work. */
     @Override
     public Token next() {
         if (!this.hasNext())
@@ -121,6 +213,7 @@ public class BasicToken implements Token {
         return work.get(position + 1);
     }
     
+    /** Returns the next token in this work, optionally ignoring whitespace tokens. */
     @Override
     public Token next(boolean ignoreWhitespace) {
         if (!ignoreWhitespace) 
@@ -138,11 +231,13 @@ public class BasicToken implements Token {
         return null;
     }
     
+    /** Checks to see if there are more tokens preceding this one in the associated work. */
     @Override
     public boolean hasPrev() {
         return position > 0;
     }
     
+    /** Returns the next token in this work. */
     @Override
     public Token prev() {
         if (!this.hasPrev())
@@ -151,6 +246,7 @@ public class BasicToken implements Token {
         return work.get(position - 1);
     }
     
+    /** Returns the next token in this work, optionally ignoring whitespace tokens. */
     @Override
     public Token prev(boolean ignoreWhitespace) {
         if (!ignoreWhitespace) 
@@ -169,23 +265,25 @@ public class BasicToken implements Token {
     }
     
     
+    //====================================================================================
+    // UTILITY METHODS
+    //====================================================================================
     
-    
-    /* (non-Javadoc)
-     * @see openscriptures.text.Token#getType()
-     */
-    @Override
-    public Type getType() { 
-        return this.type; 
-    }
-
-    /** Returns the textual value of this token. */
-    @Override
-    public String getText() {
-        return this.value;
-    }
-    
+    /** Returns a string based representation of this token. */
     public String toString() {
         return this.value;
     }
+    
+    /** Compares this token to another token in the same work.
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(Token token) {
+        // TODO check to make sure this is the same work.
+        
+        if (this.position < token.getPosition()) return -1;
+        else if (this.position > token.getPosition()) return 1;
+        else return 0;
+    }
+
 }

@@ -85,11 +85,11 @@ public abstract class StructureWrapper extends AbstractTokenSequence implements 
      * those that may need to be referenced across different texts (e.g., OSIS ids for 
      * books, chapters and verses).
      *   
-     * @see openscriptures.text.Structure#getId()
+     * @see openscriptures.text.Structure#getLocalId()
      */
     @Override
-    public String getId() {
-        return me.getId();
+    public String getLocalId() {
+        return me.getLocalId();
     }
 
     /** Return the name of this structure. This corresponds to an element name 
@@ -127,8 +127,8 @@ public abstract class StructureWrapper extends AbstractTokenSequence implements 
      *  
      * @throws UnsupportedOperationException
      */
-    public void setId(String value) throws UnsupportedOperationException {
-        me.setId(value);
+    public void setLocalId(String value) throws UnsupportedOperationException {
+        me.setLocalId(value);
     }
     
     /**

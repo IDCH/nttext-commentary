@@ -54,8 +54,8 @@ public class StructureComparator implements Comparator<Structure> {
         
         // Make sure these structures are from the same text. If not, we can't 
         // compare them.
-        UUID workA = a.getWork().getId();
-        UUID workB = b.getWork().getId();
+        UUID workA = a.getWork().getUUID();
+        UUID workB = b.getWork().getUUID();
         if (!workA.equals(workB)) {
             // this is all we can do as per the API.
             throw new ClassCastException("Incomparable structures. " +

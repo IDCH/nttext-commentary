@@ -3,6 +3,8 @@
  */
 package openscriptures.text;
 
+import java.util.UUID;
+
 /**
  * @author Neal Audenaert
  */
@@ -11,6 +13,8 @@ public interface Token extends Comparable<Token> {
 	public static enum Type {
 		WORD, PUNCTUATION, WHITESPACE
 	}
+	
+	public UUID getUUID();
 	
 	/** 
 	 * Returns the work for this token. All tokens exist only in the context of a work 

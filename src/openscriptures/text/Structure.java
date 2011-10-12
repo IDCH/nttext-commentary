@@ -42,7 +42,7 @@ public interface Structure extends TokenSequence {
      * 
 	 * @return A locally unique identifier for this structure.
 	 */
-	public String getId(); 
+	public String getLocalId(); 
     
 	/**
 	 * The name of this element. This corresponds to the name of the element tag in an OSIS
@@ -77,7 +77,7 @@ public interface Structure extends TokenSequence {
      * @throws UnsupportedOperationException
      * TODO throw something on name conflict 
      */
-    public void setId(String value) throws UnsupportedOperationException;
+    public void setLocalId(String value) throws UnsupportedOperationException;
     
     /**
      * 

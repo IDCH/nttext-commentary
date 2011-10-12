@@ -22,7 +22,7 @@ public interface Work extends TokenSequence {
 	 * edition) may have multiple representations in the system if, for example, it was imported at 
 	 * different times or with different import strategies.
 	 */
-	public UUID getId();
+	public UUID getUUID();
 		
 	/** 
 	 * The <tt>WorkId</tt> that identifies the conceptual work represented by this 

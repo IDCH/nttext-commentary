@@ -19,7 +19,7 @@ import java.util.UUID;
  * 
  * @author Neal Audenaert
  */
-public abstract class StructureWrapper extends AbstractTokenSequence implements Structure {
+public abstract class StructureWrapper extends Structure {
 	
 	private final Structure me;
 	

@@ -40,7 +40,7 @@ public class WorkTests extends TestCase {
     }
 
     public void testAssignValues() {
-        MutableWork work = new MemWork(new WorkId("Bible.grc.SBLGNT.2010"));
+        Work work = new Work(new WorkId("Bible.grc.SBLGNT.2010"));
 
         String title = "The Greek New Testament: SBL Edition";
         work.setTitle(title);
@@ -101,7 +101,7 @@ public class WorkTests extends TestCase {
     
     public void testAddTokens() {
         List<Token> tokens = new ArrayList<Token>();
-        MutableWork work = new MemWork(new WorkId("Bible.grc.SBLGNT.2010"));
+        Work work = new Work(new WorkId("Bible.grc.SBLGNT.2010"));
         Matcher mat = Pattern.compile(TOKENIZATION_PATTERN).matcher(EXAMPLE_TEXT);
         
         while (mat.find()) {
@@ -117,7 +117,7 @@ public class WorkTests extends TestCase {
     }
     
     public void testTokenizse() {
-        MutableWork work = new MemWork(new WorkId("Bible.grc.SBLGNT.2010"));
+        Work work = new Work(new WorkId("Bible.grc.SBLGNT.2010"));
         List<Token> tokens = work.tokenize(EXAMPLE_TEXT);
         
         StringBuilder sb = new StringBuilder();

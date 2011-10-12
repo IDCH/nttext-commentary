@@ -17,7 +17,6 @@ import openscriptures.text.StructureFactory;
 import openscriptures.text.Token;
 import openscriptures.text.TokenSequence;
 import openscriptures.text.Work;
-import openscriptures.text.impl.BasicStructure;
 
 /**
  * @author Neal Audenaert
@@ -51,7 +50,7 @@ public class MemStructureFactory implements StructureFactory {
      */
     @Override
     public Structure createStructure(Work work, String name, Token start, Token end) {
-        return new BasicStructure(work, name, start, end);
+        return new Structure(work, name, start, end);
     }
     
     /** 
@@ -176,7 +175,7 @@ public class MemStructureFactory implements StructureFactory {
 
         @Override
         public Structure create(String name) {
-            return new BasicStructure(work, name, null, null);
+            return new Structure(work, name, null, null);
         }
         
         @Override

@@ -67,7 +67,7 @@ public class JPATokenRepository implements TokenRepository {
         tx.begin();
         try {
             
-            t = new BasicToken(w, pos, value);
+            t = new Token(w, pos, value);
             em.persist(t);
             
             tx.commit();
@@ -95,26 +95,26 @@ public class JPATokenRepository implements TokenRepository {
         
         Token t = null;
         String token = null;
-        Matcher mat = Pattern.compile(BasicToken.TOKENIZATION_PATTERN).matcher(text);
+        Matcher mat = Pattern.compile(Token.TOKENIZATION_PATTERN).matcher(text);
         
         while (mat.find()) {
             t = null;
             token = mat.group();
 
-            Token.Type type = BasicToken.classify(token);
+            Token.Type type = Token.classify(token);
             if (type == null) {
                 badTokens.add(token);
                 continue;
 
             } else if (type == Token.Type.WHITESPACE) {
                 if (!lastTokenWasWhitespace && (w.size() > 0)) { // normalize whitespace.
-                    t = new BasicToken(w, pos++, " ");
+                    t = new Token(w, pos++, " ");
                 }
 
                 lastTokenWasWhitespace = true;
             } else {
                 lastTokenWasWhitespace = false;
-                t = new BasicToken(w, pos++, token);
+                t = new Token(w, pos++, token);
             }
 
             if (t != null) {
@@ -178,7 +178,7 @@ public class JPATokenRepository implements TokenRepository {
         tx.begin();
         Session session = (Session) em.getDelegate();
         try {
-            tokens = (List<Token>)session.createCriteria(BasicToken.class)
+            tokens = (List<Token>)session.createCriteria(Token.class)
                                 .add(Restrictions.eq("id", id.toString())).list();
             tx.commit();
         } finally {

@@ -21,7 +21,6 @@ import openscriptures.text.StructureFactory;
 import openscriptures.text.Token;
 import openscriptures.text.Work;
 import openscriptures.text.WorkId;
-import openscriptures.text.impl.BasicToken;
 import openscriptures.text.impl.mem.MemWork;
 import openscriptures.text.importer.Context;
 import openscriptures.text.importer.PathElement;
@@ -270,10 +269,10 @@ public class Importer extends DefaultHandler {
         if (context.inText) {
             String text = new String(ch, start, length);
             
-            Matcher mat = Pattern.compile(BasicToken.TOKENIZATION_PATTERN).matcher(text);
+            Matcher mat = Pattern.compile(Token.TOKENIZATION_PATTERN).matcher(text);
             while (mat.find()) {
                 String token = mat.group();
-                Token.Type type = BasicToken.classify(token); 
+                Token.Type type = Token.classify(token); 
                 if (type == null) {
                     badTokens.add(token);
                     continue;

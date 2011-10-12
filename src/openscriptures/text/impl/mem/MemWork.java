@@ -15,7 +15,6 @@ import openscriptures.text.MutableWork;
 import openscriptures.text.Structure;
 import openscriptures.text.Token;
 import openscriptures.text.WorkId;
-import openscriptures.text.impl.BasicToken;
 import openscriptures.text.impl.BasicWork;
 import openscriptures.utils.Contributor;
 import openscriptures.utils.Language;
@@ -60,7 +59,7 @@ public class MemWork extends BasicWork implements MutableWork  {
 	public Token addToken(String token) {
 	    Token t;
 	    synchronized (tokens) {
-	        t = new BasicToken(this, tokens.size(), token);
+	        t = new Token(this, tokens.size(), token);
 	        tokens.add(t);
 	    }
 	    
@@ -76,15 +75,15 @@ public class MemWork extends BasicWork implements MutableWork  {
 	    
 	    Token t;
 	    List<Token> results = new ArrayList<Token>();
-	    Matcher mat = Pattern.compile(BasicToken.TOKENIZATION_PATTERN).matcher(text);
+	    Matcher mat = Pattern.compile(Token.TOKENIZATION_PATTERN).matcher(text);
 	    
 	    synchronized (tokens) {
 	        while (mat.find()) {
 	            String token = mat.group();
-	            if (BasicToken.classify(token) == null && skipUnrecognizedTokens)
+	            if (Token.classify(token) == null && skipUnrecognizedTokens)
 	                continue;
 	            
-	            t = new BasicToken(this, tokens.size(), token);
+	            t = new Token(this, tokens.size(), token);
 	            tokens.add(t);
 	            results.add(t);
 	        }

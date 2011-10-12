@@ -16,7 +16,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import openscriptures.text.MutableWork;
 import openscriptures.text.StructureFactory;
 import openscriptures.text.Token;
 import openscriptures.text.Work;
@@ -94,7 +93,7 @@ public class Importer extends DefaultHandler {
     private List<StructureHandler> handlerChain = new ArrayList<StructureHandler>();
     
     /** The <tt>Work</tt> object that is being created by this importer. */
-    private MutableWork work = null;
+    private Work work = null;
     
     /** 
      * Flag used for whitespace normalization that indicates whether the last token

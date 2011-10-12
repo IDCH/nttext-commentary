@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import openscriptures.text.MutableWork;
+import openscriptures.text.Work;
 import openscriptures.text.StructureFactory;
 import openscriptures.text.impl.mem.MemStructureFactory;
 
@@ -23,7 +23,7 @@ public class Context {
     private static final Logger LOGGER = Logger.getLogger(Context.class);
     
     /** The <tt>Work</tt> that is being imported. */
-    public MutableWork work = null;
+    public Work work = null;
     
     /** Indicates that the parser is in the header section of the document. */
     public boolean inHeader = false;

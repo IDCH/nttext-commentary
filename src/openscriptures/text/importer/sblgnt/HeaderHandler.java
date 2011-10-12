@@ -7,7 +7,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import openscriptures.text.MutableWork;
+import openscriptures.text.Work;
 import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.StructureHandler;
 import openscriptures.utils.Language;
@@ -43,7 +43,7 @@ public class HeaderHandler extends StructureHandler {
     protected void processHeaderField(PathElement pElement) {
         String localName = pElement.getName();
         String value = pElement.getText();
-        MutableWork work = ctx.work;
+        Work work = ctx.work;
         
         if (localName.equals("title")) {
             work.setTitle(value);

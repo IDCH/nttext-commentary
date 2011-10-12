@@ -11,11 +11,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import openscriptures.text.MutableWork;
 import openscriptures.text.Structure;
 import openscriptures.text.Token;
+import openscriptures.text.Work;
 import openscriptures.text.WorkId;
-import openscriptures.text.impl.BasicWork;
 import openscriptures.utils.Contributor;
 import openscriptures.utils.Language;
 import openscriptures.utils.License;
@@ -23,7 +22,7 @@ import openscriptures.utils.License;
 /**
  * @author Neal Audenaert
  */
-public class MemWork extends BasicWork implements MutableWork  {
+public class MemWork extends Work {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(MemWork.class.getName());
 	

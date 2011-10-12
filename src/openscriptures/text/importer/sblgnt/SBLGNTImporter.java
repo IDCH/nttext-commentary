@@ -3,16 +3,14 @@
  */
 package openscriptures.text.importer.sblgnt;
 
-import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 
 import openscriptures.text.Structure;
 import openscriptures.text.StructureFacade;
-import openscriptures.text.StructureFactory;
-import openscriptures.text.Token;
+import openscriptures.text.StructureRepository;
 import openscriptures.text.Work;
-import openscriptures.text.impl.mem.MemStructureFactory;
+import openscriptures.text.impl.JPAStructureRepository;
 import openscriptures.text.importer.Importer;
 
 
@@ -28,8 +26,8 @@ public class SBLGNTImporter {
 
         long start = System.currentTimeMillis();
         try {
-            StructureFactory factory = new MemStructureFactory();
-            Importer importer = new Importer(filename, factory);
+            StructureRepository repo = new JPAStructureRepository();
+            Importer importer = new Importer(filename, repo);
             
             importer.addHandler(new HeaderHandler());
             importer.addHandler(new FrontMatterHandler());
@@ -44,7 +42,7 @@ public class SBLGNTImporter {
             
             Work work = importer.getWork();
             
-            StructureFacade facade = factory.getStructureFacade(work);
+            StructureFacade facade = repo.getStructureFacade(work);
             SortedSet<Structure> books = facade.find("book");
             System.out.println("Number of Books: " + books.size());
             

@@ -6,7 +6,7 @@ package openscriptures.text.importer;
 import org.apache.log4j.Logger;
 
 import openscriptures.text.Structure;
-import openscriptures.text.StructureFactory;
+import openscriptures.text.StructureRepository;
 import openscriptures.text.Token;
 
 /**
@@ -190,9 +190,9 @@ public abstract class StructureHandler {
         }
         
         // TODO use facade
-        StructureFactory factory = ctx.structureFactory;
+        StructureRepository repo = ctx.structureRepo;
         startAfterIndex = ctx.work.getEnd();
-        this.activeStructure = factory.createStructure(ctx.work, name, null, null);
+        this.activeStructure = repo.create(ctx.work, name, null, null);
 
         ctx.setHandler(this);
 
@@ -242,7 +242,7 @@ public abstract class StructureHandler {
             structure.setEndToken(end);
 
             this.close(structure);
-            ctx.structureFactory.save(structure);
+            ctx.structureRepo.save(structure);
             
             ctx.clearHandler(this.getName());
             LOGGER.info("closed structure: " + structure.getName());

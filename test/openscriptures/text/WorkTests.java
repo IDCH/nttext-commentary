@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import openscriptures.text.impl.mem.MemWork;
 import openscriptures.utils.Language;
 import openscriptures.utils.License;
 import junit.framework.TestCase;
@@ -33,7 +32,7 @@ public class WorkTests extends TestCase {
         "[^\\p{L}\\p{P}\\p{javaWhitespace}]+";      // everything else (typically ignored).
     
     public void testCreateWork() {
-        Work work = new MemWork(new WorkId("Bible.grc.SBLGNT.2010"));
+        Work work = new Work(new WorkId("Bible.grc.SBLGNT.2010"));
         assertNotNull(work);
         assertEquals(work.getWorkId(), "Bible.grc.SBLGNT.2010");
         assertEquals(work.getWork(), work);

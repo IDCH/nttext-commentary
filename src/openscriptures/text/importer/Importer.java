@@ -16,11 +16,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import openscriptures.text.StructureFactory;
+import openscriptures.text.StructureRepository;
 import openscriptures.text.Token;
 import openscriptures.text.Work;
 import openscriptures.text.WorkId;
-import openscriptures.text.impl.mem.MemWork;
 import openscriptures.text.importer.Context;
 import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.ProcessingPath;
@@ -111,8 +110,8 @@ public class Importer extends DefaultHandler {
     /**
      * Creates a new Importer for the specified file.
      */
-    public Importer(String filename, StructureFactory factory) {
-        this.context = new Context(factory);
+    public Importer(String filename, StructureRepository repo) {
+        this.context = new Context(repo);
         this.filename = filename;
     }
     
@@ -202,9 +201,9 @@ public class Importer extends DefaultHandler {
             //      when the document is created.
             if (name.equals("osisText") && this.work == null) {
                 // create an instance of the work.
-                // TODO Need to migrate to JPA backed work.
                 String osisIDWork = attrs.getValue(ATTR_OSIS_ID_WORK);
-                this.work = new MemWork(new WorkId(osisIDWork));
+                // FIXME Need to use WorkRepository or some similar construct.
+                this.work = new Work(new WorkId(osisIDWork));
                 this.context.work = this.work;
 
                 LOGGER.info("Ingesting new work: " + this.work.getWorkId());

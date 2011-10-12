@@ -130,69 +130,30 @@ public class BasicToken implements Token {
     //====================================================================================
 	
 	/** Returns the unique identifier for this token. */
-	@Transient
-	public UUID getUUID() {
-	    return this.uuid;
-	}
+	@Transient public UUID getUUID() { return this.uuid; }
 	
 	/** Returns the unique identifier for this token as a string. */
-	@Id
-	public String getId() {
-	    return this.uuid.toString();
-	}
-	
+	@Id public String getId() { return this.uuid.toString(); }
 	/** Used by the persistence framework to set the unique identifier for this token. */
-	public void setId(String value) {
-	    this.uuid = UUID.fromString(value);
-	}
+	public void setId(String value) { this.uuid = UUID.fromString(value); }
 	
 	// TODO persist this
-	@Transient
-	public Work getWork() {
-	    return work;
-	}
-	
+	@Transient public Work getWork() { return work; }
 	
 	/** Returns the textual value of this token. */
-    @Override @Basic
-    public String getText() {
-        return this.value;
-    }
-    
+    @Basic public String getText() { return this.value; }
     /** Used by the persistence layer to set this token's textual value. */
-    void setText(String value) {
-        this.value = value;
-    }
+    void setText(String value) { this.value = value; }
     
-    /** 
-     * Returns the position of this token in the associated work's token stream. 
-     * @see openscriptures.text.Token#getPosition()
-     */
-    @Override @Basic
-    public int getPosition() { 
-        return this.position; 
-    }
-    
+    /** Returns the position of this token in the associated work's token stream. */
+    @Basic public int getPosition() { return this.position; }
     /** Used by persistence layer to set the position of this token in the token stream. */
-    void setPosition(int pos) {
-        this.position = pos;
-    }
+    void setPosition(int pos) { this.position = pos; }
 
-    /**
-     * Returns the type of work.
-     * 
-     * @see openscriptures.text.Token#getType()
-     * @see openscriptures.text.Token.Type
-     */
-    @Override @Enumerated(EnumType.STRING) 
-    public Type getType() { 
-        return this.type; 
-    }
-
+    /** Returns the type of token. */
+    @Enumerated(EnumType.STRING) public Type getType() { return this.type; }
     /** Used by the persistence layer to set this token's type. */
-    void setType(Type t) {
-        this.type = t;
-    }
+    void setType(Type t) { this.type = t; }
     
     //====================================================================================
     // NEXT & PREV METHODS

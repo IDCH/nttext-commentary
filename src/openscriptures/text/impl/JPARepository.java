@@ -56,6 +56,31 @@ public class JPARepository<T> {
         
         return response;    
     }
+    
+    /**
+     * 
+     * @param objects
+     * @return
+     */
+    protected List<T> create(List<T> objects) {
+        EntityManager em = m_emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        
+        List<T> response = null;
+        tx.begin();
+        try {
+            for (T t : objects)
+                em.persist(t);
+            tx.commit();
+            response = objects;     // set the response object if we get to this point
+        } finally {
+            if (tx.isActive())
+                tx.rollback();
+            em.close();
+        }
+        
+        return response;    
+    }
 
     public <Q> List<Q> query(CriteriaQuery<Q> criteria) {
         List<Q> results = null;
@@ -97,8 +122,37 @@ public class JPARepository<T> {
         return q;
     }
     
+    /**
+     * 
+     * @param <Q>
+     * @param clazz
+     * @return
+     */
     public <Q> CriteriaQuery<Q> getCriteriaQuery(Class<Q> clazz) {
         CriteriaBuilder builder = m_emf.getCriteriaBuilder();
         return builder.createQuery( clazz );
+    }
+    
+    //===================================================================================
+    // UPDATES
+    //===================================================================================
+    
+    /**
+     * 
+     * @param t
+     */
+    public void save(T t) {
+        EntityManager em = m_emf.createEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        
+        tx.begin();
+        try {
+            em.merge(t);
+            tx.commit();
+        } finally {
+            if (tx.isActive())
+                tx.rollback();
+            em.close();
+        }
     }
 }

@@ -12,13 +12,9 @@ import java.util.UUID;
  */
 public interface TokenRepository {
     
-    public Token createToken(Work w, String value);
+    public Token append(Work w, String value);
     
-    public Token createToken(Work w, String value, int pos);
-    
-    public List<Token> tokenize(Work w, String text);
-    
-    public List<Token> tokenize(Work w, String text, int pos); 
+    public List<Token> appendAll(Work w, String text);
     
     public int getMaxPosition(Work work);
     

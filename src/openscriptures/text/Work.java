@@ -112,7 +112,7 @@ public class Work extends AbstractTokenSequence {
 
 	@Deprecated
     public Token addToken(String token) {
-        return this.tokenRepo.createToken(this, token);
+        return this.tokenRepo.append(this, token);
     }
     
     /**
@@ -122,7 +122,7 @@ public class Work extends AbstractTokenSequence {
      */
 	@Deprecated
     public List<Token> tokenize(String text) {
-        return this.tokenRepo.tokenize(this, text);
+        return this.tokenRepo.appendAll(this, text);
     }
 	
 	@Deprecated

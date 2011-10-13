@@ -6,11 +6,13 @@ package openscriptures.text;
 import java.util.UUID;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -147,7 +149,8 @@ public class Token implements Comparable<Token> {
 	public void setUUIDString(String value) { this.uuid = UUID.fromString(value); }
 	
 	// TODO persist this
-	@Transient public Work getWork() { return work; }
+	@ManyToOne public Work getWork() { return work; }
+	void setWork(Work w) { this.work = w; }
 	
 	/** Returns the textual value of this token. */
     @Basic public String getText() { return this.value; }
@@ -155,7 +158,7 @@ public class Token implements Comparable<Token> {
     void setText(String value) { this.value = value; }
     
     /** Returns the position of this token in the associated work's token stream. */
-    @Basic public int getPosition() { return this.position; }
+    @Column(name="token_pos") public int getPosition() { return this.position; }
     /** Used by persistence layer to set the position of this token in the token stream. */
     void setPosition(int pos) { this.position = pos; }
 
@@ -241,7 +244,6 @@ public class Token implements Comparable<Token> {
     /** Compares this token to another token in the same work.
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    @Override
     public int compareTo(Token token) {
         // TODO check to make sure this is the same work.
         

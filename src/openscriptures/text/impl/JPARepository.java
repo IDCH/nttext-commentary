@@ -3,14 +3,25 @@
  */
 package openscriptures.text.impl;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author Neal Audenaert
  */
 public class JPARepository<T> {
+    private final static Logger LOGGER = Logger.getLogger(JPARepository.class);
+    
+    // TODO figure out how to implement canonical metamodel
+    //  SEE http://docs.jboss.org/hibernate/entitymanager/3.6/reference/en/html/metamodel.html#metamodel-static
+    
     
     protected EntityManagerFactory m_emf = null;
     
@@ -46,4 +57,48 @@ public class JPARepository<T> {
         return response;    
     }
 
+    public <Q> List<Q> query(CriteriaQuery<Q> criteria) {
+        List<Q> results = null;
+        EntityManager em = m_emf.createEntityManager();
+        try {
+             results = em.createQuery( criteria ).getResultList();
+        } finally {
+            em.close();
+        }
+        
+        return results;
+    }
+    
+    /**
+     * 
+     * @param <Q>
+     * @param criteria
+     * @return
+     */
+    public <Q> Q queryOne(CriteriaQuery<Q> criteria) {
+        EntityManager em = m_emf.createEntityManager();
+        
+        Q q = null;
+        try {
+             List<Q> results = em.createQuery( criteria ).getResultList();
+             if ((results != null) && (results.size() > 0)) {
+                 String errmsg = 
+                     "Expected to find at most one object. Found " + results.size();
+                 assert results.size() == 1 : errmsg;
+                 if (results.size() != 1)
+                     LOGGER.warn(errmsg);
+                 
+                 q = results.get(0);
+             }
+        } finally {
+            em.close();
+        }
+        
+        return q;
+    }
+    
+    public <Q> CriteriaQuery<Q> getCriteriaQuery(Class<Q> clazz) {
+        CriteriaBuilder builder = m_emf.getCriteriaBuilder();
+        return builder.createQuery( clazz );
+    }
 }

@@ -12,7 +12,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import javax.persistence.AttributeOverrides;
+import javax.persistence.AttributeOverride;
 import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -131,7 +135,7 @@ public class Work extends AbstractTokenSequence {
 //============================================================================================
 	
 	/** Returns the unique persistent identifier for this work. */
-	@Id @GeneratedValue Long getId() { return this.id; }
+	@Id @GeneratedValue public Long getId() { return this.id; }
 	/** Sets the unique persistent identifier for this work. */
 	void setId(Long id) { this.id = id; }
 	
@@ -149,12 +153,18 @@ public class Work extends AbstractTokenSequence {
 	void setUUIDString(String id) { this.uuid = UUID.fromString(id); }
 		
 	/** The <tt>WorkId</tt> of this work. */
-	@Transient public WorkId getWorkId() { return this.osisID; }
-	
-	/** Returns a string representation of this work's OSIS id. @see #getWorkId() */
-	@Basic public String getOsisId() { return this.osisID.toString(); }
-	/** Sets the work id of this Work. @see #getWorkId() */
-	void setOsisId(String id) { this.osisID = new WorkId(id); }
+	@Embedded 
+	@AttributeOverrides( {
+        @AttributeOverride(name="type", column = @Column(name="workId_type") ),
+        @AttributeOverride(name="lgCode", column = @Column(name="workId_lg") ),
+        @AttributeOverride(name="publisher", column = @Column(name="workId_pub") ),
+        @AttributeOverride(name="name", column = @Column(name="workId_name") ),
+        @AttributeOverride(name="publicationDate", column = @Column(name="workId_date") )
+	} )
+	public WorkId getWorkId() { return this.osisID; }
+	/** Used by persistence layer to set the work id for this work. */
+	void setWorkId(WorkId osisId) { this.osisID = osisId; }
+	// TODO there is a lot of redundant information here.
 	
 	/** The title of this work. */
 	@Basic public String getTitle() { return title; }
@@ -172,9 +182,9 @@ public class Work extends AbstractTokenSequence {
     public void setDescription(String desc) {  this.description = desc; }
 
 	/** The URL where this resource was originally obtained. */
-	@Basic public String getSourceURL() {  return this.sourceUrl; }
+	@Basic public String getSourceUrl() {  return this.sourceUrl; }
 	 /** Sets the URL where this resource was originally obtained. */ 
-    public void setSourceURL(String url) {  this.sourceUrl = url; }
+    public void setSourceUrl(String url) {  this.sourceUrl = url; }
     
 	/** The individual or organization responsible for creating this work. */
 	@Basic public String getCreator() { return this.creator; }

@@ -3,7 +3,11 @@
  */
 package openscriptures.text;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import openscriptures.utils.Language;
+import openscriptures.utils.Language.Direction;
 import openscriptures.utils.License;
 
 /**
@@ -32,9 +36,35 @@ public class ApplicationContext {
     // MEMBER VARIABLES
     //=======================================================================================
     
+    private Map<String, Language> languages = new HashMap<String, Language>();
+    
     //=======================================================================================
     // CONSTRUCTORS
     //=======================================================================================
+    ApplicationContext() {
+        loadLanguageDefinitions();
+    }
+    
+    
+    private void loadLanguageDefinitions() {
+        // TODO load from file.
+        // TODO use ISO codes.
+        defineLanguage("eng", "English", Direction.LTR);
+        defineLanguage("grc", "Greek", Direction.LTR);
+    }
+    
+    private Language defineLanguage(String lgCode, String name, Language.Direction dir) {
+        Language lg = null;
+        synchronized (languages) {
+            lg = this.languages.get(lgCode);
+            if (lg == null) {
+                lg = new Language(name, lgCode, dir);
+                this.languages.put(lgCode, lg);
+            }
+        }
+        
+        return lg;
+    }
     
     //=======================================================================================
     // ACCESSORS
@@ -42,9 +72,7 @@ public class ApplicationContext {
     
     
     public Language getLanguage(String lgCode) {
-        // TODO load language repository from XML file (or other configured source)
-        //      and lookup the appropriate language
-        return null;
+        return languages.get(lgCode);
     }
     
     public License getLicense(String license) {

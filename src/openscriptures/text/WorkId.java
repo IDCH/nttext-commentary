@@ -20,13 +20,6 @@ import openscriptures.utils.Language;
 @Embeddable
 public class WorkId {
 	// Most of these TODO's are not properly a part of the OSIS framework.
-	// TODO Need to implement lookup services that that will search for a work ID based on
-	//		its title, language or type. For example, return all works of type 'Bible'
-	// TODO Need to implement more full-featured descriptions. A work should have 
-	//		the title, copyright information, description, versification strategy, and 
-	//      perhaps other information about how to resolve references to it.
-	// TODO cross walk with FRBR.
-	//		I think we have work = type, expression = <lg, slug>, manifestation = <publisher, edition> 
 	
 	public static enum Type {
 		// XXX This seems like the wrong approach. If we need multiple types, we'll
@@ -84,6 +77,11 @@ public class WorkId {
 // CONSTRUCTORS
 //============================================================================================  
 
+	/** Default constructor required for persistence layer. */
+	WorkId() {
+	    
+	}
+	
 	/**
 	 * 
 	 * @param name
@@ -167,9 +165,9 @@ public class WorkId {
 		// TODO handle revision number, version number, and edition number?
 	}
 	
-//============================================================================================
-// ACCESSORS
-//============================================================================================  
+    //===================================================================================
+    // ACCESSORS
+    //===================================================================================
 
 	/** Returns the type of this work. */
     @Enumerated(EnumType.STRING) public Type getType() { return this.type; }
@@ -184,20 +182,21 @@ public class WorkId {
 	}
 	
 	/** Returns the publisher of this work. */
-	public String getPublisher() {
-		return this.publisher;
-	}
+	@Basic public String getPublisher() { return this.publisher; }
+	void setPublisher(String pub) { this.publisher = pub; }
 	
 	/** Returns the name of this work. */
-	public String getName() {
-		return this.name;
-	}
+	@Basic public String getName() { return this.name; }
+	void setName(String name) { this.name = name; }
 
 	/** Returns the date this work was published. */
-	public String getPublicationDate() {
-		return this.publicationDate;
-	}
+	@Basic public String getPublicationDate() { return this.publicationDate; }
+	void setPublicationDate(String date) { this.publicationDate = date; }
 	
+	//===================================================================================
+	// UTILITY METHODS
+	//===================================================================================
+
 	/** Returns the properly formatted OSIS identifier for this work. */
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

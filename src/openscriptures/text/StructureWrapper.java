@@ -20,7 +20,10 @@ import java.util.UUID;
  * @author Neal Audenaert
  */
 public abstract class StructureWrapper extends Structure {
-	
+	// TODO (maybe) connect to repository so that we can write changes through.
+    // TODO This is dangerous. We're inheriting structure, but there is no requirement
+    //      that we override the interface methods. Inconsistent Changes Some may default 
+    
 	private final Structure me;
 	
 //========================================================================================

@@ -6,11 +6,18 @@ package openscriptures.text;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
+import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Transient;
+
 import openscriptures.utils.Language;
 
 /**
  * @author Neal Audenaert
  */
+@Embeddable
 public class WorkId {
 	// Most of these TODO's are not properly a part of the OSIS framework.
 	// TODO Need to implement lookup services that that will search for a work ID based on
@@ -165,13 +172,15 @@ public class WorkId {
 //============================================================================================  
 
 	/** Returns the type of this work. */
-	public Type getType() {
-		return this.type;
-	}
+    @Enumerated(EnumType.STRING) public Type getType() { return this.type; }
+    void setType(Type t) { this.type = t; }
 	
 	/** Returns the language of this work */
-	public Language getLanguage() {
-		return this.language;
+	@Transient public Language getLanguage() { return this.language; }
+	@Basic String getLgCode() { return this.language.getCode(); }
+	void setLgCode(String lgCode) {
+	    ApplicationContext ctx = ApplicationContext.getApplicationContext();
+	    this.language = ctx.getLanguage(lgCode); 
 	}
 	
 	/** Returns the publisher of this work. */

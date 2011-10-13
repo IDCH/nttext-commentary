@@ -9,6 +9,7 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -93,6 +94,7 @@ public class Token implements Comparable<Token> {
     // MEMBER VARIABLES
     //====================================================================================
     
+    private Long id;
 	private UUID uuid;
 	
 	private Work work;
@@ -131,17 +133,21 @@ public class Token implements Comparable<Token> {
     // ACCESSORS & MUTATORS
     //====================================================================================
 	
+	/** Returns the unique persistent identifier for this work. */
+    @Id @GeneratedValue Long getId() { return this.id; }
+    /** Sets the unique persistent identifier for this work. */
+    void setId(Long id) { this.id = id; }
+    
 	/** Returns the unique identifier for this token. */
 	@Transient public UUID getUUID() { return this.uuid; }
 	
 	/** Returns the unique identifier for this token as a string. */
-	@Id public String getId() { return this.uuid.toString(); }
+	@Basic public String getUUIDString() { return this.uuid.toString(); }
 	/** Used by the persistence framework to set the unique identifier for this token. */
-	public void setId(String value) { this.uuid = UUID.fromString(value); }
+	public void setUUIDString(String value) { this.uuid = UUID.fromString(value); }
 	
 	// TODO persist this
 	@Transient public Work getWork() { return work; }
-	
 	
 	/** Returns the textual value of this token. */
     @Basic public String getText() { return this.value; }

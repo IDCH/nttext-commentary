@@ -25,17 +25,15 @@ import openscriptures.text.Work;
 /**
  * @author Neal Audenaert
  */
-public class JPATokenRepository implements TokenRepository {
+public class JPATokenRepository extends JPARepository<Token> implements TokenRepository {
     private static final Logger LOGGER = Logger.getLogger(JPATokenRepository.class);
-    
-    private EntityManagerFactory m_emf = null;
     
     //=======================================================================================
     // CONSTRUCTOR
     //=======================================================================================
     
     public JPATokenRepository(EntityManagerFactory emf) {
-        m_emf = emf;
+        super(emf);
     }
     
     //=======================================================================================
@@ -61,24 +59,7 @@ public class JPATokenRepository implements TokenRepository {
      * @return
      */
     public Token createToken(Work w, String value, int pos) {
-        Token t = null;
-        EntityManager em = m_emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        
-        tx.begin();
-        try {
-            
-            t = new Token(w, pos, value);
-            em.persist(t);
-            
-            tx.commit();
-        } finally {
-            if (tx.isActive())
-                tx.rollback();
-            em.close();
-        }
-        
-        return t;
+        return create(new Token(w, pos, value));
     }
     
     /**

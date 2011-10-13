@@ -144,9 +144,9 @@ public class Work extends AbstractTokenSequence {
 	@Transient public UUID getUUID() { return this.uuid; }
 	
 	/** Returns the UUID as a string. Intended to be used by the persistence framework. */
-	@Basic String getUuidString() { return this.uuid.toString(); }
+	@Basic String getUUIDString() { return this.uuid.toString(); }
 	/** Sets the UUID as a string. Intended to be used by the persistence framework. */
-	void setIdString(String id) { this.uuid = UUID.fromString(id); }
+	void setUUIDString(String id) { this.uuid = UUID.fromString(id); }
 		
 	/** The <tt>WorkId</tt> of this work. */
 	@Transient public WorkId getWorkId() { return this.osisID; }

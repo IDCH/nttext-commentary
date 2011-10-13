@@ -13,6 +13,8 @@ import java.util.UUID;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -156,6 +158,8 @@ public class Structure extends AbstractTokenSequence {
 	// TODO comments are currently derived from Python reference implementation. need to 
 	//      be updated
 	
+	private Long id;
+	
 	protected UUID uuid;
 	
 	/**
@@ -167,7 +171,7 @@ public class Structure extends AbstractTokenSequence {
 	 * A locally unique identifier for this structure. This is (optionally) used to provides 
 	 * access to domain specific identifiers (e.g., OSIS ids for books, chapters and verses).
 	 */
-	protected String id;
+	protected String localId;
 	
 	/** The work this structure pertains to. This must be same as the start and end tokens. */
 	protected Work work;
@@ -260,7 +264,10 @@ public class Structure extends AbstractTokenSequence {
 //========================================================================================
 // ACCESSORS
 //========================================================================================
-
+	 /** Returns the unique DB identifier. To be used by the persistence layer. */
+    @Id @GeneratedValue Long getId() { return id; }
+    /** Used by persistence layer to set the UUID from a string. */
+    void setId(Long id) { this.id = id; }
 	
 	/** 
 	 *  Returns the unique identifier for this <tt>Structure</tt> 
@@ -283,11 +290,11 @@ public class Structure extends AbstractTokenSequence {
      * those that may need to be referenced across different texts (e.g., OSIS ids for 
      * books, chapters and verses).
      */
-    @Basic public String getLocalId() { return this.id; }
+    @Basic public String getLocalId() { return this.localId; }
     /** 
      * Sets the locally unique ID for this structure. Note that the uniqueness of 
      * this name is not enforced. */
-    public void setLocalId(String value) { this.id = value; }
+    public void setLocalId(String value) { this.localId = value; }
     
     /** Return the name of this structure. This corresponds to an element 
      * name in an XML document. */

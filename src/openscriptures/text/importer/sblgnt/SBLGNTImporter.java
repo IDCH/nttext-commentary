@@ -6,11 +6,17 @@ package openscriptures.text.importer.sblgnt;
 import java.util.SortedSet;
 import java.util.logging.Logger;
 
+import javax.persistence.EntityManagerFactory;
+
+import org.idch.util.PersistenceUtil;
+
 import openscriptures.text.Structure;
 import openscriptures.text.StructureFacade;
-import openscriptures.text.StructureRepository;
 import openscriptures.text.Work;
 import openscriptures.text.impl.JPAStructureRepository;
+import openscriptures.text.impl.JPATokenRepository;
+import openscriptures.text.impl.JPAWorkRepository;
+import openscriptures.text.importer.Context;
 import openscriptures.text.importer.Importer;
 
 
@@ -26,8 +32,12 @@ public class SBLGNTImporter {
 
         long start = System.currentTimeMillis();
         try {
-            StructureRepository repo = new JPAStructureRepository();
-            Importer importer = new Importer(filename, repo);
+            EntityManagerFactory emf = PersistenceUtil.getEMFactory("nttext");
+            Context context = new Context(
+                    new JPAWorkRepository(emf),
+                    new JPATokenRepository(emf),
+                    new JPAStructureRepository(emf));
+            Importer importer = new Importer(filename, context);
             
             importer.addHandler(new HeaderHandler());
             importer.addHandler(new FrontMatterHandler());
@@ -42,7 +52,7 @@ public class SBLGNTImporter {
             
             Work work = importer.getWork();
             
-            StructureFacade facade = repo.getStructureFacade(work);
+            StructureFacade facade = context.structures.getStructureFacade(work);
             SortedSet<Structure> books = facade.find("book");
             System.out.println("Number of Books: " + books.size());
             

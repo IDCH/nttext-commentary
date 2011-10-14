@@ -7,10 +7,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import javax.persistence.AttributeOverrides;
 import javax.persistence.AttributeOverride;
@@ -39,9 +37,6 @@ import openscriptures.utils.License;
 @Entity
 @Table(name="OpenS_Works")
 public class Work extends AbstractTokenSequence {
-	@SuppressWarnings("unused")
-	private static final Logger LOGGER = Logger.getLogger(Work.class.getName());
-	
 
 	//============================================================================================
 	// MEMBER VARIABLES
@@ -110,25 +105,7 @@ public class Work extends AbstractTokenSequence {
 	// METHODS TO CREATE AND QUERY THE CONTENTS OF THIS WORK
 	//============================================================================================
 
-	@Deprecated
-    public Token addToken(String token) {
-        return this.tokenRepo.append(this, token);
-    }
-    
-    /**
-     * 
-     * @param text
-     * @return
-     */
-	@Deprecated
-    public List<Token> tokenize(String text) {
-        return this.tokenRepo.appendAll(this, text);
-    }
 	
-	@Deprecated
-	public Structure createStructure(Token start, Token end) {
-        return null;
-    }
 	
 //============================================================================================
 // ACCESSORS AND MUTATORS

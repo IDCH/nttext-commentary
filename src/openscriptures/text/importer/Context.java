@@ -9,7 +9,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import openscriptures.text.StructureRepository;
+import openscriptures.text.TokenRepository;
 import openscriptures.text.Work;
+import openscriptures.text.WorkRepository;
 
 /**
  * Provides a shared context for use by both the main <tt>Importer</tt> and individual 
@@ -35,10 +37,12 @@ public class Context {
      *  it encounters. */
     public boolean inText = false;
     
-    /** Used to create structure instances. 
-     *  FIXME we need to implement some way to discover this.
-     */
-    StructureRepository structureRepo = null;
+    public WorkRepository works = null;
+    
+    public TokenRepository tokens = null;
+    
+    /** Used to create structure instances. */
+    public StructureRepository structures = null;
     
     //=====================================================================================
     // PRIVATE STATE VARIABLES
@@ -69,8 +73,12 @@ public class Context {
      *           how objects are created and retrieved.
      *      
      */
-    Context(StructureRepository repo) {
-        this.structureRepo = repo;
+    public Context(WorkRepository workRepo, 
+            TokenRepository tokenRepo, 
+            StructureRepository structureRepo) {
+        this.works = workRepo;
+        this.tokens = tokenRepo;
+        this.structures = structureRepo;
     }
     
     //=====================================================================================

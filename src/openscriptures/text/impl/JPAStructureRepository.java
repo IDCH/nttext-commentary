@@ -5,6 +5,8 @@ package openscriptures.text.impl;
 
 import java.util.SortedSet;
 
+import javax.persistence.EntityManagerFactory;
+
 import openscriptures.text.Structure;
 import openscriptures.text.StructureFacade;
 import openscriptures.text.StructureRepository;
@@ -15,15 +17,17 @@ import openscriptures.text.Work;
 /**
  * @author Neal Audenaert
  */
-public class JPAStructureRepository implements StructureRepository {
+public class JPAStructureRepository extends JPARepository<Structure> implements StructureRepository {
 
+    public JPAStructureRepository(EntityManagerFactory emf) {
+        super(emf);
+    }
+    
     /* (non-Javadoc)
      * @see openscriptures.text.StructureRepository#create(openscriptures.text.Work, java.lang.String)
      */
-    @Override
     public Structure create(Work work, String name) {
-        // TODO Auto-generated method stub
-        return null;
+        return create(new Structure(work, name, null, null));
     }
 
     /* (non-Javadoc)
@@ -98,14 +102,4 @@ public class JPAStructureRepository implements StructureRepository {
         // TODO Auto-generated method stub
         return null;
     }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.StructureRepository#save(openscriptures.text.Structure)
-     */
-    @Override
-    public boolean save(Structure s) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
 }

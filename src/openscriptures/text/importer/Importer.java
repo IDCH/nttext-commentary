@@ -6,18 +6,12 @@ package openscriptures.text.importer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import openscriptures.text.StructureRepository;
-import openscriptures.text.Token;
 import openscriptures.text.Work;
 import openscriptures.text.WorkId;
 import openscriptures.text.importer.Context;
@@ -94,15 +88,6 @@ public class Importer extends DefaultHandler {
     /** The <tt>Work</tt> object that is being created by this importer. */
     private Work work = null;
     
-    /** 
-     * Flag used for whitespace normalization that indicates whether the last token
-     * processed was a whitespace token.
-     */
-    private boolean lastTokenWasWhitespace = false;
-
-    /** Used to keep track of unrecognized tokens for error reporting.  */
-    Set<String> badTokens = new HashSet<String>();
-
 //========================================================================================
 // CONSTRUCTORS
 //========================================================================================
@@ -110,8 +95,8 @@ public class Importer extends DefaultHandler {
     /**
      * Creates a new Importer for the specified file.
      */
-    public Importer(String filename, StructureRepository repo) {
-        this.context = new Context(repo);
+    public Importer(String filename, Context context) {
+        this.context = context;
         this.filename = filename;
     }
     
@@ -266,26 +251,7 @@ public class Importer extends DefaultHandler {
         
         if (context.inText) {
             String text = new String(ch, start, length);
-            
-            Matcher mat = Pattern.compile(Token.TOKENIZATION_PATTERN).matcher(text);
-            while (mat.find()) {
-                String token = mat.group();
-                Token.Type type = Token.classify(token); 
-                if (type == null) {
-                    badTokens.add(token);
-                    continue;
-                    
-                } else if (type == Token.Type.WHITESPACE) {
-                    if (!lastTokenWasWhitespace && (work.size() > 0)) { // normalize whitespace.
-                        work.addToken(" ");
-                    }
-                    
-                    lastTokenWasWhitespace = true;
-                } else {
-                    lastTokenWasWhitespace = false;
-                    work.addToken(token);
-                }
-            }
+            context.tokens.appendAll(work, text);
         } 
     }
     

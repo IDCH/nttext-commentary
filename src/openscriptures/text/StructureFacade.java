@@ -26,8 +26,8 @@ public class StructureFacade {
         return repo.create(work, name);
     }
     
-    public boolean save(Structure s) {
-        return repo.save(s);
+    public void save(Structure s) {
+        repo.save(s);
     }
     
     public SortedSet<Structure> find(String name) {

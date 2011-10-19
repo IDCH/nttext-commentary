@@ -38,7 +38,7 @@ public class JPARepository<T> {
      * @param object
      * @return
      */
-    protected T create(T object) {
+    public T create(T object) {
         EntityManager em = m_emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         
@@ -62,15 +62,16 @@ public class JPARepository<T> {
      * @param objects
      * @return
      */
-    protected List<T> create(List<T> objects) {
+    public List<T> create(List<T> objects) {
         EntityManager em = m_emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         
         List<T> response = null;
         tx.begin();
         try {
-            for (T t : objects)
+            for (T t : objects) {
                 em.persist(t);
+            }
             tx.commit();
             response = objects;     // set the response object if we get to this point
         } finally {

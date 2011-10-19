@@ -56,18 +56,16 @@ public class HeaderHandler extends StructureHandler {
             try {
                 work.setPublicationDate(fmt.parse(value));
             } catch (ParseException pe) {
-                SBLGNTImporter.LOGGER.warning("Could not parse publication date. " +
+                SBLGNTImporter.LOGGER.warn("Could not parse publication date. " +
                         "Expected yyyy-MM-dd format: " + value + 
                         " (Work: " + work.getWorkId() + ")");
             }
             
         } else if (localName.equals("publisher")) {
             work.setPublisher(value);
-            System.out.println("publisher: '" + value + "'");
             
         } else if (localName.equals("type")) {
             work.setType(value);
-//                System.out.println("type: '" + value + "'");
             
         } else if (localName.equals("format")) {
             // not used.
@@ -77,19 +75,15 @@ public class HeaderHandler extends StructureHandler {
             
         } else if (localName.equals("language")) {
             work.setLanguage(Language.lookup(value));
-//                System.out.println("language: '" + value + "'");
             
         } else if (localName.equals("rights")) {
             work.setCopyright(value);
-//                System.out.println("rights: '" + value + "'");
             
         } else if (localName.equals("scope")) {
             work.setScope(value);
-//                System.out.println("scope: '" + value + "'");
             
         } else if (localName.equals("refSystem")) {
             work.setRefSystem(value);
-//                System.out.println("refSystem: '" + value + "'");
         }
     }
 }

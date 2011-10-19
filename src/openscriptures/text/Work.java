@@ -3,12 +3,16 @@
  */
 package openscriptures.text;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.AttributeOverrides;
 import javax.persistence.AttributeOverride;
@@ -23,6 +27,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+
+import org.idch.util.Cache;
 
 import openscriptures.text.Work;
 import openscriptures.utils.Contributor;
@@ -68,7 +74,13 @@ public class Work extends AbstractTokenSequence {
 	// TODO need to implement support for providing license definitions. 
 	protected License license;	
 	
-	private TokenRepository tokenRepo = null;
+	// TOKENS AND CACHING
+	//===============================
+	
+	private ApplicationContext ac = null; 
+	private TokenRepository tokens = null;
+	
+	Cache<Integer, Token> tokenCache = new Cache<Integer, Token>("tokens", 1000);
 
 //============================================================================================
 // CONSTRUCTORS
@@ -93,18 +105,114 @@ public class Work extends AbstractTokenSequence {
 		this.description = desc;
 	}
 	
-	/** 
-	 * Sets the token repository to be used to obtain tokens for this work.
-	 * @param repo
-	 */
-	public void setTokenRepository(TokenRepository repo) {
-	    this.tokenRepo = repo;
+	@Transient 
+	public TokenRepository getTokenRepository() {
+	    if (ac == null)
+	        ac = ApplicationContext.getApplicationContext();
+	    
+	    if (this.tokens == null)
+	        this.tokens = ac.getTokens(this);
+	    
+	    return this.tokens;
 	}
 
-	//============================================================================================
+	//===================================================================================
 	// METHODS TO CREATE AND QUERY THE CONTENTS OF THIS WORK
-	//============================================================================================
+	//===================================================================================
+	
+	/**
+     * 
+     * @param w
+     * @param value
+     * @param pos
+     * @return
+     */
+    public Token append(Work w, String value) {
+        // XXX  this may have synchronization issues.
+        if (size < 0) this.size();
+        
+        Token t = new Token(w, size++, value);
+        synchronized (tokenCache) {
+            tokenCache.cache(t.getPosition(), t);
+        }
+        
+        return this.getTokenRepository().create(t);
+    }
+    
+    /**
+     * 
+     * @param w
+     * @param text
+     * @return
+     */
+    public List<Token> appendAll(String text) {
+        if (size < 0) this.size();
+        
+        
+        List<Token> tokens = new ArrayList<Token>();
+        boolean lastTokenWasWhitespace = false;
+        if (text == null)
+            return tokens;
+        
+        Matcher mat = Pattern.compile(Token.TOKENIZATION_PATTERN).matcher(text);
+        while (mat.find()) {
+            String token = mat.group();
 
+            Token.Type type = Token.classify(token);
+            if (type == null) {
+                continue;       // TODO do something about this 
+
+            } else if (type == Token.Type.WHITESPACE) {
+                if (!lastTokenWasWhitespace && (size > 0)) { // normalize whitespace.
+                    tokens.add(new Token(this, size++, " "));
+                }
+
+                lastTokenWasWhitespace = true;
+            } else {
+                lastTokenWasWhitespace = false;
+                tokens.add(new Token(this, size++, token));
+            }
+        }
+        
+        synchronized (tokenCache) {
+            for (Token t : tokens) {
+                tokenCache.cache(t.getPosition(), t);
+            }
+        }
+        return this.getTokenRepository().create(tokens);
+    }
+    
+	/** Returns the token at the specified index. */
+    public Token get(int index) {
+        
+        Token t = null;
+        t = tokenCache.get(index);
+        synchronized (tokenCache) {
+            if (t == null) {
+                TokenRepository tokens = this.getTokenRepository();
+                t = tokens.find(this, index);
+                
+                tokenCache.cache(index, t);
+            }
+        }
+        
+        return t;
+    }
+
+    private int size = Integer.MIN_VALUE;
+    public int size() {
+        if (size >= 0)
+            return size;
+        
+        TokenRepository tokens = this.getTokenRepository();
+        if (tokens == null) {
+            // TODO if the repo isn't set, we need to throw an exception
+            return -1;
+        }
+        size = tokens.getMaxPosition(this) + 1;
+        
+        return size;
+    }
 	
 	
 //============================================================================================
@@ -303,14 +411,17 @@ public class Work extends AbstractTokenSequence {
      * Return the end position (exclusive) in the underlying <tt>Work</tt>'s token stream.  
      */
     @Transient
-    public int getEnd() { 
-        return this.tokenRepo.getMaxPosition(this) + 1;
+    public int getEnd() {
+        TokenRepository tokens = this.getTokenRepository();
+        if (tokens == null) {
+            // TODO if the repo isn't set, we need to throw an exception
+            return -1;
+        }
+        
+        return tokens.getMaxPosition(this) + 1;
+        
     }
      
-    /** Returns the token at the specified index. */
-    public Token get(int index) {
-        return this.tokenRepo.find(this, index);
-    }
-
+    
 	
 }

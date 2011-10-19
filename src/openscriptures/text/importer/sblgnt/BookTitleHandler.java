@@ -32,7 +32,5 @@ public class BookTitleHandler extends StructureHandler {
 //            Other Endings of Mark
 //            Intermediate Ending
 //            Long Ending
-            
-//            System.out.println(p.getText());
         }
     }

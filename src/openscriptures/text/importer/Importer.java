@@ -13,7 +13,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import openscriptures.text.Work;
-import openscriptures.text.WorkId;
 import openscriptures.text.importer.Context;
 import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.ProcessingPath;
@@ -85,9 +84,6 @@ public class Importer extends DefaultHandler {
      */
     private List<StructureHandler> handlerChain = new ArrayList<StructureHandler>();
     
-    /** The <tt>Work</tt> object that is being created by this importer. */
-    private Work work = null;
-    
 //========================================================================================
 // CONSTRUCTORS
 //========================================================================================
@@ -128,7 +124,7 @@ public class Importer extends DefaultHandler {
      * @return
      */
     public Work getWork() {
-        return this.work;
+        return context.work;
     }
 
     /**
@@ -161,8 +157,6 @@ public class Importer extends DefaultHandler {
     public void startElement(
             String nsURI, String name, String qName, Attributes attrs)
     throws SAXException {
-        
-        
         PathElement el = this.path.push(nsURI, name, qName, attrs);
         if (context.inHeader || context.inFront) {
             // FIXME this seems really ad hoc
@@ -184,14 +178,12 @@ public class Importer extends DefaultHandler {
             // TODO this is very specific to OSIS texts. What about TEI, etc. We need to 
             //      delegate this to the normal handler mechanisms and create the new work
             //      when the document is created.
-            if (name.equals("osisText") && this.work == null) {
+            if (name.equals("osisText") && context.work == null) {
                 // create an instance of the work.
                 String osisIDWork = attrs.getValue(ATTR_OSIS_ID_WORK);
-                // FIXME Need to use WorkRepository or some similar construct.
-                this.work = new Work(new WorkId(osisIDWork));
-                this.context.work = this.work;
+                context.work = context.works.create(osisIDWork);
 
-                LOGGER.info("Ingesting new work: " + this.work.getWorkId());
+                LOGGER.info("Ingesting new work: " + context.work.getWorkId());
 
             } else {
                 LOGGER.info("Unhandled start tag: " + this.path);
@@ -251,8 +243,9 @@ public class Importer extends DefaultHandler {
         
         if (context.inText) {
             String text = new String(ch, start, length);
-            context.tokens.appendAll(work, text);
-        } 
+            if (context.work != null)
+                context.work.appendAll(text);
+        }
     }
     
     /**

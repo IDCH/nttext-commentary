@@ -238,13 +238,15 @@ public class Structure extends AbstractTokenSequence {
 	protected Structure() {
 	}
 	
-	public Structure(Work work, String name, Token start, Token end) {
-	    // TODO for now, I've made this public. May need to re-evaluate this if I want
-	    //      to force people to use a specific sub-class
+	public Structure(Work work, String name) {
 	    this.uuid = UUID.randomUUID();
-	    
-	    this.name = name;
-	    this.work = work;
+        
+        this.name = name;
+        this.work = work;
+	}
+	
+	public Structure(Work work, String name, Token start, Token end) {
+	    this(work, name);
 	    this.setTokens(start, end);
 	}
 	
@@ -303,10 +305,10 @@ public class Structure extends AbstractTokenSequence {
     public void setName(String value) { this.name = value; }
 
     @Basic Integer getStartTokenPosition() { return this.startTokenPosition; }
-    void setStartTokenPosition(int pos) { this.startTokenPosition = pos; }
+    void setStartTokenPosition(Integer pos) { this.startTokenPosition = pos; }
     
     @Basic Integer getEndTokenPosition() { return this.endTokenPosition; }
-    void setEndTokenPosition(int pos) { this.endTokenPosition = pos; }
+    void setEndTokenPosition(Integer pos) { this.endTokenPosition = pos; }
 
     
     
@@ -326,6 +328,7 @@ public class Structure extends AbstractTokenSequence {
 
     @Transient
     public int getStart() {
+        // TODO Test start and end behavior extensively. These have lots of failure points.
         return (startTokenPosition != null)  
                 ? startTokenPosition
                 : -1;
@@ -341,14 +344,13 @@ public class Structure extends AbstractTokenSequence {
     /** Returns the token at which this structure starts. */
     @Transient
     public Token getStartToken() {
-        Integer start = this.startTokenPosition;
+        int start = this.getStart();
         
         Token t = null;
-        if ((this.startToken != null) && 
-            (this.startToken.getPosition() == start.intValue())) {
+        if ((startToken != null) && (startToken.getPosition() == start)) {
             t = startToken;
             
-        } else if (start != null && start >= 0) {
+        } else if (startTokenPosition != null && start >= 0) {
             t = this.work.get(start);
             this.startToken = t;
         }
@@ -370,6 +372,8 @@ public class Structure extends AbstractTokenSequence {
      */
     public void setStartToken(Token token) 
     throws UnsupportedOperationException, InvalidTokenException {
+        this.startToken = null;
+        
         Token end = this.getEndToken();
         if (end != null) 
             checkOrder(token, end);
@@ -384,14 +388,13 @@ public class Structure extends AbstractTokenSequence {
      */
     @Transient
     public Token getEndToken() {
-        Integer end = this.startTokenPosition;
+        int end = this.getEnd();
         
         Token t = null;
-        if ((this.endToken != null) && 
-            (this.endToken.getPosition() == end.intValue())) {
+        if ((endToken != null) && (endToken.getPosition() == end)) {
             t = endToken;
             
-        } else if (end != null && end >= 0) {
+        } else if (endTokenPosition != null && end >= 0) {
             t = this.work.get(end);
             this.endToken = t;
         }
@@ -414,6 +417,8 @@ public class Structure extends AbstractTokenSequence {
      */
     public void setEndToken(Token token) 
     throws UnsupportedOperationException, InvalidTokenException {
+        this.endToken = null;
+        
         checkOrder(this.getStartToken(), token);
         if (token != null) 
             checkWork(token);
@@ -437,6 +442,14 @@ public class Structure extends AbstractTokenSequence {
      */
     public void setTokens(Token start, Token end) 
     throws UnsupportedOperationException, InvalidTokenException {
+        this.startToken = null;
+        this.endToken = null;
+        
+        if (start == null) {
+            this.startTokenPosition = null;
+            this.endTokenPosition = null;
+        }
+        
         checkOrder(start, end);
         checkWork(start); 
         if (end != null) 

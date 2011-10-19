@@ -106,7 +106,7 @@ public abstract class StructureHandler {
      * @see #end(PathElement)
      * @see #matchesStart(PathElement) 
      */
-    boolean matchesEnd(PathElement p) {
+    public boolean matchesEnd(PathElement p) {
         return this.matchesStart(p);
     }
 
@@ -197,6 +197,11 @@ public abstract class StructureHandler {
         return activeStructure;
     }
     
+    long timect = 0;
+    long avgTime = 0;
+    long gap = 0;
+    long gapTime = 0;
+    long end = 0;
     /**
      * TODO add comment
      * @return
@@ -208,10 +213,25 @@ public abstract class StructureHandler {
         if (structure != null) {
             warning += "(" + structure.getName() + "): ";
             
+            long startTime = System.currentTimeMillis();
+            if (end != 0) gapTime += startTime - end; 
+
+            
             // get the start token
-            Token start = ctx.work.get(startAfterIndex);
+            Token start = ctx.work.get(startAfterIndex);        // TODO possibly (although bad) null pointer exception
             if (start.getType() == Token.Type.WHITESPACE)
                 start = start.next(true);
+            
+            end = System.currentTimeMillis();
+            avgTime += end - startTime;
+            if (++timect % 10 == 0) {
+                System.out.println("Structure Handler (" + structure.getName() + "): \n" +
+                		"  Time (" + timect + "): " + ((float)avgTime / 10) + "\n" + 
+                        "  Gap (" + timect + "): " + ((float)gapTime / 10));
+                avgTime = 0;
+                gapTime = 0;
+                
+            }
             
             // get the end token
             int lastPos = ctx.work.getEnd() - 1;

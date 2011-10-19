@@ -6,6 +6,12 @@ package openscriptures.text;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.persistence.EntityManagerFactory;
+
+import org.idch.util.PersistenceUtil;
+
+import openscriptures.text.impl.JPAStructureRepository;
+import openscriptures.text.impl.JPAWorkRepository;
 import openscriptures.utils.Language;
 import openscriptures.utils.Language.Direction;
 import openscriptures.utils.License;
@@ -36,15 +42,33 @@ public class ApplicationContext {
     // MEMBER VARIABLES
     //=======================================================================================
     
+    private EntityManagerFactory m_emf;
+    
     private Map<String, Language> languages = new HashMap<String, Language>();
+    
+    private WorkRepository works = null;
+    
+    /** Used to create structure instances. */
+    private StructureRepository structures = null;
     
     //=======================================================================================
     // CONSTRUCTORS
     //=======================================================================================
     ApplicationContext() {
         loadLanguageDefinitions();
+        
+        // TODO need to make this configurable
+        this.m_emf = PersistenceUtil.getEMFactory("nttext");
+        
+        works = new JPAWorkRepository(m_emf);
+        structures = new JPAStructureRepository(m_emf);
     }
     
+    public void shutdown() {
+        PersistenceUtil.shutdown();
+        
+        // ... and other cleanup tasks.
+    }
     
     private void loadLanguageDefinitions() {
         // TODO load from file.
@@ -81,6 +105,21 @@ public class ApplicationContext {
     }
     
 
+    /**
+     * Returns the token repository for use with the specified work.
+     * 
+     * @param w
+     * @return
+     */
+    public TokenRepository getTokens(Work w) {
+        // TODO look up the appropriate work repo for the supplied work
+        return works.getTokenRepository();
+    }
+    
+    public StructureRepository getStructureRepo(String key) {
+        return this.structures;
+    }
+    
     //=======================================================================================
     // CONFIGURATION METHODS
     //=======================================================================================

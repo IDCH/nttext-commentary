@@ -10,6 +10,8 @@ import java.util.List;
  */
 public interface WorkRepository {
     
+    public TokenRepository getTokenRepository();
+    
     public Work create(String workId);
     
     public Work create(WorkId id, String title, String abbr, String desc);

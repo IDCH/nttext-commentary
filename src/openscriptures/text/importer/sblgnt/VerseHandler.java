@@ -27,6 +27,9 @@ public class VerseHandler extends StructureHandler {
         return p.getName().equals("verse");
     }
     
+    // DEBUG
+   
+    
     public void start(PathElement p) {
         if (p.hasAttribute("osisID")) {         // starting verse milestone marker
             String osisId = p.getAttribute("osisID");
@@ -35,8 +38,9 @@ public class VerseHandler extends StructureHandler {
             verse = Verse.init(struct, osisId);       // initializes the new chapter
             
             LOGGER.info("Creating verse: " + verse.getOsisId());
-            
         } else if (p.hasAttribute("eID")) {     // ending verse milestone marker
+            // FIXME This is the code block that is causing the delay.
+            
             String eId = p.getAttribute("eID");
             assert eId.equals(verse.getOsisId()) :
                 "Verse Mismatch. Expected " + verse.getOsisId() + " but found " + eId;
@@ -56,7 +60,7 @@ public class VerseHandler extends StructureHandler {
         if (!ensureMatchingStructure(verse, s)) return;
         
         LOGGER.info("Finished creating verse: " + verse.getOsisId());
-        LOGGER.info(verse.getText());
+//        LOGGER.info(verse.getText());
         
         this.verse = null;
     }

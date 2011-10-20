@@ -20,11 +20,12 @@
            but need to move to this approach as we get things figured out.  
       <jta-data-source>java:/DefaultDS</jta-data-source>
        -->
-      <class>org.nttext.mss.Manuscript</class>
-      <class>org.nttext.mss.Designation</class>
+      
+<!--  <class>org.nttext.mss.Designation</class>
       <class>org.nttext.mss.HistoricalDate</class>
       <class>org.nttext.util.Institution</class>
-<!--       <class>org.nttext.mss.Location</class> -->
+      <class>openscriptures.text.Token</class>
+      <class>org.nttext.mss.Location</class> -->
       
       <properties>
       
@@ -32,10 +33,10 @@
              where JNDI is not available. In general, we should be using the JNDI provided 
              with Tomcat or else use the modular version of JBoss. -->
              
-        <property name="javax.persistence.jdbc.driver"   value="org.hsqldb.jdbcDriver"/>
+        <property name="javax.persistence.jdbc.driver"   value="org.hsqldb.jdbcDriver"/> 
         <property name="javax.persistence.jdbc.url"      value="jdbc:hsqldb:hsql://localhost/nttext"/>
         <property name="javax.persistence.jdbc.user"     value="sa"/>
-        <property name="javax.persistence.jdbc.password" value=""/>
+        <property name="javax.persistence.jdbc.password" value=""/> 
         
         <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
         

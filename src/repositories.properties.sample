@@ -1,0 +1,22 @@
+
+-- MAIN DIRECTORY FOR SQL FILES
+-- For each module, the system expects to find create.sql, clean.sql, and 
+-- drop.sql files under the subdirectory with the appropriate module name. If
+-- the file init.sql is found, it will  be executed as part of the DB 
+-- initialization sequence immediately after the create script. 
+repo.sqldir=C:/Documents and Settings/neal/workspace/CritSpace/src/sql/
+
+-- DATABASE CONNECTION DATA
+repo.text.url=jdbc:mysql://<dbserver>/critspace?useUnicode=true&amp;characterEncoding=UTF-8
+repo.text.driver=com.mysql.jdbc.Driver
+repo.text.user=username
+repo.text.pass=password
+
+repo.nttext.url=jdbc:mysql://<dbserver>/critspace?useUnicode=true&amp;characterEncoding=UTF-8
+repo.nttext.driver=com.mysql.jdbc.Driver
+repo.nttext.user=username
+repo.nttext.pass=password
+
+-- CLASSNAMES FOR DIFFERENT REPOSITORY MODULES
+vprops.classname=org.idch.vprops.persist.mysql.MySQLPropertyRepository
+critspace.classname=org.idch.critspace.persist.mysql.MySQLCritspaceRepository

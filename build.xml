@@ -31,6 +31,7 @@
   <import file="${basedir}/../build-tools/dbutils.xml"/>
 
   <target name="run" description="Executes the indexer" depends="compile, copy-metafiles">
-    <java classname="org.nttext.mss.importer.MSSParser" classpathref="test.path" fork="${junit.fork}"/>
+    <!-- <java classname="org.nttext.mss.importer.MSSParser" classpathref="test.path" fork="${junit.fork}"/> -->
+    <java classname="openscriptures.Main" classpathref="test.path" fork="${junit.fork}"/>
   </target>
 </project>

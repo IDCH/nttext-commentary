@@ -33,3 +33,7 @@ syntax: regexp
 ^build\.properties$
 syntax: regexp
 ^data/db$
+syntax: regexp
+^etc/META-INF/persistence\.xml$
+syntax: regexp
+^src/repositories\.properties$

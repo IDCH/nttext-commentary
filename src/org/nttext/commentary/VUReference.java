@@ -1,5 +1,16 @@
 package org.nttext.commentary;
 
+import java.util.UUID;
+
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import openscriptures.text.Structure;
 import openscriptures.text.WorkId;
 
@@ -11,9 +22,17 @@ import org.nttext.commentary.VariationUnit.TextProxy;
  * 
  * @author Neal Audenaert
  */
+//@Entity
+//@Table(name="VU_References")
 public class VUReference {
     // TODO think about making this a TokenSequence
 
+    //=======================================================================================
+    // MEMBER VARIABLES
+    //=======================================================================================
+    
+    private Long id;
+    
     private VariationUnit vu;      // The variation unit this is a reference for
 
     /** Marks the token sequence that this VU refers to. */
@@ -27,6 +46,15 @@ public class VUReference {
     // Temporary place holders - these should be drawn form the Work object for this text. 
     private TextProxy source;
 
+    //=======================================================================================
+    // CONSTRUCTORS
+    //=======================================================================================
+    
+    /** Restricted scope default for use by persistence layer. */
+    VUReference() {
+        
+    }
+    
     /**
      * Creates a reference for a variation unit to the form of that unit that 
      * appears in some edition of the New Testament.
@@ -43,6 +71,7 @@ public class VUReference {
         this.baseReading = s.getText();
     }
 
+
     @Deprecated
     public VUReference(VariationUnit vu, TextProxy source, String match) {
         this.vu = vu;
@@ -50,13 +79,37 @@ public class VUReference {
         this.baseReading = match;
     }
 
+    //=======================================================================================
+    // ACCESSORS & MUTATORS
+    //=======================================================================================
+    
+    /** Restricted access getter for use by persistence layer. */
+    @Id
+    @GeneratedValue
+    Long getId() {
+        return this.id;
+    }
+    
+    /** Private setter for use by persistence layer */
+    void setId(Long value) {
+        this.id = value;
+    }
+    
     /** 
      * Returns the base reading for the associated variation unit in the 
      * corresponding NT edition.
      */
+    @Basic
     public String getBaseReading() {
         return this.baseReading;
     }
+    
+    /** Private setter for use by persistence layer. */
+    @SuppressWarnings("unused")
+    private void setBaseReading(String value) {
+        this.baseReading = value;
+    }
+    
     
     /**
      * Returns the structure that mark the associated variation unit in the
@@ -64,16 +117,43 @@ public class VUReference {
      * 
      * @return The structure that marks this variation unit.
      */
+    @Transient
     public Structure getReference() {
         return this.structure;
     }
+    
+    /** Returns the unique identifier for the structure that defines this reference. This is
+     *  used by the persistence layer. */
+    @Basic
+    String getReferenceId() {
+        return this.structure.getLocalId();
+    }
+    
+    /** Used by the persistence layer to restore the scripture reference. */
+    void setReferenceId(String id) {
+        UUID uuid = UUID.fromString(id);
+        Commentary commentary = Commentary.getInstance();
+        
+        this.structure = commentary.getStructureById(uuid);
+        // TODO Make sure this worked.
+    }
+    
+    
     
     /**
      * Returns the variation unit that this reference describes. 
      * @return the variation unit that this reference describes.
      */
+    @ManyToOne
+    @JoinColumn(name="vu_fk")
     public VariationUnit getVariationUnit() {
         return this.vu;
+    }
+    
+    /** Private setter for use by persistence framework. */
+    @SuppressWarnings("unused")
+    private void setVariationUnit(VariationUnit vu) {
+        this.vu = vu;
     }
     
     /** 
@@ -82,6 +162,7 @@ public class VUReference {
      * 
      * @return The name of the corresponding NT edition.
      */
+    @Transient
     public String getEdition() {
         WorkId id = this.structure.getWork().getWorkId();
         return id.getName();
@@ -93,6 +174,7 @@ public class VUReference {
      * 
      * @return The language name of the corresponding NT edtion.
      */
+    @Transient
     public String getLanguage() {
         return this.source.getLanguage();
     }
@@ -103,6 +185,7 @@ public class VUReference {
      * 
      * @return The three letter language code.
      */
+    @Transient
     public String getLgCode() {
         return this.source.getLgCode();
     }

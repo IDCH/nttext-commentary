@@ -8,10 +8,12 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.FlushModeType;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
 import org.apache.log4j.Logger;
+import org.idch.util.Cache.CacheStatistics;
 
 /**
  * @author Neal Audenaert
@@ -25,6 +27,10 @@ public class JPARepository<T> {
     
     protected EntityManagerFactory m_emf = null;
     
+    protected boolean keepOpen = false;
+    protected EntityManager em = null;
+    
+    
     //=======================================================================================
     // CONSTRUCTOR
     //=======================================================================================
@@ -33,13 +39,24 @@ public class JPARepository<T> {
         m_emf = emf;
     }
     
+    
+    protected EntityManager getEM() {
+        EntityManager em = m_emf.createEntityManager();
+        em.setFlushMode(FlushModeType.COMMIT);
+        return em;
+    }
+    
+    protected void close(EntityManager em) {
+        em.close();
+    }
+    
     /**
      * 
      * @param object
      * @return
      */
     public T create(T object) {
-        EntityManager em = m_emf.createEntityManager();
+        EntityManager em = getEM();
         EntityTransaction tx = em.getTransaction();
         
         T response = null;
@@ -51,7 +68,7 @@ public class JPARepository<T> {
         } finally {
             if (tx.isActive())
                 tx.rollback();
-            em.close();
+            close(em);
         }
         
         return response;    
@@ -63,7 +80,7 @@ public class JPARepository<T> {
      * @return
      */
     public List<T> create(List<T> objects) {
-        EntityManager em = m_emf.createEntityManager();
+        EntityManager em = getEM();
         EntityTransaction tx = em.getTransaction();
         
         List<T> response = null;
@@ -77,7 +94,7 @@ public class JPARepository<T> {
         } finally {
             if (tx.isActive())
                 tx.rollback();
-            em.close();
+            close(em);
         }
         
         return response;    
@@ -85,11 +102,11 @@ public class JPARepository<T> {
 
     public <Q> List<Q> query(CriteriaQuery<Q> criteria) {
         List<Q> results = null;
-        EntityManager em = m_emf.createEntityManager();
+        EntityManager em = getEM();
         try {
              results = em.createQuery( criteria ).getResultList();
         } finally {
-            em.close();
+            close(em);
         }
         
         return results;
@@ -102,7 +119,7 @@ public class JPARepository<T> {
      * @return
      */
     public <Q> Q queryOne(CriteriaQuery<Q> criteria) {
-        EntityManager em = m_emf.createEntityManager();
+        EntityManager em = getEM();
         
         Q q = null;
         try {
@@ -117,7 +134,7 @@ public class JPARepository<T> {
                  q = results.get(0);
              }
         } finally {
-            em.close();
+            close(em);
         }
         
         return q;
@@ -143,7 +160,7 @@ public class JPARepository<T> {
      * @param t
      */
     public void save(T t) {
-        EntityManager em = m_emf.createEntityManager();
+        EntityManager em = getEM();
         EntityTransaction tx = em.getTransaction();
         
         tx.begin();
@@ -153,7 +170,7 @@ public class JPARepository<T> {
         } finally {
             if (tx.isActive())
                 tx.rollback();
-            em.close();
+            close(em);
         }
     }
 }

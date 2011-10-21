@@ -56,49 +56,44 @@ public class JPAStructureRepository extends JPARepository<Structure> implements 
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
-     */
-    @Override
-    public SortedSet<Structure> find(Work w, String name) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, int)
-     */
-    @Override
-    public SortedSet<Structure> find(Work w, int position) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, openscriptures.text.TokenSequence)
-     */
-    @Override
-    public SortedSet<Structure> find(Work w, String name, TokenSequence seq) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int)
-     */
-    @Override
-    public SortedSet<Structure> find(Work w, String name, int start, int end) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int, boolean)
-     */
-    @Override
-    public SortedSet<Structure> find(Work w, String name, int start, int end,
-            boolean strict) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+//    /* (non-Javadoc)
+//     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
+//     */
+//    public SortedSet<Structure> find(Work w, String name) {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
+//
+//    /* (non-Javadoc)
+//     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, int)
+//     */
+//    public SortedSet<Structure> find(Work w, int position) {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
+//
+//    /* (non-Javadoc)
+//     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, openscriptures.text.TokenSequence)
+//     */
+//    public SortedSet<Structure> find(Work w, String name, TokenSequence seq) {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
+//
+//    /* (non-Javadoc)
+//     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int)
+//     */
+//    public SortedSet<Structure> find(Work w, String name, int start, int end) {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
+//
+//    /* (non-Javadoc)
+//     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int, boolean)
+//     */
+//    public SortedSet<Structure> find(Work w, String name, int start, int end,
+//            boolean strict) {
+//        // TODO Auto-generated method stub
+//        return null;
+//    }
 }

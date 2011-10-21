@@ -14,11 +14,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.persistence.AttributeOverrides;
-import javax.persistence.AttributeOverride;
 import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -31,6 +27,7 @@ import javax.persistence.Transient;
 import org.idch.util.Cache;
 
 import openscriptures.text.Work;
+import openscriptures.text.WorkId.Type;
 import openscriptures.utils.Contributor;
 import openscriptures.utils.Language;
 import openscriptures.utils.License;
@@ -50,7 +47,6 @@ public class Work extends AbstractTokenSequence {
 	    
 	protected Long id;
 	protected UUID uuid;
-	protected WorkId osisID;
 	
 	protected String title;             /** The title of this work. */
 	protected String abbreviation;      /** An abbreviated title for this work. */
@@ -65,7 +61,7 @@ public class Work extends AbstractTokenSequence {
 	protected String refSystem;         /** The reference system used to identify and resolve passages. */
 	protected String sourceUrl;         /** URL where this resource was originally obtained. */
 	
-	protected Date publicationDate;
+	protected String publicationDate;
 	protected Date importDate;
 	
 	// create as embeddable class? This is currently very simplified. 
@@ -79,8 +75,10 @@ public class Work extends AbstractTokenSequence {
 	
 	private ApplicationContext ac = null; 
 	private TokenRepository tokens = null;
+    private int size = Integer.MIN_VALUE;
 	
-	Cache<Integer, Token> tokenCache = new Cache<Integer, Token>("tokens", 1000);
+    // Of dubious value - cache at the repo level
+	private Cache<Integer, Token> tokenCache = new Cache<Integer, Token>("tokens", 1000);
 
 //============================================================================================
 // CONSTRUCTORS
@@ -90,16 +88,27 @@ public class Work extends AbstractTokenSequence {
 		
 	}
 	
+	public Work(long id) {
+	    this.id = id;
+	}
+	
+	public Work(UUID id) {
+	    this.uuid = id;
+	}
+	
 	public Work(WorkId id) {
 	    this.uuid = UUID.randomUUID();
 	    
-		this.osisID = id;
+	    this.abbreviation = id.getName();
+	    this.type = id.getType().value;
+	    this.language = id.getLgCode();
+	    this.publisher = id.getPublisher();
+	    this.publicationDate = id.getPublicationDate();
 	}
 	
-	public Work(WorkId id, String title, String abbr, String desc) {
+	public Work(String title, String abbr, String desc) {
 		this.uuid = UUID.randomUUID();
 		
-		this.osisID = id;
 		this.title = title;
 		this.abbreviation = abbr;
 		this.description = desc;
@@ -112,6 +121,11 @@ public class Work extends AbstractTokenSequence {
 	    
 	    if (this.tokens == null)
 	        this.tokens = ac.getTokens(this);
+	    
+	    assert this.tokens != null : "Could not load token repository.";
+	    if (this.tokens == null) {
+            throw new RepositoryNotInitializedException("Could not load token repository.");
+        }
 	    
 	    return this.tokens;
 	}
@@ -128,15 +142,18 @@ public class Work extends AbstractTokenSequence {
      * @return
      */
     public Token append(Work w, String value) {
-        // XXX  this may have synchronization issues.
+        // FIXME  this may have synchronization issues, but this will be used only in
+        //        pretty rare instances, so it likely doesn't pose a problem in the 
+        //        near term (2011-2012)
         if (size < 0) this.size();
         
-        Token t = new Token(w, size++, value);
+        Token t = new Token(w, size++, value); 
+        t = this.getTokenRepository().create(t);
         synchronized (tokenCache) {
             tokenCache.cache(t.getPosition(), t);
         }
         
-        return this.getTokenRepository().create(t);
+        return t;
     }
     
     /**
@@ -147,7 +164,6 @@ public class Work extends AbstractTokenSequence {
      */
     public List<Token> appendAll(String text) {
         if (size < 0) this.size();
-        
         
         List<Token> tokens = new ArrayList<Token>();
         boolean lastTokenWasWhitespace = false;
@@ -173,13 +189,9 @@ public class Work extends AbstractTokenSequence {
                 tokens.add(new Token(this, size++, token));
             }
         }
-        
-        synchronized (tokenCache) {
-            for (Token t : tokens) {
-                tokenCache.cache(t.getPosition(), t);
-            }
-        }
-        return this.getTokenRepository().create(tokens);
+       
+        tokens = this.getTokenRepository().create(tokens);
+        return tokens;
     }
     
 	/** Returns the token at the specified index. */
@@ -192,26 +204,20 @@ public class Work extends AbstractTokenSequence {
                 TokenRepository tokens = this.getTokenRepository();
                 t = tokens.find(this, index);
                 
-                tokenCache.cache(index, t);
+                tokenCache.cache(t.getPosition(), t);
             }
         }
         
         return t;
     }
 
-    private int size = Integer.MIN_VALUE;
     public int size() {
-        if (size >= 0)
-            return size;
+        if (this.size >= 0)
+            return this.size;
         
         TokenRepository tokens = this.getTokenRepository();
-        if (tokens == null) {
-            // TODO if the repo isn't set, we need to throw an exception
-            return -1;
-        }
-        size = tokens.getMaxPosition(this) + 1;
-        
-        return size;
+        this.size = tokens.getNumberOfTokens(this);
+        return this.size;
     }
 	
 	
@@ -222,7 +228,7 @@ public class Work extends AbstractTokenSequence {
 	/** Returns the unique persistent identifier for this work. */
 	@Id @GeneratedValue public Long getId() { return this.id; }
 	/** Sets the unique persistent identifier for this work. */
-	void setId(Long id) { this.id = id; }
+	public void setId(Long id) { this.id = id; }
 	
 	/**
 	 * Internal ID used to represent a specific local instance of a work. Note that a single 
@@ -235,21 +241,20 @@ public class Work extends AbstractTokenSequence {
 	/** Returns the UUID as a string. Intended to be used by the persistence framework. */
 	@Basic String getUUIDString() { return this.uuid.toString(); }
 	/** Sets the UUID as a string. Intended to be used by the persistence framework. */
-	void setUUIDString(String id) { this.uuid = UUID.fromString(id); }
+	public void setUUIDString(String id) { this.uuid = UUID.fromString(id); }
 		
 	/** The <tt>WorkId</tt> of this work. */
-	@Embedded 
-	@AttributeOverrides( {
-        @AttributeOverride(name="type", column = @Column(name="workId_type") ),
-        @AttributeOverride(name="lgCode", column = @Column(name="workId_lg") ),
-        @AttributeOverride(name="publisher", column = @Column(name="workId_pub") ),
-        @AttributeOverride(name="name", column = @Column(name="workId_name") ),
-        @AttributeOverride(name="publicationDate", column = @Column(name="workId_date") )
-	} )
-	public WorkId getWorkId() { return this.osisID; }
-	/** Used by persistence layer to set the work id for this work. */
-	void setWorkId(WorkId osisId) { this.osisID = osisId; }
-	// TODO there is a lot of redundant information here.
+	@Transient
+	public WorkId getWorkId() { 
+	    WorkId workId = new WorkId();
+	    workId.setName(this.getAbbreviation());
+	    workId.setType(Type.find(this.getType()));
+	    workId.setPublisher(this.getPublisher());
+	    workId.setPublicationDate(this.getPublicationDate());
+	    workId.setLgCode(this.getLgCode());
+	    
+	    return workId;
+	}
 	
 	/** The title of this work. */
 	@Basic public String getTitle() { return title; }
@@ -277,15 +282,15 @@ public class Work extends AbstractTokenSequence {
     public void setCreator(String creator) {  this.creator = creator; }
     
     /** Return the publisher of this work. */
-    @Basic public String getPublisher() { return this.publisher; }
+    @Basic public String getPublisher() { return this.publisher; } 
     /** Sets the publisher of this work. */
     public void setPublisher(String value) { this.publisher = value; }
     
     /** Returns the date this work was published. */
-    @Temporal(TemporalType.DATE) 
-    public Date getPublicationDate() { return this.publicationDate; }
+    @Basic 
+    public String getPublicationDate() { return this.publicationDate; } 
     /** Sets the date this work was published. */
-    public void setPublicationDate(Date date) { this.publicationDate = date; }
+    public void setPublicationDate(String date) { this.publicationDate = date; }
 
 	/** Returns a description of the copyright holder. */
 	@Basic public String getCopyright() { return copyright; }
@@ -320,7 +325,7 @@ public class Work extends AbstractTokenSequence {
     /** Returns the language code. */
     @Basic public String getLgCode() { return this.language; }
     /** Sets the language code. Primarily intended for use by the persistence layer. */
-    void setLgCode(String lgCode) { this.language = lgCode; }
+    public void setLgCode(String lgCode) { this.language = lgCode; }
 
     /** Returns the scope (e.g., scripture range) of this work. */
     @Basic public String getScope() { return this.scope; }
@@ -413,13 +418,18 @@ public class Work extends AbstractTokenSequence {
     @Transient
     public int getEnd() {
         TokenRepository tokens = this.getTokenRepository();
-        if (tokens == null) {
-            // TODO if the repo isn't set, we need to throw an exception
-            return -1;
+        
+        
+        return tokens.getNumberOfTokens(this);
+        
+    }
+    
+    private static class RepositoryNotInitializedException extends RuntimeException {
+        private static final long serialVersionUID = -5178662703322206219L;
+
+        private RepositoryNotInitializedException(String msg) {
+            super(msg);
         }
-        
-        return tokens.getMaxPosition(this) + 1;
-        
     }
      
     

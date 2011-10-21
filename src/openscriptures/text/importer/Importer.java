@@ -148,7 +148,6 @@ public class Importer extends DefaultHandler {
     public void startDocument() throws SAXException {
     }
     
-   
     /**
      * SAX handler for start element tags. This invokes the first handler from the 
      * handler chain whose <tt>{@link StructureHandler#matchesStart(PathElement)}</tt>
@@ -173,6 +172,7 @@ public class Importer extends DefaultHandler {
                 break;
             }
         }
+        
         
         if (!handled) {
             // TODO this is very specific to OSIS texts. What about TEI, etc. We need to 

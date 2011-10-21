@@ -16,19 +16,15 @@ public interface TokenRepository {
     
     public List<Token> create(List<Token> tokens);
     
-//    public Token append(Work w, String value);
-//    
-//    public List<Token> appendAll(Work w, String text);
-    
-    public int getMaxPosition(Work work);
+    public int getNumberOfTokens(Work work);
     
     public Token find(UUID id);
     
     public Token find(Work w, int pos);
     
-    public List<Token> find(Work w, int start, int end);
+//    public List<Token> find(Work w, int start, int end);
+//    
+//    public List<Token> find(Structure s);
     
-    public List<Token> find(Structure s);
-    
-    public void save(Token t);
+//    public void save(Token t);
 }

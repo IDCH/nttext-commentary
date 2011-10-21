@@ -36,7 +36,9 @@ public class WorkId {
 	    QURAN ("Quran"),
 	    MISHNAH ("Mishnah"),
 	    TALMUD ("Talmud"),
-	    BOOK_OF_MORMON ("BookOfMormon");
+	    BOOK_OF_MORMON ("BookOfMormon"),
+	    UNKNOWN ("unknown")
+	    ;
 		
 		public final String value;
 		
@@ -59,7 +61,7 @@ public class WorkId {
 					return t;
 			}
 			
-			return null;
+			return UNKNOWN;
 		}
 	}
 	
@@ -129,8 +131,10 @@ public class WorkId {
 		Type t = Type.find(segments[ix]); 
 		if (t != null) {
 			this.type = t;
-			ix++;
-			if (ix >= len) return;	// just a type identifier 		
+			if (t != Type.UNKNOWN) {
+			    ix++;
+			    if (ix >= len) return;	// just a type identifier 		
+			}
 		}
 		
 		// check to see if the current element is a language type
@@ -175,7 +179,7 @@ public class WorkId {
 	
 	/** Returns the language of this work */
 	@Transient public Language getLanguage() { return this.language; }
-	@Basic String getLgCode() { return this.language.getCode(); }
+	@Basic String getLgCode() { return (language != null) ? this.language.getCode() : null; }
 	void setLgCode(String lgCode) {
 	    ApplicationContext ctx = ApplicationContext.getApplicationContext();
 	    this.language = ctx.getLanguage(lgCode); 

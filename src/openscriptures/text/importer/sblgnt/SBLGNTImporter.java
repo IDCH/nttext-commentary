@@ -6,12 +6,15 @@ package openscriptures.text.importer.sblgnt;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.log4j.Logger;
+import org.idch.persist.RepositoryAccessException;
 import org.idch.util.PersistenceUtil;
 
+import openscriptures.text.TextRepo;
 import openscriptures.text.Work;
 import openscriptures.text.impl.JPAStructureRepository;
 import openscriptures.text.impl.JPATokenRepository;
 import openscriptures.text.impl.JPAWorkRepository;
+import openscriptures.text.impl.MySQLTextRepository;
 import openscriptures.text.importer.Context;
 import openscriptures.text.importer.Importer;
 
@@ -27,16 +30,19 @@ public class SBLGNTImporter {
     private long elapsedTime = 0;
     private Work work = null;
     
-    public SBLGNTImporter() {
-        
+    private TextRepo m_repo;
+    public SBLGNTImporter(TextRepo repo) {
+        m_repo = repo;
     }
     
-    public SBLGNTImporter(String filename) {
+    public SBLGNTImporter(String filename, TextRepo repo) {
         this.filename = filename;
+        m_repo = repo;
     }
     
-    public void setFilename(String filename) {
+    public void setFilename(String filename, TextRepo repo) {
         this.filename = filename;
+        m_repo = repo;
     }
     
     public void doImport() throws Exception {
@@ -44,16 +50,16 @@ public class SBLGNTImporter {
         try {
             EntityManagerFactory emf = PersistenceUtil.getEMFactory("nttext");
             Context context = new Context(
-                    new JPAWorkRepository(emf),
-                    new JPATokenRepository(emf),
-                    new JPAStructureRepository(emf));
+                    m_repo.getWorkRepository(), 
+                    m_repo.getTokenRepository(),
+                    m_repo.getStructureRepository());
             Importer importer = new Importer(filename, context);
             
             context.inText = true;
+            importer.addHandler(new WordHandler());
             importer.addHandler(new HeaderHandler());
             importer.addHandler(new FrontMatterHandler());
-            importer.addHandler(new WordHandler());
-//            importer.addHandler(new ParagraphHandler());
+            importer.addHandler(new ParagraphHandler());
             importer.addHandler(new VerseHandler());
             importer.addHandler(new ChapterHandler());
             importer.addHandler(new BookHandler());
@@ -92,18 +98,18 @@ public class SBLGNTImporter {
         //		String filename = "SBLGNT.osis.xml";
         String filename = "H:\\IDCH\\Development\\Workspaces\\nttext\\data\\nt\\SBLGNT\\source\\SBLGNT.osis.xml";
         
-        SBLGNTImporter importer = new SBLGNTImporter(filename);
-
+        SBLGNTImporter importer;
         try {
+            importer = new SBLGNTImporter(filename, MySQLTextRepository.get());
             importer.doImport();
 
+            System.out.println();
+            System.out.println();
+            System.out.println("Elapsed Time: " + importer.getElapsedTime());
         } catch (Exception ex) {
             System.out.println(ex);
             ex.printStackTrace();
         }
       
-        System.out.println();
-        System.out.println();
-        System.out.println("Elapsed Time: " + importer.getElapsedTime());
     }
 }

@@ -19,15 +19,15 @@ public interface StructureRepository {
     
     public StructureFacade getStructureFacade(Work w);
     
-    public SortedSet<Structure> find(Work w, String name);
-    
-    public SortedSet<Structure> find(Work w, int position);
-    
-    public SortedSet<Structure> find(Work w, String name, TokenSequence seq);
-    
-    public SortedSet<Structure> find(Work w, String name, int start, int end);
-    
-    public SortedSet<Structure> find(Work w, String name, int start, int end, boolean strict);
+//    public SortedSet<Structure> find(Work w, String name);
+//    
+//    public SortedSet<Structure> find(Work w, int position);
+//    
+//    public SortedSet<Structure> find(Work w, String name, TokenSequence seq);
+//    
+//    public SortedSet<Structure> find(Work w, String name, int start, int end);
+//    
+//    public SortedSet<Structure> find(Work w, String name, int start, int end, boolean strict);
     
     public void save(Structure s);
 }

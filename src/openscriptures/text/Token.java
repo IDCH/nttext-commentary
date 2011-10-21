@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 
 /**
@@ -35,8 +36,12 @@ import javax.persistence.Transient;
  * @author Neal Audenaert
  */
 @Entity
-@Table(name="OpenS_Tokens")
+@Table(
+        name="OpenS_Tokens",
+        uniqueConstraints = @UniqueConstraint(columnNames={"work_id", "token_pos"})
+)
 public class Token implements Comparable<Token> {
+    // TODO restrict access to setters probably through proxy objects and protected methods
     
     public static enum Type {
         WORD, PUNCTUATION, WHITESPACE
@@ -136,21 +141,22 @@ public class Token implements Comparable<Token> {
     //====================================================================================
 	
 	/** Returns the unique persistent identifier for this work. */
-    @Id @GeneratedValue Long getId() { return this.id; }
+    @Id @GeneratedValue
+    public Long getId() { return this.id; }
     /** Sets the unique persistent identifier for this work. */
-    void setId(Long id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
     
 	/** Returns the unique identifier for this token. */
 	@Transient public UUID getUUID() { return this.uuid; }
+	public void setUUID(UUID uuid) { this.uuid = uuid; }
 	
 	/** Returns the unique identifier for this token as a string. */
 	@Basic public String getUUIDString() { return this.uuid.toString(); }
 	/** Used by the persistence framework to set the unique identifier for this token. */
 	public void setUUIDString(String value) { this.uuid = UUID.fromString(value); }
 	
-	// TODO persist this
 	@ManyToOne public Work getWork() { return work; }
-	void setWork(Work w) { this.work = w; }
+	public void setWork(Work w) { this.work = w; }
 	
 	/** Returns the textual value of this token. */
     @Basic public String getText() { return this.value; }
@@ -160,12 +166,12 @@ public class Token implements Comparable<Token> {
     /** Returns the position of this token in the associated work's token stream. */
     @Column(name="token_pos") public int getPosition() { return this.position; }
     /** Used by persistence layer to set the position of this token in the token stream. */
-    void setPosition(int pos) { this.position = pos; }
+    public void setPosition(int pos) { this.position = pos; }
 
     /** Returns the type of token. */
     @Enumerated(EnumType.STRING) public Token.Type getType() { return this.type; }
     /** Used by the persistence layer to set this token's type. */
-    void setType(Token.Type t) { this.type = t; }
+    public void setType(Token.Type t) { this.type = t; }
     
     //====================================================================================
     // NEXT & PREV METHODS

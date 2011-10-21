@@ -4,6 +4,7 @@
 package openscriptures.text.importer;
 
 import org.apache.log4j.Logger;
+import org.idch.util.StopWatch;
 
 import openscriptures.text.Structure;
 import openscriptures.text.Token;
@@ -197,11 +198,7 @@ public abstract class StructureHandler {
         return activeStructure;
     }
     
-    long timect = 0;
-    long avgTime = 0;
-    long gap = 0;
-    long gapTime = 0;
-    long end = 0;
+    private StopWatch timer = new StopWatch("Struct", 100);
     /**
      * TODO add comment
      * @return
@@ -211,35 +208,23 @@ public abstract class StructureHandler {
         
         Structure structure = this.activeStructure;
         if (structure != null) {
-            warning += "(" + structure.getName() + "): ";
             
-            long startTime = System.currentTimeMillis();
-            if (end != 0) gapTime += startTime - end; 
-
-            
+            timer.start();
             // get the start token
             Token start = ctx.work.get(startAfterIndex);        // TODO possibly (although bad) null pointer exception
             if (start.getType() == Token.Type.WHITESPACE)
                 start = start.next(true);
-            
-            end = System.currentTimeMillis();
-            avgTime += end - startTime;
-            if (++timect % 10 == 0) {
-                System.out.println("Structure Handler (" + structure.getName() + "): \n" +
-                		"  Time (" + timect + "): " + ((float)avgTime / 10) + "\n" + 
-                        "  Gap (" + timect + "): " + ((float)gapTime / 10));
-                avgTime = 0;
-                gapTime = 0;
-                
-            }
             
             // get the end token
             int lastPos = ctx.work.getEnd() - 1;
             Token end = ctx.work.get(lastPos);
             if (end.getType() == Token.Type.WHITESPACE)
                 end = end.prev(true);
+            timer.pause();
+            
             
             // handle errors
+            warning += "(" + structure.getName() + "): ";
             if (start == null) {
                 warning += "Could not locate start token from  position " + startAfterIndex;
                 LOGGER.warn(warning);
@@ -255,19 +240,20 @@ public abstract class StructureHandler {
                 warning += "End token came before start token. Setting end = start.";
                 LOGGER.warn(warning);
             }
-            
+           
             structure.setStartToken(start);
             structure.setEndToken(end);
 
             this.close(structure);
             ctx.structures.save(structure);
-            
             ctx.clearHandler(this.getName());
             LOGGER.info("closed structure: " + structure.getName());
+            timer.pause();
         } else {
             warning += "No active structure.";
             LOGGER.warn(warning);
         }
+        
         
         this.activeStructure = null;
         return structure;

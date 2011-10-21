@@ -33,18 +33,37 @@ public class JPATokenRepository extends JPARepository<Token> implements TokenRep
     }
     
 
+    private Token prep(Token t, Work w) {
+//        t.setWork(w);
+        return t;
+    }
+    
+    private List<Token> prep(List<Token> tokens, Work w) {
+//        for (Token t : tokens) {
+//            t.setWork(w);
+//        }
+        
+        return tokens;
+    }
+    
     //=======================================================================================
     // TOKEN RETRIEVAL METHODS
     //=======================================================================================
 
-    public int getMaxPosition(Work work) {
-        EntityManager em = m_emf.createEntityManager();
-        TypedQuery<Integer> query = em.createQuery(
-                "SELECT t.position FROM Token t WHERE t.work = :work ORDER BY t.position DESC", Integer.class);
-        query.setMaxResults(1);
-        query.setParameter("work", work);
-          
-        List<Integer> result = query.getResultList();
+    public int getNumberOfTokens(Work work) {
+        List<Integer> result = null;  
+        EntityManager em = getEM();
+        try {
+            TypedQuery<Integer> query = em.createQuery(
+                    "SELECT t.position FROM Token t WHERE t.work = :work ORDER BY t.position DESC", Integer.class);
+            query.setMaxResults(1);
+            query.setParameter("work", work);
+
+            result = query.getResultList();
+        } finally {
+            close(em);
+        }
+        
         return (result != null && !result.isEmpty()) ? result.get(0) : -1;
     }
     
@@ -64,24 +83,46 @@ public class JPATokenRepository extends JPARepository<Token> implements TokenRep
     }
     
     public Token find(Work w, int pos) {
-        CriteriaBuilder builder = m_emf.getCriteriaBuilder();
-        CriteriaQuery<Token> criteria = builder.createQuery(Token.class);
+        Token token = null;  
+        EntityManager em = getEM();
+        try {
+            TypedQuery<Token> query = em.createQuery(
+                    "SELECT t FROM Token t WHERE t.work = :work AND t.position = :pos", Token.class);
+            query.setMaxResults(1);
+            query.setParameter("work", w);
+            query.setParameter("pos", pos);
+
+            token = query.getSingleResult();
+        } finally {
+            close(em);
+        }
         
-        Root<Token> tokenRoot = criteria.from(Token.class);
-        criteria.where(builder.and(
-                builder.equal(tokenRoot.get("work"), w),
-                builder.equal(tokenRoot.get("position"), pos)
-            ) );
-        
-        return this.queryOne(criteria);
-        
+        return (token != null) ? prep(token, w) : null;
+//        CriteriaBuilder builder = m_emf.getCriteriaBuilder();
+//        CriteriaQuery<Token> criteria = builder.createQuery(Token.class);
+//        
+//        Root<Token> tokenRoot = criteria.from(Token.class);
+//        criteria.where(builder.and(
+//                builder.equal(tokenRoot.get("work"), w),
+//                builder.equal(tokenRoot.get("position"), pos)
+//            ) );
+//        
+//        return prep(this.queryOne(criteria), w);
     }
     
     public List<Token> find(Work w, int start, int end) {
         // TODO IMPLEMENT
+        CriteriaBuilder builder = m_emf.getCriteriaBuilder();
+        CriteriaQuery<Token> criteria = builder.createQuery(Token.class);
         
-        return null;
+        Root<Token> tokenRoot = criteria.from(Token.class);
+//        criteria.where(builder.and(
+//                builder.equal(tokenRoot.get("work"), w),
+//                builder.gt(tokenRoot.get("token_pos"), start), 
+//                builder.lt(tokenRoot.get("token_pos"), end)
+//            ) );
         
+        return prep(this.query(criteria), w);
     }
     
     /**
@@ -90,6 +131,7 @@ public class JPATokenRepository extends JPARepository<Token> implements TokenRep
      * @return
      */
     public List<Token> find(Structure s) {
+        Work w = s.getWork();
         return this.find(s.getWork(), s.getStart(), s.getEnd());
     }
     

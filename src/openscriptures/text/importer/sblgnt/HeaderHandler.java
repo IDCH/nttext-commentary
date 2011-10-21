@@ -3,10 +3,6 @@
  */
 package openscriptures.text.importer.sblgnt;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import openscriptures.text.Work;
 import openscriptures.text.importer.PathElement;
 import openscriptures.text.importer.StructureHandler;
@@ -52,14 +48,7 @@ public class HeaderHandler extends StructureHandler {
             work.setCreator(value);
             
         } else if (localName.equals("date")) {
-            DateFormat fmt = new SimpleDateFormat("yyy-MM-dd");
-            try {
-                work.setPublicationDate(fmt.parse(value));
-            } catch (ParseException pe) {
-                SBLGNTImporter.LOGGER.warn("Could not parse publication date. " +
-                        "Expected yyyy-MM-dd format: " + value + 
-                        " (Work: " + work.getWorkId() + ")");
-            }
+            work.setPublicationDate(value);
             
         } else if (localName.equals("publisher")) {
             work.setPublisher(value);

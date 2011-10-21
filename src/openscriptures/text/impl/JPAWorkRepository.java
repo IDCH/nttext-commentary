@@ -4,6 +4,7 @@
 package openscriptures.text.impl;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -20,9 +21,6 @@ import openscriptures.text.WorkRepository;
  */
 public class JPAWorkRepository extends JPARepository<Work> implements WorkRepository {
     
-    // TODO Need to implement more full-featured descriptions. A work should have 
-    //      the title, copyright information, description, versification strategy, and 
-    //      perhaps other information about how to resolve references to it.
     // TODO cross walk with FRBR.
     //      I think we have work = type, expression = <lg, slug>, manifestation = <publisher, edition> 
     
@@ -57,8 +55,8 @@ public class JPAWorkRepository extends JPARepository<Work> implements WorkReposi
      * @param desc
      * @return
      */
-    public Work create(WorkId id, String title, String abbr, String desc) {
-        Work w = new Work(id, title, abbr, desc);
+    public Work create(String title, String abbr, String desc) {
+        Work w = new Work(title, abbr, desc);
         return create(w);
     }
     
@@ -122,6 +120,24 @@ public class JPAWorkRepository extends JPARepository<Work> implements WorkReposi
             );
         
         return this.query(criteria);
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.WorkRepository#find(long)
+     */
+    @Override
+    public Work find(long id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.WorkRepository#find(java.util.UUID)
+     */
+    @Override
+    public Work find(UUID id) {
+        // TODO Auto-generated method stub
+        return null;
     }
     
     //===================================================================================

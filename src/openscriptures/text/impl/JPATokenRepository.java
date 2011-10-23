@@ -115,7 +115,7 @@ public class JPATokenRepository extends JPARepository<Token> implements TokenRep
         CriteriaBuilder builder = m_emf.getCriteriaBuilder();
         CriteriaQuery<Token> criteria = builder.createQuery(Token.class);
         
-        Root<Token> tokenRoot = criteria.from(Token.class);
+//        Root<Token> tokenRoot = criteria.from(Token.class);
 //        criteria.where(builder.and(
 //                builder.equal(tokenRoot.get("work"), w),
 //                builder.gt(tokenRoot.get("token_pos"), start), 

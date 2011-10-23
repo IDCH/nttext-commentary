@@ -7,14 +7,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import openscriptures.text.Structure;
 import openscriptures.text.StructureRepository;
 import openscriptures.text.TextRepo;
-import openscriptures.text.Token;
 import openscriptures.text.TokenRepository;
-import openscriptures.text.Work;
 import openscriptures.text.WorkRepository;
 
 import org.idch.persist.DBBackedRepository;

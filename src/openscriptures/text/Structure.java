@@ -259,7 +259,7 @@ public class Structure extends AbstractTokenSequence {
 	}
 	
 	protected void checkWork(Token t) throws InvalidTokenException {
-	    if (!t.getWork().equals(this.workUUID))
+	    if (!t.getWork().getUUID().equals(this.workUUID))
 	        throw new InvalidTokenException(
 	                "The token's work does not match this structure.", t);
 	}

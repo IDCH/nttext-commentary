@@ -8,11 +8,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
 import openscriptures.text.Structure;
+import openscriptures.text.StructureComparator;
 import openscriptures.text.StructureRepository;
 import openscriptures.text.Token;
 import openscriptures.text.Work;
@@ -115,7 +118,7 @@ public class MySQLStructureRepository implements StructureRepository {
         if (s.getId() != null)
             return null;
         
-        String sql = "INSERT INTO TEXTS_Structures (" + FIELDS +") " +
+        String sql = "INSERT INTO TEXTS_Structures (" + FIELDS + ") " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
         Connection conn = null;
         try {
@@ -254,6 +257,172 @@ public class MySQLStructureRepository implements StructureRepository {
         
         return s;
     }
+    
+    private SortedSet<Structure> find(PreparedStatement stmt) throws SQLException {
+        SortedSet<Structure> structures = new TreeSet<Structure>(new StructureComparator()); 
+        
+        Structure s; 
+        ResultSet results = stmt.executeQuery();
+        while (results.next()) {
+            s = new Structure(results.getLong(STRUCTURE_ID));
+            
+            structures.add(restore(s, results));
+        }
+        
+        return structures;
+    }
+    
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
+     */
+    @Override
+    public SortedSet<Structure> find(Work w, String name) {
+        // TODO LOTS of duplicated code. Refactor into delgate class.
+        int WORK_ID = 1, NAME = 2;
+        String sql =
+                "SELECT " + FIELDS + ", structure_id " +
+                "  FROM TEXTS_Structures" + 
+                " WHERE work_uuid = ? AND structure_name = ?" +
+                " ORDER BY start_pos ASC, end_pos DESC";
+        
+        SortedSet<Structure> structures = null;
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(WORK_ID, w.getUUID().toString());
+            stmt.setString(NAME,  name);
+        
+            structures = find(stmt);
+        } catch (Exception ex) {
+            String msg = "Could not retrieve structures (" + name + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            structures.clear();
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return structures;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, int)
+     */
+    @Override
+    public SortedSet<Structure> find(Work w, int position) {
+        int WORK_ID = 1, START_POS = 2, END_POS = 3;
+        String sql =
+                "SELECT " + FIELDS + ", structure_id " +
+                "  FROM TEXTS_Structures" + 
+                " WHERE work_uuid = ? AND " +
+                "       start_pos <= ? AND end_pos > ?" +
+                " ORDER BY start_pos ASC, end_pos DESC";
+        
+        SortedSet<Structure> structures = null;
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(WORK_ID, w.getUUID().toString());
+            stmt.setInt(START_POS,  position);
+            stmt.setInt(END_POS,  position);
+        
+            structures = find(stmt);
+        } catch (Exception ex) {
+            String msg = "Could not retrieve structures: " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            structures.clear();
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return structures;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int)
+     */
+    @Override
+    public SortedSet<Structure> find(Work w, String name, int start, int end) {
+        int WORK_ID = 1, NAME = 2, START_POS = 3, END_POS = 4;
+        String sql =
+                "SELECT " + FIELDS + ", structure_id " +
+                "  FROM TEXTS_Structures" + 
+                " WHERE work_uuid = ? AND " +
+                "       structure_name = ? AND start_pos <= ? AND end_pos > ?" +
+                " ORDER BY start_pos ASC, end_pos DESC";
+        
+        SortedSet<Structure> structures = null;
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(WORK_ID, w.getUUID().toString());
+            stmt.setString(NAME,  name);
+            stmt.setInt(START_POS,  start);
+            stmt.setInt(END_POS,  end);
+        
+            structures = find(stmt);
+        } catch (Exception ex) {
+            String msg = "Could not retrieve structures: " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            structures.clear();
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return structures;
+    }
+    
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int)
+     */
+    @Override
+    public SortedSet<Structure> find(Work w, String name, int start, int end, boolean strict) {
+        int WORK_ID = 1, NAME = 2, 
+            AFTER = 3, BEFORE = 4,
+            END_AFTER = 5, END_BEFORE = 6;
+        String sql =
+                "SELECT " + FIELDS + ", structure_id " +
+                "  FROM TEXTS_Structures" + 
+                " WHERE work_uuid = ? AND " +
+                "       structure_name = ? AND " +
+                "       (start_pos <= ? AND end_pos > ?) " +
+    ((strict) ? "    OR (start_pos < ? AND end_pos > ?)" : "") +
+                " ORDER BY start_pos ASC, end_pos DESC";
+        
+        if (!strict)
+            return this.find(w, name, start, end);
+        
+        SortedSet<Structure> structures = null;
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(WORK_ID, w.getUUID().toString());
+            stmt.setString(NAME,  name);
+            
+            if (strict) {
+                stmt.setInt(AFTER, start);
+                stmt.setInt(BEFORE, start);
+                stmt.setInt(END_AFTER,  end);
+                stmt.setInt(END_BEFORE,  end);
+            } else {
+                stmt.setInt(AFTER, start);
+                stmt.setInt(BEFORE, END);
+            }
+        
+            structures = find(stmt);
+        } catch (Exception ex) {
+            String msg = "Could not retrieve structures: " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            structures.clear();
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return structures;
+    }
 
     /**
      * 
@@ -267,7 +436,7 @@ public class MySQLStructureRepository implements StructureRepository {
                 "    structure_name = ?, " +
                 "    perspective = ?, " + 
                 "    start_pos = ?, " + 
-                "    end_pos = ?, " +
+                "    end_pos = ? " +
                 "WHERE structure_id = ?";
         
         boolean success = false;
@@ -296,7 +465,7 @@ public class MySQLStructureRepository implements StructureRepository {
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
-            String msg = "Could not create structure: " + s.getName() + ". " + ex.getMessage();
+            String msg = "Could not save structure: " + s.getName() + ". " + ex.getMessage();
             LOGGER.warn(msg, ex);
             s = null;
         } finally {

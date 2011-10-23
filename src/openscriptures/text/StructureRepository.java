@@ -20,21 +20,47 @@ public interface StructureRepository {
     
     public boolean hasStructuresFor(UUID workId);
     
-    public Structure find(UUID id);
-    
-    public Structure find(long id);
-    
     public Structure synchronize(Structure s);
     
-//    public SortedSet<Structure> find(Work w, String name);
-//    
-//    public SortedSet<Structure> find(Work w, int position);
-//    
-//    public SortedSet<Structure> find(Work w, String name, TokenSequence seq);
-//    
-//    public SortedSet<Structure> find(Work w, String name, int start, int end);
-//    
-//    public SortedSet<Structure> find(Work w, String name, int start, int end, boolean strict);
+    /**
+     * Looks up an existing structure by its globally unique identifier.
+     * 
+     * @param id The id of the structure to retrieve.
+     * @return The identified structure or null if no such structure exists. 
+     */
+    public Structure find(UUID id);
+    
+    /** 
+     * Looks up an existing structure by its internal database identifier.
+     * 
+     * @param id The id of the structure to retrieve.
+     * @return The identified structure or null if no such structure exists. 
+     */
+    public Structure find(long id);
+
+    // TODO need to find a better way to do this
+    /**
+     * Looks up all structures within a work having the specified name. For example, 
+     * find all 'book' structures in the SBLGNT.
+     *  
+     * @param w The work for which to retrieve structures.
+     * @param name The name of the structure to retrieve.
+     * @return The specified structures or the empty set if no such structures exist.
+     */
+    public SortedSet<Structure> find(Work w, String name);
+    
+    /**
+     * Looks up all structures within a work having that include the specified token. 
+     *  
+     * @param w The work for which to retrieve structures.
+     * @param position The token position that should be spanned by the returned structures. 
+     * @return The specified structures or the empty set if no such structures exist.
+     */
+    public SortedSet<Structure> find(Work w, int position);
+    
+    public SortedSet<Structure> find(Work w, String name, int start, int end);
+    
+    public SortedSet<Structure> find(Work w, String name, int start, int end, boolean strict);
     
     public boolean save(Structure s);
 }

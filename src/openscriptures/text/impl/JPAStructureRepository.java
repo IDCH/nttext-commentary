@@ -3,6 +3,7 @@
  */
 package openscriptures.text.impl;
 
+import java.util.SortedSet;
 import java.util.UUID;
 
 import javax.persistence.EntityManagerFactory;
@@ -77,21 +78,21 @@ public class JPAStructureRepository extends JPARepository<Structure> implements 
         return true;
     }
 
-//    /* (non-Javadoc)
-//     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
-//     */
-//    public SortedSet<Structure> find(Work w, String name) {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
-//
-//    /* (non-Javadoc)
-//     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, int)
-//     */
-//    public SortedSet<Structure> find(Work w, int position) {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
+     */
+    public SortedSet<Structure> find(Work w, String name) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, int)
+     */
+    public SortedSet<Structure> find(Work w, int position) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 //
 //    /* (non-Javadoc)
 //     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, openscriptures.text.TokenSequence)
@@ -101,20 +102,20 @@ public class JPAStructureRepository extends JPARepository<Structure> implements 
 //        return null;
 //    }
 //
-//    /* (non-Javadoc)
-//     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int)
-//     */
-//    public SortedSet<Structure> find(Work w, String name, int start, int end) {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
-//
-//    /* (non-Javadoc)
-//     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int, boolean)
-//     */
-//    public SortedSet<Structure> find(Work w, String name, int start, int end,
-//            boolean strict) {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int)
+     */
+    public SortedSet<Structure> find(Work w, String name, int start, int end) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, int, int, boolean)
+     */
+    public SortedSet<Structure> find(Work w, String name, int start, int end,
+            boolean strict) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

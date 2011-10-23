@@ -66,9 +66,20 @@ public class StructureComparator implements Comparator<Structure> {
             return startDiff;
         
         // These structures are co-extensive. We'll order them (semi-arbitrarily) 
-        // by their names.
-        if (b.getEnd() == a.getEnd())
-            return a.getName().compareTo(b.getName());
+        // by their names or UUIDs.
+        if (b.getEnd() == a.getEnd()) {
+            int order = a.getName().compareTo(b.getName());
+            if (order == 0) {
+                // This seems like a fringe case, but it is required to be consistent 
+                // with 'equals'.
+                String aUUID = a.getUUID().toString();                
+                String bUUID = b.getUUID().toString();
+                
+                order = aUUID.compareTo(bUUID);
+            }
+            
+            return order;
+        }
 
         // If they start at the same place, the one that ends last is the "earlier" 
         // structure because because it is nested inside the surrounding structure.

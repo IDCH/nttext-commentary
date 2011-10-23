@@ -131,8 +131,10 @@ public class JPATokenRepository extends JPARepository<Token> implements TokenRep
      * @return
      */
     public List<Token> find(Structure s) {
-        Work w = s.getWork();
-        return this.find(s.getWork(), s.getStart(), s.getEnd());
+        // TODO implement
+        return null;
+//        UUID wId = s.getWorkUUID();
+//        return this.find(s.getWorkUUID(), s.getStart(), s.getEnd());
     }
     
     //=======================================================================================

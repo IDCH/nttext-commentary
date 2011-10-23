@@ -22,9 +22,9 @@ public interface TokenRepository {
     
     public Token find(Work w, int pos);
     
-//    public List<Token> find(Work w, int start, int end);
-//    
-//    public List<Token> find(Structure s);
+    public List<Token> find(Work w, int start, int end);
+    
+    public List<Token> find(Structure s);
     
 //    public void save(Token t);
 }

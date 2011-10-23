@@ -2,17 +2,7 @@ package org.nttext.commentary;
 
 import java.util.UUID;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import openscriptures.text.Structure;
-import openscriptures.text.WorkId;
 
 import org.nttext.commentary.VariationUnit.TextProxy;
 
@@ -84,8 +74,6 @@ public class VUReference {
     //=======================================================================================
     
     /** Restricted access getter for use by persistence layer. */
-    @Id
-    @GeneratedValue
     Long getId() {
         return this.id;
     }
@@ -99,7 +87,6 @@ public class VUReference {
      * Returns the base reading for the associated variation unit in the 
      * corresponding NT edition.
      */
-    @Basic
     public String getBaseReading() {
         return this.baseReading;
     }
@@ -117,16 +104,16 @@ public class VUReference {
      * 
      * @return The structure that marks this variation unit.
      */
-    @Transient
     public Structure getReference() {
         return this.structure;
     }
     
     /** Returns the unique identifier for the structure that defines this reference. This is
      *  used by the persistence layer. */
-    @Basic
     String getReferenceId() {
-        return this.structure.getLocalId();
+        // TODO IMPLEMENT
+        return null;
+//        return this.structure.getLocalId();
     }
     
     /** Used by the persistence layer to restore the scripture reference. */
@@ -144,8 +131,6 @@ public class VUReference {
      * Returns the variation unit that this reference describes. 
      * @return the variation unit that this reference describes.
      */
-    @ManyToOne
-    @JoinColumn(name="vu_fk")
     public VariationUnit getVariationUnit() {
         return this.vu;
     }
@@ -162,10 +147,11 @@ public class VUReference {
      * 
      * @return The name of the corresponding NT edition.
      */
-    @Transient
     public String getEdition() {
-        WorkId id = this.structure.getWork().getWorkId();
-        return id.getName();
+        // TODO IMPLEMENT
+//        WorkId id = this.structure.getWorkUUID().getWorkId();
+//        return id.getName();
+        return null;
     }
 
     /** 
@@ -174,7 +160,6 @@ public class VUReference {
      * 
      * @return The language name of the corresponding NT edtion.
      */
-    @Transient
     public String getLanguage() {
         return this.source.getLanguage();
     }
@@ -185,7 +170,6 @@ public class VUReference {
      * 
      * @return The three letter language code.
      */
-    @Transient
     public String getLgCode() {
         return this.source.getLgCode();
     }

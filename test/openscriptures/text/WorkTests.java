@@ -35,7 +35,7 @@ public class WorkTests extends TestCase {
         Work work = new Work(new WorkId("Bible.grc.SBLGNT.2010"));
         assertNotNull(work);
         assertEquals(work.getWorkId(), "Bible.grc.SBLGNT.2010");
-        assertEquals(work.getWork(), work);
+        assertEquals(work.getWorkUUID(), work);
     }
 
     public void testAssignValues() {

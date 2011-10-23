@@ -5,7 +5,6 @@
 package openscriptures.text;
 
 import java.util.Comparator;
-import java.util.UUID;
 
 /**
  * Tests to determine the sequential relationship between two <tt>Structures</tt>. 
@@ -54,9 +53,7 @@ public class StructureComparator implements Comparator<Structure> {
         
         // Make sure these structures are from the same text. If not, we can't 
         // compare them.
-        UUID workA = a.getWork().getUUID();
-        UUID workB = b.getWork().getUUID();
-        if (!workA.equals(workB)) {
+        if (!a.getWorkUUID().equals(b.getWorkUUID())) {
             // this is all we can do as per the API.
             throw new ClassCastException("Incomparable structures. " +
             		"These structures are defined for different texts.");  

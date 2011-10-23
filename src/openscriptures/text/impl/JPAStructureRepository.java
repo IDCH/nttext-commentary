@@ -3,15 +3,13 @@
  */
 package openscriptures.text.impl;
 
-import java.util.SortedSet;
+import java.util.UUID;
 
 import javax.persistence.EntityManagerFactory;
 
 import openscriptures.text.Structure;
-import openscriptures.text.StructureFacade;
 import openscriptures.text.StructureRepository;
 import openscriptures.text.Token;
-import openscriptures.text.TokenSequence;
 import openscriptures.text.Work;
 
 /**
@@ -42,18 +40,41 @@ public class JPAStructureRepository extends JPARepository<Structure> implements 
      * @see openscriptures.text.StructureRepository#hasStructuresFor(openscriptures.text.Work)
      */
     @Override
-    public boolean hasStructuresFor(Work work) {
+    public boolean hasStructuresFor(UUID workId) {
         // TODO Auto-generated method stub
         return false;
     }
 
     /* (non-Javadoc)
-     * @see openscriptures.text.StructureRepository#getStructureFacade(openscriptures.text.Work)
+     * @see openscriptures.text.StructureRepository#find(java.util.UUID)
      */
     @Override
-    public StructureFacade getStructureFacade(Work w) {
+    public Structure find(UUID id) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(long)
+     */
+    @Override
+    public Structure find(long id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#synchronize(openscriptures.text.Structure)
+     */
+    @Override
+    public Structure synchronize(Structure s) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean save(Structure s) {
+        super.save(s);
+        return true;
     }
 
 //    /* (non-Javadoc)

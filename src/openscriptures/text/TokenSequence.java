@@ -5,6 +5,7 @@ package openscriptures.text;
 
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.UUID;
 
 /**
  * @author Neal Audenaert
@@ -13,7 +14,7 @@ public interface TokenSequence {
 
 	public String getText();
 	
-	public Work getWork();
+	public UUID getWorkUUID();
 	
 	/** Return the start position (inclusive) in the underlying <tt>Work</tt>'s token stream. */
 	abstract int getStart();

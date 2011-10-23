@@ -383,8 +383,8 @@ public class Work extends AbstractTokenSequence {
      * @see openscriptures.text.TokenSequence#getWork()
      */
     @Transient 
-    public Work getWork() {
-        return this;
+    public UUID getWorkUUID() {
+        return this.uuid;
     }
 
     

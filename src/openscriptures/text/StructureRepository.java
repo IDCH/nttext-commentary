@@ -4,6 +4,7 @@
 package openscriptures.text;
 
 import java.util.SortedSet;
+import java.util.UUID;
 
 
 /**
@@ -15,9 +16,15 @@ public interface StructureRepository {
     
     public Structure create(Work work, String name, Token start, Token end);
     
-    public boolean hasStructuresFor(Work work);
+    public Structure create(Structure s);
     
-    public StructureFacade getStructureFacade(Work w);
+    public boolean hasStructuresFor(UUID workId);
+    
+    public Structure find(UUID id);
+    
+    public Structure find(long id);
+    
+    public Structure synchronize(Structure s);
     
 //    public SortedSet<Structure> find(Work w, String name);
 //    
@@ -29,5 +36,5 @@ public interface StructureRepository {
 //    
 //    public SortedSet<Structure> find(Work w, String name, int start, int end, boolean strict);
     
-    public void save(Structure s);
+    public boolean save(Structure s);
 }

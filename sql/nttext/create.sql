@@ -43,7 +43,6 @@ CREATE TABLE IF NOT EXISTS TEXTS_Structures (
     uuid                CHAR(38) NOT NULL UNIQUE,
     work_uuid           CHAR(38) NOT NULL,
     
-    local_id            VARCHAR(255),
     structure_name      VARCHAR(255),
     perspective         VARCHAR(255),
     

@@ -24,7 +24,7 @@ public abstract class AbstractTokenSequence implements TokenSequence {
      * @return
      */
     private boolean isSameWork(Token t) {
-        UUID myId = this.getWork().getUUID();
+        UUID myId = this.getWorkUUID();
         UUID tId = t.getWork().getUUID();
         
         return tId.equals(myId);
@@ -130,7 +130,8 @@ public abstract class AbstractTokenSequence implements TokenSequence {
     public Token get(int index) {
         checkIndexInBounds(index);
         
-        return this.getWork().get(this.getStart() + index);
+        ApplicationContext ac = ApplicationContext.getApplicationContext();
+        return ac.getToken(this.getWorkUUID(), this.getStart() + index);
     }
 
     /* (non-Javadoc)
@@ -390,8 +391,8 @@ public abstract class AbstractTokenSequence implements TokenSequence {
             this.s = s;
         }
         
-        public Work getWork() {
-            return s.getWork();
+        public UUID getWorkUUID() {
+            return s.getWorkUUID();
         }
         
         public int getStart() {

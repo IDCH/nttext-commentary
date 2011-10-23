@@ -174,7 +174,7 @@ public class Structure extends AbstractTokenSequence {
 	protected String localId;
 	
 	/** The work this structure pertains to. This must be same as the start and end tokens. */
-	protected Work work;
+	protected UUID workUUID;
 	
 	/** 
      * The position of the token that starts the structure's content; this may or may not 
@@ -238,11 +238,19 @@ public class Structure extends AbstractTokenSequence {
 	protected Structure() {
 	}
 	
+	public Structure(Long id) {
+	    this.id = id;
+	}
+	
+	public Structure(UUID id) {
+	    this.uuid = id;
+	}
+	
 	public Structure(Work work, String name) {
 	    this.uuid = UUID.randomUUID();
         
         this.name = name;
-        this.work = work;
+        this.workUUID = work.getUUID();
 	}
 	
 	public Structure(Work work, String name, Token start, Token end) {
@@ -251,7 +259,7 @@ public class Structure extends AbstractTokenSequence {
 	}
 	
 	protected void checkWork(Token t) throws InvalidTokenException {
-	    if (!t.getWork().getUUID().equals(this.work.getUUID()))
+	    if (!t.getWork().equals(this.workUUID))
 	        throw new InvalidTokenException(
 	                "The token's work does not match this structure.", t);
 	}
@@ -267,9 +275,10 @@ public class Structure extends AbstractTokenSequence {
 // ACCESSORS
 //========================================================================================
 	 /** Returns the unique DB identifier. To be used by the persistence layer. */
-    @Id @GeneratedValue Long getId() { return id; }
+    @Id @GeneratedValue
+    public Long getId() { return id; }
     /** Used by persistence layer to set the UUID from a string. */
-    void setId(Long id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
 	
 	/** 
 	 *  Returns the unique identifier for this <tt>Structure</tt> 
@@ -278,37 +287,28 @@ public class Structure extends AbstractTokenSequence {
     @Transient public UUID getUUID() { return uuid; }
     
     /** Returns a string version of this structures UUID for use by the persistence layer. */
-    @Basic String getUuidString() { return uuid.toString(); }
+    @Basic String getUUIDString() { return uuid.toString(); }
     /** Used by persistence layer to set the UUID from a string. */
-    void setUuidString(String uuid) { this.uuid = UUID.fromString(uuid); }
+    public void setUUIDString(String uuid) { this.uuid = UUID.fromString(uuid); }
     
     /** Returns the <tt>Work</tt> that this structure is found in. */
     // TODO make persistent
-    @Transient public Work getWork() { return this.work; }
+    @Transient public UUID getWorkUUID() { return this.workUUID; }
+    public void setWork(UUID uuid) { this.workUUID = uuid; }
 
-    /** 
-     * Returns a locally unique identifier for this structure. This is (optionally) used to 
-     * provide access to domain specific identification schemes for structures, especially 
-     * those that may need to be referenced across different texts (e.g., OSIS ids for 
-     * books, chapters and verses).
-     */
-    @Basic public String getLocalId() { return this.localId; }
-    /** 
-     * Sets the locally unique ID for this structure. Note that the uniqueness of 
-     * this name is not enforced. */
-    public void setLocalId(String value) { this.localId = value; }
-    
     /** Return the name of this structure. This corresponds to an element 
      * name in an XML document. */
     @Basic public String getName() { return this.name; }
     /** Sets the name of this structure. */
     public void setName(String value) { this.name = value; }
 
-    @Basic Integer getStartTokenPosition() { return this.startTokenPosition; }
-    void setStartTokenPosition(Integer pos) { this.startTokenPosition = pos; }
+    // TODO perhaps replace getStart/getEnd
+    @Basic
+    public Integer getStartTokenPosition() { return this.startTokenPosition; }
+    public void setStartTokenPosition(Integer pos) { this.startTokenPosition = pos; }
     
-    @Basic Integer getEndTokenPosition() { return this.endTokenPosition; }
-    void setEndTokenPosition(Integer pos) { this.endTokenPosition = pos; }
+    @Basic public Integer getEndTokenPosition() { return this.endTokenPosition; }
+    public void setEndTokenPosition(Integer pos) { this.endTokenPosition = pos; }
 
     
     
@@ -341,21 +341,22 @@ public class Structure extends AbstractTokenSequence {
                 : this.getStart();
     }
     
+    private Token getToken(int pos) {
+        ApplicationContext ac = ApplicationContext.getApplicationContext();
+        return ac.getToken(workUUID, pos);
+    }
+    
     /** Returns the token at which this structure starts. */
     @Transient
     public Token getStartToken() {
-        int start = this.getStart();
+        if (this.startTokenPosition == null) 
+            return null;
         
-        Token t = null;
-        if ((startToken != null) && (startToken.getPosition() == start)) {
-            t = startToken;
-            
-        } else if (startTokenPosition != null && start >= 0) {
-            t = this.work.get(start);
-            this.startToken = t;
-        }
-        
-        return t;
+        int pos = startTokenPosition.intValue();
+        if ((startToken == null) || (startToken.getPosition() != pos))
+            startToken = getToken(pos);
+    
+        return startToken;
     }
     
     /**
@@ -388,18 +389,14 @@ public class Structure extends AbstractTokenSequence {
      */
     @Transient
     public Token getEndToken() {
-        int end = this.getEnd();
+        if (this.endTokenPosition == null) 
+            return null;
         
-        Token t = null;
-        if ((endToken != null) && (endToken.getPosition() == end)) {
-            t = endToken;
-            
-        } else if (endTokenPosition != null && end >= 0) {
-            t = this.work.get(end);
-            this.endToken = t;
-        }
+        int pos = endTokenPosition.intValue();
+        if ((endToken == null) || (endToken.getPosition() != pos))
+                endToken = getToken(pos);
         
-        return t;
+        return endToken;
     }
     
     /**
@@ -550,7 +547,7 @@ public class Structure extends AbstractTokenSequence {
         if (equals(s))
             return true;
         
-        if (!s.getWork().getUUID().equals(this.getWork().getUUID()))
+        if (!s.getWorkUUID().equals(this.getWorkUUID()))
             return false;
         
         return (s.getStart() == this.getStart()) &&         

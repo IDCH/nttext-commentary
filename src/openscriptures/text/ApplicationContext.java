@@ -5,6 +5,7 @@ package openscriptures.text;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -137,8 +138,42 @@ public class ApplicationContext {
         return this.structures;
     }
     
+    public WorkRepository getWorkRepository(UUID id) {
+        return this.works;
+    }
+    
+    public Work getWork(UUID id) {
+        return this.works.find(id);
+    }
+    
+    public Token getToken(UUID workId, int pos) {
+        Work w = getWork(workId);
+        if (w == null) {
+            throw new InaccessibleWorkException(workId);
+        }
+        
+        if (pos >= w.size()) {
+            throw new ArrayIndexOutOfBoundsException(
+                    "The requested token (pos='" + pos + "') does not exist for this work. " + 
+                    "This work (" + w.getUUIDString() + ") has " + w.size() + " tokens.");
+        }
+        
+        return w.get(pos);
+    }
+    
     //=======================================================================================
     // CONFIGURATION METHODS
     //=======================================================================================
     
+    
+    //========================================================================================
+    // INNER CLASSES
+    //========================================================================================
+    public static class InaccessibleWorkException extends RuntimeException {
+        private static final long serialVersionUID = -1033727611861247876L;
+
+        InaccessibleWorkException(UUID id) {
+            super("Could not locate the work '" + id + "'");
+        }
+    }
 }

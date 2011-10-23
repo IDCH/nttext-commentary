@@ -8,12 +8,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.idch.util.StopWatch;
 
+import openscriptures.text.Structure;
 import openscriptures.text.Token;
 import openscriptures.text.TokenRepository;
 import openscriptures.text.Work;
@@ -164,6 +166,33 @@ public class MySQLTokenRepository implements TokenRepository {
         return tokens;
     }
 
+    /**
+     * Restores a token from the provide result set. This assumes that the result set 
+     * cursor is positioned at the row to be restored. This will not update the cursor.
+     * 
+     * @param results The result set to use to restore the token.
+     * @return The restored token.
+     * @throws SQLException if there are problems accessing the result set.
+     */
+    private Token restore(ResultSet results) throws SQLException {
+        long id = results.getLong(ID);
+        long workId = results.getLong(WORK_ID);
+        int pos = results.getInt(POS);
+        String uuid = results.getString(UUID);
+        String text = results.getString(TEXT);
+        String type = results.getString(TYPE);
+        
+        WorkRepository works = repo.getWorkRepository();
+        Work w = works.find(workId);
+        
+        Token token = new Token(w, pos, text);
+        token.setId(id);
+        token.setUUIDString(uuid);
+        token.setType(Token.Type.valueOf(type));
+        
+        return token;
+    }
+    
     /* (non-Javadoc)
      * @see openscriptures.text.TokenRepository#getMaxPosition(openscriptures.text.Work)
      */
@@ -225,25 +254,6 @@ public class MySQLTokenRepository implements TokenRepository {
         return token;
     }
     
-    private Token restore(ResultSet results) throws SQLException {
-        long id = results.getLong(ID);
-        long workId = results.getLong(WORK_ID);
-        int pos = results.getInt(POS);
-        String uuid = results.getString(UUID);
-        String text = results.getString(TEXT);
-        String type = results.getString(TYPE);
-        
-        WorkRepository works = repo.getWorkRepository();
-        Work w = works.find(workId);
-        
-        Token token = new Token(w, pos, text);
-        token.setId(id);
-        token.setUUIDString(uuid);
-        token.setType(Token.Type.valueOf(type));
-        
-        return token;
-    }
-    
     public Token find(UUID uuid) {
         String sql = "SELECT " + FIELDS + "FROM TEXTS_Tokens WHERE uuid = ?"; 
         
@@ -267,5 +277,43 @@ public class MySQLTokenRepository implements TokenRepository {
         }
         
         return token;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.TokenRepository#find(openscriptures.text.Work, int, int)
+     */
+    @Override
+    public List<Token> find(Work w, int start, int end) {
+        String sql = "SELECT " + FIELDS + "FROM TEXTS_Tokens WHERE uuid = ?"; 
+        
+        List<Token> tokens = new ArrayList<Token>(end - start);
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            
+            
+            ResultSet results = stmt.executeQuery();
+            while (results.next()) {
+                tokens.add(restore(results));
+            }
+        } catch (Exception ex) {
+            String msg = "Could not retrieve tokens (" + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            tokens = null;
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return tokens;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.TokenRepository#find(openscriptures.text.Structure)
+     */
+    @Override
+    public List<Token> find(Structure s) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

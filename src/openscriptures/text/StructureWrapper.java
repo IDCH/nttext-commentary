@@ -75,24 +75,11 @@ public abstract class StructureWrapper extends Structure {
     
     /** 
      *  Returns the <tt>Work</tt> that this structure is found in. 
-     *  @see openscriptures.text.Structure#getWork()
+     *  @see openscriptures.text.Structure#getWorkUUID()
      */
     @Override
-    public Work getWork() {
-        return me.getWork();
-    }
-
-    /** 
-     * Returns a locally unique identifier for this structure. This is (optionally) used to 
-     * provide access to domain specific identification schemes for structures, especially 
-     * those that may need to be referenced across different texts (e.g., OSIS ids for 
-     * books, chapters and verses).
-     *   
-     * @see openscriptures.text.Structure#getLocalId()
-     */
-    @Override
-    public String getLocalId() {
-        return me.getLocalId();
+    public UUID getWorkUUID() {
+        return me.getWorkUUID();
     }
 
     /** Return the name of this structure. This corresponds to an element name 
@@ -123,16 +110,6 @@ public abstract class StructureWrapper extends Structure {
     //========================================================================================
     // MUTATORS
     //========================================================================================
-    /**
-     * Sets the locally unique ID for this structure.
-     * 
-     * @param value The id value
-     *  
-     * @throws UnsupportedOperationException
-     */
-    public void setLocalId(String value) throws UnsupportedOperationException {
-        me.setLocalId(value);
-    }
     
     /**
      * 

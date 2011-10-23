@@ -13,7 +13,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
 import org.apache.log4j.Logger;
-import org.idch.util.Cache.CacheStatistics;
 
 /**
  * @author Neal Audenaert
@@ -159,7 +158,7 @@ public class JPARepository<T> {
      * 
      * @param t
      */
-    public void save(T t) {
+    public boolean save(T t) {
         EntityManager em = getEM();
         EntityTransaction tx = em.getTransaction();
         
@@ -172,5 +171,7 @@ public class JPARepository<T> {
                 tx.rollback();
             close(em);
         }
+        
+        return true;
     }
 }

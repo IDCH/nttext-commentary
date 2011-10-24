@@ -1,66 +1,79 @@
--- Defines works that are recorded in a local database
-CREATE TABLE IF NOT EXISTS TEXTS_Works (
-    work_id             SERIAL  PRIMARY KEY,
-    uuid                CHAR(38) NOT NULL UNIQUE,
+-- A Commentary Entry
+CREATE TABLE IF NOT EXISTS NTTEXTComm_Entries (
+    entry_id     SERIAL  PRIMARY KEY,  
+    -- The scripture passage this entry refers to
+    passage      VARCHAR(64) NOT NULL, 
+    -- A overview of the variants found in this passage 
+    overview     TEXT,                 
+    -- The username of the user who owns this entry This implies that usernames should not 
+    -- be modified. Otherwise, we could use id, possibly UUID. 
+    owned_by     VARCHAR(64),          
+    status       VARCHAR(64),
     
-    title               VARCHAR(255),
-    abbreviation        VARCHAR(32),
-    description         TEXT,
-    
-    creator             VARCHAR(255),
-    publisher           VARCHAR(255),
-    language            VARCHAR(3),
-    work_type           VARCHAR(16),
-    copyright           TEXT,
-    scope               VARCHAR(255),
-    ref_system          VARCHAR(16),
-    soruce_url          VARCHAR(255),
-    
-    publication_date    CHAR(10),
-    import_date         DATETIME
+    date_created TIMESTAMP DEFAULT now(),
+    last_updated TIMESTAMP NOT NULL
     
 ) ENGINE=InnoDB CHARSET utf8;
 
--- Defines the tokens for works stored in this database 
-CREATE TABLE IF NOT EXISTS TEXTS_Tokens (
-    token_id       SERIAL  PRIMARY KEY,
-    uuid           CHAR(38) NOT NULL UNIQUE,
-    work_id        BIGINT UNSIGNED NOT NULL,
+
+-- Variation Units
+CREATE TABLE IF NOT EXISTS NTTEXTComm_VUs (
+    vu_id        SERIAL PRIMARY KEY,
+    passage      VARCHAR(64) NOT NULL,
+    commentary   TEXT,
     
-    token_pos      INTEGER,
-    token_text     VARCHAR(255) NOT NULL,
-    token_type     ENUM('WORD', 'WHITESPACE', 'PUNCTUATION'), 
-    
-    UNIQUE (work_id, token_pos),
-    
-    FOREIGN KEY (work_id)
-      REFERENCES TEXTS_Works (work_id)
+    date_created TIMESTAMP DEFAULT now(),
+    last_updated TIMESTAMP NOT NULL
+) ENGINE=InnoDB CHARSET utf8;
+
+-- Links a VU to its manifestation in a particular NT edition.
+-- TODO remove - this should simply be a structure . . . . maybe
+CREATE TABLE IF NOT EXISTS NTTEXTComm_VUReference (
+    vu_id           BIGINT UNSIGNED NOT NULL, 
+    structure_uuid  CHAR(38) NOT NULL,
+    baseReading     TEXT NOT NULL,
+
+    FOREIGN KEY (vu_id)
+      REFERENCES NTTEXTComm_VUs (vu_id)
       ON DELETE CASCADE
 ) ENGINE=InnoDB CHARSET utf8;
 
-CREATE TABLE IF NOT EXISTS TEXTS_Structures (
-    structure_id        SERIAL  PRIMARY KEY,
-    uuid                CHAR(38) NOT NULL UNIQUE,
-    work_uuid           CHAR(38) NOT NULL,
+-- Variant Readings
+CREATE TABLE IF NOT EXISTS NTTEXTComm_Rdgs (
+    -- Unique id for this reading
+    rdg_id          SERIAL PRIMARY KEY,         
+    -- The variation unit this is a reading of 
+    vu_id           BIGINT UNSIGNED NOT NULL,   
+    -- Greek form of this variant reading 
+    greek_rdg       TEXT NOT NULL,              
+    -- English language gloss of this reading
+    english_rdg     TEXT NOT NULL,              
+    -- description or list of manuscripts that have this reading 
+    witnesses       VARCHAR(255),               
     
-    structure_name      VARCHAR(255),
-    perspective         VARCHAR(255),
-    
-    start_pos           INTEGER,
-    end_pos             INTEGER
-    
-) ENGINE=InnoDB CHARSET utf8;
-
--- Attributes for a structure
-CREATE TABLE IF NOT EXISTS TEXTS_StructureAttributes (
-    structure_id   BIGINT UNSIGNED NOT NULL,
-    attr_key       VARCHAR(255),
-    attr_value     TEXT,
-    
-    UNIQUE (structure_id, attr_key),
-    
-    FOREIGN KEY (structure_id)
-      REFERENCES TEXTS_Structures (structure_id)
+    FOREIGN KEY (vu_id)
+      REFERENCES NTTEXTComm_VUs (vu_id)
       ON DELETE CASCADE
     
 ) ENGINE=InnoDB CHARSET utf8;
+
+
+
+-- Mapping of Entries to the VU's those entries describe
+CREATE TABLE IF NOT EXISTS NTTEXTComm_EntryVUs (
+    entry_id        BIGINT UNSIGNED NOT NULL,
+    vu_id           BIGINT UNSIGNED NOT NULL,
+    
+    FOREIGN KEY (entry_id)
+      REFERENCES NTTEXTComm_Entries (entry_id)
+      ON DELETE CASCADE,
+    FOREIGN KEY (vu_id)
+      REFERENCES NTTEXTComm_VUs (vu_id)
+      ON DELETE CASCADE
+) ENGINE=InnoDB CHARSET utf8;
+
+-- Mapping of variant readings to the manuscripts in which those readings are found
+-- CREATE TABLE IF NOT EXISTS NTTEXTComm_RdgWitnesses (
+    
+    
+-- ) ENGINE=InnoDB CHARSET utf8;

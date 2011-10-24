@@ -12,10 +12,8 @@ import org.nttext.commentary.VariationUnit.TextProxy;
  * 
  * @author Neal Audenaert
  */
-//@Entity
-//@Table(name="VU_References")
 public class VUReference {
-    // TODO think about making this a TokenSequence
+    // TODO think about making this a StructureWrapper
 
     //=======================================================================================
     // MEMBER VARIABLES

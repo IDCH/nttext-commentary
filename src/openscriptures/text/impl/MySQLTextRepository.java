@@ -18,11 +18,11 @@ import org.idch.persist.DatabaseException;
 import org.idch.persist.RepositoryAccessException;
 
 /**
- * @author Neal_2
+ * @author Neal Audenaert
  */
 public class MySQLTextRepository extends DBBackedRepository implements TextRepo {
 
-    public final static String MODULE_NAME = "nttext";
+    public final static String MODULE_NAME = "texts";
     
     /** 
      * 

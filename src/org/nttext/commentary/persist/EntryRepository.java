@@ -16,7 +16,7 @@ public interface EntryRepository {
 
     public Entry create(Passage passage);
     
-    public Entry lookup(Passage passage);
+    public Entry find(Passage passage);
     
     public Entry remove(Entry entry);
 }

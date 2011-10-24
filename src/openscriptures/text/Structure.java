@@ -200,8 +200,8 @@ public class Structure extends AbstractTokenSequence {
     
     protected String perspective;
 
-    protected Map<String, StructureAttribute> attributes = 
-        new HashMap<String, StructureAttribute>();
+    protected Map<String, String> attributes = 
+        new HashMap<String, String>();
     
 //========================================================================================
 // MISC PROPERTIES, CURRENTLY UNUSED
@@ -457,25 +457,28 @@ public class Structure extends AbstractTokenSequence {
     }
     
    
-    
-//========================================================================================
-// METHODS FOR REPRESENTING ATTRIBUTES, CONTENT, AND HIERARCHICAL STRUCTURES
-//========================================================================================
-    /*
-     * 
-     */
-	public String getAttribute(String name) {
-		StructureAttribute attr = attributes.get(name);
-		
-		return (attr == null) ? null : attr.getValue();
-	}
 
-    /* (non-Javadoc)
-     * @see openscriptures.text.Structure#listAttributes()
+  //========================================================================================
+  // METHODS FOR REPRESENTING ATTRIBUTES, CONTENT, AND HIERARCHICAL STRUCTURES
+  //========================================================================================
+      
+    /**
+     *  
+     * @return
      */
     public Set<String> listAttributes() {
         return this.attributes.keySet();
     }
+
+    /**
+     * 
+     * @param name
+     * @return
+     */
+	public String getAttribute(String name) {
+	    return attributes.get(name);
+	}
+
     
     /**
      * 
@@ -484,10 +487,23 @@ public class Structure extends AbstractTokenSequence {
      * @return
      */
     public String setAttribute(String name, String value) {
-        StructureAttribute previous = 
-            attributes.put(name, new StructureAttribute(name, value));
-        
-        return (previous != null) ? previous.getValue() : null;
+        return attributes.put(name, value);
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public Map<String, String> getAttributes() {
+        return Collections.unmodifiableMap(this.attributes);
+    }
+    
+    /**
+     * 
+     * @param attrs
+     */
+    public void setAttributes(Map<String, String> attrs) {
+        this.attributes = attrs;
     }
     
     /**

@@ -50,3 +50,17 @@ CREATE TABLE IF NOT EXISTS TEXTS_Structures (
     end_pos             INTEGER
     
 ) ENGINE=InnoDB CHARSET utf8;
+
+-- Attributes for a structure
+CREATE TABLE IF NOT EXISTS TEXTS_StructureAttributes (
+    structure_id   BIGINT UNSIGNED NOT NULL,
+    attr_key       VARCHAR(255),
+    attr_value     TEXT,
+    
+    UNIQUE (structure_id, attr_key),
+    
+    FOREIGN KEY (structure_id)
+      REFERENCES TEXTS_Structures (structure_id)
+      ON DELETE CASCADE
+    
+) ENGINE=InnoDB CHARSET utf8;

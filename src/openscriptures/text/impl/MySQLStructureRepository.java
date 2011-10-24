@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -76,7 +78,8 @@ public class MySQLStructureRepository implements StructureRepository {
     // MEMBER VARIABLES
     //===================================================================================
     
-    MySQLTextRepository repo = null;
+    private MySQLTextRepository repo = null;
+    private AttrRepo attrs = null;
     
     //===================================================================================
     // CONSTRUCTORS
@@ -88,6 +91,7 @@ public class MySQLStructureRepository implements StructureRepository {
      */
     MySQLStructureRepository(MySQLTextRepository repo) {
         this.repo = repo;
+        this.attrs = new AttrRepo();
     }
 
     //===================================================================================
@@ -203,6 +207,10 @@ public class MySQLStructureRepository implements StructureRepository {
         assert wId != null : "No identifier for this token's work.";         // should be enforced by DB constraints
         s.setWork(UUID.fromString(wId));
 
+        // retrieve the attributes
+        Connection conn = results.getStatement().getConnection();
+        s.setAttributes(attrs.get(conn, s.getId()));
+        
         return s;
     }
     
@@ -265,7 +273,6 @@ public class MySQLStructureRepository implements StructureRepository {
         ResultSet results = stmt.executeQuery();
         while (results.next()) {
             s = new Structure(results.getLong(STRUCTURE_ID));
-            
             structures.add(restore(s, results));
         }
         
@@ -279,7 +286,7 @@ public class MySQLStructureRepository implements StructureRepository {
     public SortedSet<Structure> find(Work w, String name) {
         // TODO LOTS of duplicated code. Refactor into delgate class.
         int WORK_ID = 1, NAME = 2;
-        String sql =
+        String sql = 
                 "SELECT " + FIELDS + ", structure_id " +
                 "  FROM TEXTS_Structures" + 
                 " WHERE work_uuid = ? AND structure_name = ?" +
@@ -442,8 +449,12 @@ public class MySQLStructureRepository implements StructureRepository {
         boolean success = false;
         Connection conn = null;
         try {
-            // build the statement
             conn = repo.openConnection();
+            
+            // save the attributes
+            this.attrs.createOrUpdate(conn, s.getId(), s.getAttributes());
+            
+            // build the statement
             PreparedStatement stmt = conn.prepareStatement(sql); 
             
             stmt.setString(NAME, s.getName());
@@ -474,4 +485,75 @@ public class MySQLStructureRepository implements StructureRepository {
         
         return success;
     }
+    
+    
+    //===================================================================================
+    // INNER CLASS FOR PERSISTING ATTRIBUTES
+    //===================================================================================
+    
+    private static class AttrRepo {
+        private static final String DROP_SQL = 
+                "DELETE FROM TEXTS_StructureAttributes WHERE structure_id = ?";
+        private static final String INSERT_SQL = 
+                "INSERT INTO TEXTS_StructureAttributes (structure_id, attr_key, attr_value) " +
+                        "VALUES (?, ?, ?)";
+        private static final String SELECT_SQL = 
+                "SELECT attr_key, attr_value " +
+                "  FROM TEXTS_StructureAttributes " +
+                " WHERE structure_id = ?";        
+        
+        public AttrRepo() {  }
+        
+        /**
+         * 
+         * @param conn
+         * @param structureId
+         * @param attrs
+         * @throws SQLException
+         */
+        public void createOrUpdate(
+                Connection conn, long structureId, Map<String, String> attrs) 
+        throws SQLException {
+            int ID = 1, KEY = 2, VALUE = 3;
+            
+            PreparedStatement stmt = null;
+            stmt = conn.prepareStatement(DROP_SQL);
+            stmt.setLong(ID, structureId);
+            stmt.executeUpdate();
+            
+            stmt = conn.prepareStatement(INSERT_SQL); 
+            stmt.setLong(ID, structureId);
+            for (String k : attrs.keySet()) {
+                stmt.setString(KEY, k);
+                stmt.setString(VALUE, attrs.get(k));
+                
+                int numberOfRows = stmt.executeUpdate();
+                assert numberOfRows == 1 : "Unexpected number of rows inserted.";
+                
+            }
+        }
+        
+        /**
+         * 
+         * @param conn
+         * @param structureId
+         * @return
+         * @throws SQLException
+         */
+        public Map<String, String> get(Connection conn, long structureId) throws SQLException {
+            int ID = 1, KEY = 1, VALUE = 2;
+            
+            Map<String, String> attrs = new HashMap<String, String>();
+            PreparedStatement stmt = conn.prepareStatement(SELECT_SQL); 
+                
+            stmt.setLong(ID, structureId);
+            ResultSet results = stmt.executeQuery();
+            while(results.next()) {
+                attrs.put(results.getString(KEY), results.getString(VALUE));
+            }
+            
+            return attrs;
+        }
+        
+    }   // END AttrRepo class
 }

@@ -28,5 +28,7 @@ public interface WorkRepository {
     public List<Work> findByAbbr(String abbreviation);
     
     public boolean save(Work w);
+    
+    public boolean remove(Work w);
 
 }

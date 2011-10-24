@@ -140,6 +140,9 @@ public class JPAWorkRepository extends JPARepository<Work> implements WorkReposi
         return null;
     }
     
+    public boolean remove(Work w) {
+        return false;
+    }
     //===================================================================================
     // UPDATE METHOS
     //===================================================================================

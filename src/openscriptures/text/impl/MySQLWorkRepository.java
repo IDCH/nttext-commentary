@@ -423,6 +423,47 @@ public class MySQLWorkRepository implements WorkRepository {
         
         return success;
     }
+    
+    /**
+     * Removes the indicated work and all associated tokens. Note that this does not remove 
+     * any structures associated with this work. 
+     */
+    public boolean remove(Work w) {
+        int ID = 1;
+        String sql = "DELETE FROM TEXTS_Works WHERE work_id = ?";
+        
+        boolean success = false;
+        Connection conn = null;
+        try {
+            // build the statement
+            conn = repo.openConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            
+            stmt.setLong(ID, w.getId());
+            
+            // execute the query
+            int numRowsChanged = stmt.executeUpdate();
+            success = numRowsChanged == 1;
+            if (numRowsChanged > 1) {
+                LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
+                            "while removing a work (" + w.getUUID() + "). Expected 1.");
+                repo.rollbackConnection(conn);
+            } else {
+                w.setId(null);
+                conn.commit();
+            }
+            
+        } catch (Exception ex) {
+            repo.rollbackConnection(conn);
+            
+            String msg = "Could not remove work: " + w.getWorkId() + ". " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return success;
+    }
 
 
     

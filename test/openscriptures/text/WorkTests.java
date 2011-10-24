@@ -3,14 +3,7 @@
  */
 package openscriptures.text;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import openscriptures.utils.Language;
 import openscriptures.utils.License;
@@ -25,6 +18,7 @@ public class WorkTests extends TestCase {
         "Ἰούδας Ἰησοῦ Χριστοῦ δοῦλος, ἀδελφὸς δὲ Ἰακώβου, τοῖς ἐν θεῷ πατρὶ " +
         "ἠγαπημένοις καὶ Ἰησοῦ Χριστῷ τετηρημένοις κλητοῖς·";
     
+    @SuppressWarnings("unused")
     private static final String TOKENIZATION_PATTERN =
         "\\p{L}+|" +                                // Unicode letters
         "\\p{P}+|" +                                // Unicode punctuation
@@ -66,15 +60,10 @@ public class WorkTests extends TestCase {
         work.setCopyright(copy);
         assertEquals("Incorrect copyright", copy, work.getCopyright());
 
-        DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            work.setPublicationDate(fmt.parse("2010-10-28"));
-            assertEquals("Unexpected publication date", 
-                    fmt.parse("2010-10-28"), 
-                    work.getPublicationDate());
-        } catch (ParseException pe) {
-            assertFalse("Could not parse date", true);
-        }
+        work.setPublicationDate("2010-10-28");
+        assertEquals("Unexpected publication date", 
+                "2010-10-28", 
+                work.getPublicationDate());
 
         work.setRefSystem("Bible.NRSVA");       // TODO need to perform lookups
         assertEquals("Incorrect ref system", "Bible.NRSVA", work.getRefSystem());

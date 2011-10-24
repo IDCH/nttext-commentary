@@ -17,7 +17,7 @@ public class EntryData {
     }
     
     public String getReference() {
-        return this.entry.getReference().toString();
+        return this.entry.getPassage().toString();
     }
     
     public ScriptureReference getPrimaryScripture() {

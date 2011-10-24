@@ -41,6 +41,14 @@ public abstract class StructureWrapper extends Structure {
 		me = structure;
 	}
 	
+	public Long getId() {
+	    return me.getId();
+	}
+	
+	public void setId(Long id) {
+	    me.setId(id);
+	}
+	
 	/** 
 	 * Determines whether the supplied structure is an acceptable instance of this
 	 * wrapper. This will be called as the first step in construction (before member variables

@@ -28,6 +28,7 @@ public class BookTitleHandler extends StructureHandler {
         public void end(PathElement p) {
             ctx.inText();
             
+            // TODO need to set the title.
             // TODO need to handle Mark weirdness
 //            Other Endings of Mark
 //            Intermediate Ending

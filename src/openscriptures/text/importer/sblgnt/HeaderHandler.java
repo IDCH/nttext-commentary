@@ -31,6 +31,7 @@ public class HeaderHandler extends StructureHandler {
     public void end(PathElement p) {
         if (p.getName().equals("header")) {                // exit the header section
             ctx.notInHeader();
+            ctx.getWorksRepo().save(ctx.work);
         } else {
             processHeaderField(p);
         }

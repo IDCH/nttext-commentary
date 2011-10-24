@@ -4,7 +4,6 @@
 package openscriptures.text.importer.sblgnt;
 
 import org.apache.log4j.Logger;
-import org.idch.util.StopWatch;
 
 import openscriptures.text.Structure;
 import openscriptures.text.importer.PathElement;

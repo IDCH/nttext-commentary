@@ -75,7 +75,6 @@ public class Work extends AbstractTokenSequence {
 	
 	private ApplicationContext ac = null; 
 	private TokenRepository tokens = null;
-    private int size = Integer.MIN_VALUE;
 	
     // Of dubious value - cache at the repo level
 	private Cache<Integer, Token> tokenCache = new Cache<Integer, Token>("tokens", 1000);
@@ -145,7 +144,7 @@ public class Work extends AbstractTokenSequence {
         // FIXME  this may have synchronization issues, but this will be used only in
         //        pretty rare instances, so it likely doesn't pose a problem in the 
         //        near term (2011-2012)
-        if (size < 0) this.size();
+        int size = this.size();
         
         Token t = new Token(w, size++, value); 
         t = this.getTokenRepository().create(t);
@@ -163,7 +162,7 @@ public class Work extends AbstractTokenSequence {
      * @return
      */
     public List<Token> appendAll(String text) {
-        if (size < 0) this.size();
+        int size = this.size();
         
         List<Token> tokens = new ArrayList<Token>();
         boolean lastTokenWasWhitespace = false;
@@ -212,12 +211,12 @@ public class Work extends AbstractTokenSequence {
     }
 
     public int size() {
-        if (this.size >= 0)
-            return this.size;
+//        if (this.size >= 0)
+//            return this.size;
         
         TokenRepository tokens = this.getTokenRepository();
-        this.size = tokens.getNumberOfTokens(this);
-        return this.size;
+        int size = tokens.getNumberOfTokens(this);
+        return size;
     }
 	
 	

@@ -3,17 +3,11 @@
  */
 package openscriptures.text.importer.sblgnt;
 
-import javax.persistence.EntityManagerFactory;
 
 import org.apache.log4j.Logger;
-import org.idch.persist.RepositoryAccessException;
-import org.idch.util.PersistenceUtil;
 
 import openscriptures.text.TextRepo;
 import openscriptures.text.Work;
-import openscriptures.text.impl.JPAStructureRepository;
-import openscriptures.text.impl.JPATokenRepository;
-import openscriptures.text.impl.JPAWorkRepository;
 import openscriptures.text.impl.MySQLTextRepository;
 import openscriptures.text.importer.Context;
 import openscriptures.text.importer.Importer;
@@ -48,14 +42,11 @@ public class SBLGNTImporter {
     public void doImport() throws Exception {
         long start = System.currentTimeMillis();
         try {
-            EntityManagerFactory emf = PersistenceUtil.getEMFactory("nttext");
             Context context = new Context(
                     m_repo.getWorkRepository(), 
-                    m_repo.getTokenRepository(),
                     m_repo.getStructureRepository());
             Importer importer = new Importer(filename, context);
             
-            context.inText = true;
             importer.addHandler(new WordHandler());
             importer.addHandler(new HeaderHandler());
             importer.addHandler(new FrontMatterHandler());

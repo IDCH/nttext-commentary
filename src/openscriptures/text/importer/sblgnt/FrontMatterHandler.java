@@ -19,11 +19,11 @@ public class FrontMatterHandler extends StructureHandler {
     }
     
     public void start(PathElement p) {
-        ctx.inFront = true;
-        ctx.inText = false;
+        ctx.inFront();
+        ctx.notInText();
     }
     
     public void end(PathElement p) {
-        ctx.inFront = false;
+        ctx.notInFront();
     }
 }

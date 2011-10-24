@@ -21,16 +21,16 @@ public class HeaderHandler extends StructureHandler {
     }
     
     public boolean matchesEnd(PathElement p) {
-        return ctx.inHeader;
+        return ctx.isInHeader();
     }
     
     public void start(PathElement p) {
-        ctx.inHeader = true;
+        ctx.inHeader();
     }
     
     public void end(PathElement p) {
         if (p.getName().equals("header")) {                // exit the header section
-            ctx.inHeader = false;
+            ctx.notInHeader();
         } else {
             processHeaderField(p);
         }

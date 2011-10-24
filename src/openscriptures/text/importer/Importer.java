@@ -157,7 +157,7 @@ public class Importer extends DefaultHandler {
             String nsURI, String name, String qName, Attributes attrs)
     throws SAXException {
         PathElement el = this.path.push(nsURI, name, qName, attrs);
-        if (context.inHeader || context.inFront) {
+        if (context.isInHeader() || context.isInFront()) {
             // FIXME this seems really ad hoc
             // do nothing (we'll process these at the end tag)
             return;
@@ -181,7 +181,7 @@ public class Importer extends DefaultHandler {
             if (name.equals("osisText") && context.work == null) {
                 // create an instance of the work.
                 String osisIDWork = attrs.getValue(ATTR_OSIS_ID_WORK);
-                context.work = context.works.create(osisIDWork);
+                context.work = context.getWorksRepo().create(osisIDWork);
 
                 LOGGER.info("Ingesting new work: " + context.work.getWorkId());
 
@@ -241,7 +241,7 @@ public class Importer extends DefaultHandler {
         // textual and paratextual elements.
         path.characters(ch, start, length);
         
-        if (context.inText) {
+        if (context.isInText()) {
             String text = new String(ch, start, length);
             if (context.work != null)
                 context.work.appendAll(text);

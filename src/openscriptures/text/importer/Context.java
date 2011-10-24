@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import openscriptures.text.StructureRepository;
-import openscriptures.text.TokenRepository;
 import openscriptures.text.Work;
 import openscriptures.text.WorkRepository;
 
@@ -27,22 +26,20 @@ public class Context {
     public Work work = null;
     
     /** Indicates that the parser is in the header section of the document. */
-    public boolean inHeader = false;
+    private boolean inHeader = false;
     
     /** Indicates that the parser is in the front matter section of the document. */
-    public boolean inFront = false;
+    private boolean inFront = false;
     
     /** Indicates that the parser is in the text of the document. While this is 
      *  set to true, the importer will add tokens from the character data that 
      *  it encounters. */
-    public boolean inText = false;
+    private boolean inText = false;
     
-    public WorkRepository works = null;
-    
-    public TokenRepository tokens = null;
+    private WorkRepository works = null;
     
     /** Used to create structure instances. */
-    public StructureRepository structures = null;
+    private StructureRepository structures = null;
     
     //=====================================================================================
     // PRIVATE STATE VARIABLES
@@ -74,10 +71,8 @@ public class Context {
      *      
      */
     public Context(WorkRepository workRepo, 
-            TokenRepository tokenRepo, 
             StructureRepository structureRepo) {
         this.works = workRepo;
-        this.tokens = tokenRepo;
         this.structures = structureRepo;
     }
     
@@ -89,22 +84,29 @@ public class Context {
      * Updates the context to indicate that the parser is in a text segment (this 
      * will enable tokenization until <tt>{@link #notInText()}</tt> is called).
      */
-    public void inText() {
-        this.inText = true;
-    }
+    public void inText() { this.inText = true;  }
     
     /**
      * Updates the context to indicate that the parser is not in a text segment (this 
      * will prevent tokenization until <tt>{@link #inText()}</tt> is called).
      */
-    public void notInText() {
-        this.inText = false;
-    }
+    public void notInText() { this.inText = false; }
     
-    public boolean isInText() {
-        return this.inText;
-    }
+    public boolean isInText() { return this.inText; }
     
+
+    public void inHeader() { this.inHeader= true;  }
+   
+    public void notInHeader() { this.inHeader = false; }
+   
+    public boolean isInHeader() { return this.inHeader; }
+    
+    public void inFront() { this.inFront= true;  }
+    
+    public void notInFront() { this.inFront = false; }
+   
+    public boolean isInFront() { return this.inFront; }
+           
     /**
      * Sets a numeric property of the context.
      *  
@@ -168,6 +170,18 @@ public class Context {
         LOGGER.debug("Retreived numeric property: '" + key + "'=" + d);
         return d;
     }
+
+    public WorkRepository getWorksRepo() {
+        return this.works;
+    }
+    
+    public StructureRepository getStructureRepo() {
+        return this.structures;
+    }
+    
+    //=====================================================================================
+    // HANDLER ACCESS METHOS
+    //=====================================================================================
     
     /**
      * Returns the named structure currently being processed by an importer. Note that this 

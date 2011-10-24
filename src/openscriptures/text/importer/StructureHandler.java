@@ -191,7 +191,7 @@ public abstract class StructureHandler {
         
         // TODO use facade
         startAfterIndex = ctx.work.getEnd();
-        this.activeStructure = ctx.structures.create(ctx.work, name);
+        this.activeStructure = ctx.getStructureRepo().create(ctx.work, name);
 
         ctx.setHandler(this);
 
@@ -245,7 +245,7 @@ public abstract class StructureHandler {
             structure.setEndToken(end);
 
             this.close(structure);
-            ctx.structures.save(structure);
+            ctx.getStructureRepo().save(structure);
             ctx.clearHandler(this.getName());
             LOGGER.info("closed structure: " + structure.getName());
             timer.pause();

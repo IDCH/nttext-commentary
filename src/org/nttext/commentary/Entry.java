@@ -4,15 +4,14 @@
 package org.nttext.commentary;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.UUID;
 
 import openscriptures.ref.Passage;
-import openscriptures.ref.VerseRange;
 
 /**
  * Represents a single entry in the commentary.
@@ -25,7 +24,7 @@ public class Entry {
     // MEMBER VARIABLES
     //======================================================================================
     
-    private UUID id;
+    private Long id;
 	private Passage ref;
 	private String overview;
 	
@@ -36,6 +35,16 @@ public class Entry {
 	// Constructors
 	//======================================================================================
 	
+	protected Entry() {
+	    
+	}
+	
+	public Entry(Long id, Passage ref, String overview, Date created, Date modified) {
+	    this.id = id;
+	    this.ref = ref;
+	    this.overview = overview;
+	}
+	
 	/**
 	 * Instantiates a new <tt>Entry</tt> from the provided reference. An entry must refer 
 	 * to exactly one scripture reference. 
@@ -43,7 +52,6 @@ public class Entry {
 	 * @param ref The scripture reference this entry refers to.  
 	 */
 	public Entry(Passage ref) {
-	    this.id = UUID.randomUUID();
 		this.ref = ref;
 	}
 	
@@ -52,31 +60,21 @@ public class Entry {
     //======================================================================================
     
 	/** Returns the unique identifier for this entry. */
-	public String getId() {
-	    return id.toString();
+	public Long getId() {
+	    return id;
 	}
 	
-	void setId(String id) {
-	    this.id = UUID.fromString(id);
-	}
-	
-	/**
-	 * Returns a stringified version of the scripture reference that this Entry describes.
-	 */
-	String getRefString() {
-	    return this.ref.toString();
-	}
-
-	/** Sets the scripture reference this Entry describes. This is used by the 
-	 *  persistence layer. */ 
-	@SuppressWarnings("unused")
-    private void setRefString(String ref) {
-	    this.ref = new VerseRange(ref);
+	public void setId(long id) {
+	    this.id = id;
 	}
 	
 	/** Returns the scripture passage this entry refers to. */
 	public Passage getReference() {
 		return this.ref;
+	}
+	
+	public void setReference(Passage ref) {
+	    this.ref = ref;
 	}
 	
 	/** Returns the overview text associated with this entry. This is expected to be
@@ -139,8 +137,7 @@ public class Entry {
 	 * 
 	 * @param variationUnits The variation units associated with this entry.
 	 */
-	@SuppressWarnings("unused")
-    private void setVariationUnits(Set<VariationUnit> variationUnits) {
+    public void setVariationUnits(Set<VariationUnit> variationUnits) {
 	    // TODO use a comparator
 	    this.variants = new TreeSet<VariationUnit>();
 	    this.variants.addAll(variationUnits);

@@ -16,7 +16,11 @@ public interface EntryRepository {
 
     public Entry create(Passage passage);
     
+    public Entry find(long id);
+    
     public Entry find(Passage passage);
     
-    public Entry remove(Entry entry);
+    public boolean save(Entry entry);
+    
+    public boolean remove(Entry entry);
 }

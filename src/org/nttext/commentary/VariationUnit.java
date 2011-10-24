@@ -4,14 +4,13 @@
 package org.nttext.commentary;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import openscriptures.ref.Passage;
-import openscriptures.ref.VerseRange;
 import openscriptures.text.Structure;
 
 /**
@@ -23,14 +22,12 @@ public class VariationUnit {
     // MEMBER VARIABLES
     //===================================================================================
     
-	private UUID id;
+	private Long id;
 	private String commentary;
-	private List<VariantReading> readings;
-
 	private Passage ref;
 	
+	private List<VariantReading> readings;
 	private Map<String, VUReference> references = new HashMap<String, VUReference>();
-	
 	
 	//===================================================================================
     // CONSTRUCTORS
@@ -40,8 +37,14 @@ public class VariationUnit {
 	    
 	}
 	
-	public VariationUnit(String ref) {
-	    this.ref = new VerseRange(ref);
+	public VariationUnit(Long id, Passage ref, String commentary, Date created, Date modified) {
+	    this.id = id;
+	    this.ref = ref;
+	    this.commentary = commentary;
+    }
+	
+	public VariationUnit(Passage ref) {
+	    this.ref = ref;
 	}
 	
 	//===================================================================================
@@ -49,38 +52,21 @@ public class VariationUnit {
     //===================================================================================
     
 	/** Returns a unique identifier for this variation unit. */
- 	public String getId() {
-	    return id.toString();
-	}
+ 	public Long getId() { return id; }
 	
 	/** Used by the persistence layer to set the unique id of this VU. */ 
-	void setId(String id) {
-        this.id = UUID.fromString(id);
-    }
+	public void setId(long id) { this.id = id; }
 	
-	/** Returns a stringified version of the scripture reference associated with this VU. */
-    String getRefString() {
-        // TODO we'll need to improve this in order to support query by passage
-        return this.ref.toString();
-    }
-
-    /** Sets the scripture reference this Entry describes. This is used by the 
-     *  persistence layer. */ 
-    void setRefString(String ref) {
-        this.ref = new VerseRange(ref);
-    }
-    
-    
  	/** Returns the passage this variation unit is found in. */
 	public Passage getPassage() {
 	    return this.ref;
 	}
+	
+	public void setPassage(Passage ref) { this.ref = ref; }
 		
 
 	/** Retrieves the commentary describing this variation unit. */
-	public String getCommentary() {
-	    return commentary;
-	}
+	public String getCommentary() {  return commentary; }
 	
 	/**
 	 * Sets the commentary associated with this variation unit. This is expected to be

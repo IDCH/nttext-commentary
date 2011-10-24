@@ -69,7 +69,7 @@ public class Entry {
 	}
 	
 	/** Returns the scripture passage this entry refers to. */
-	public Passage getReference() {
+	public Passage getPassage() {
 		return this.ref;
 	}
 	

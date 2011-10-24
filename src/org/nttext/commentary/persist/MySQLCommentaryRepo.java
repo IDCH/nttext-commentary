@@ -30,10 +30,12 @@ public final static String MODULE_NAME = "nttext_commentary";
         return (MySQLCommentaryRepo)get(MODULE_NAME);
     }
     
-    private EntryRepository entryRepo; 
+    private EntryRepository entryRepo;
+    private VURepository vuRepo; 
 
     public MySQLCommentaryRepo() {
         entryRepo = new MySQLEntryRepository(this);
+        vuRepo = new MySQLVariationUnitRepository(this);
     }
     
     /**
@@ -41,6 +43,10 @@ public final static String MODULE_NAME = "nttext_commentary";
      */
     public EntryRepository getEntryRepository() {
         return entryRepo;
+    }
+    
+    public VURepository getVURepository() {
+        return vuRepo;
     }
     
     //========================================================================

@@ -48,7 +48,7 @@ public class EntryTests extends TestCase {
         Passage passage = new VerseRange(ref);
         Entry entry = entryRepo.create(passage);
         
-        assertTrue(entry.getReference().equals(passage));
+        assertTrue(entry.getPassage().equals(passage));
         assertTrue(entry.getId() >= 0);
     }
     
@@ -64,7 +64,7 @@ public class EntryTests extends TestCase {
         
         entry = entryRepo.find(id);
         
-        assertTrue(entry.getReference().equals(passage));
+        assertTrue(entry.getPassage().equals(passage));
         assertTrue(entry.getId() >= 0);
         assertEquals(overview, entry.getOverview());
     }
@@ -80,7 +80,7 @@ public class EntryTests extends TestCase {
         
         entry = entryRepo.find(new VerseRange(ref));
         
-        assertTrue(entry.getReference().equals(passage));
+        assertTrue(entry.getPassage().equals(passage));
         assertTrue(entry.getId() >= 0);
         assertEquals(overview, entry.getOverview());
         
@@ -99,7 +99,7 @@ public class EntryTests extends TestCase {
         
         entry = entryRepo.find(new VerseRange(ref));
         
-        assertTrue(entry.getReference().equals(passage));
+        assertTrue(entry.getPassage().equals(passage));
         assertTrue(entry.getId() >= 0);
         assertEquals(overview, entry.getOverview());
         

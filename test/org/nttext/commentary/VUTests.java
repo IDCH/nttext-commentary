@@ -8,7 +8,6 @@ import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
 
 import org.idch.persist.RepositoryAccessException;
-import org.nttext.commentary.persist.EntryRepository;
 import org.nttext.commentary.persist.MySQLCommentaryRepo;
 import org.nttext.commentary.persist.VURepository;
 
@@ -41,7 +40,7 @@ public class VUTests extends TestCase {
         }
     }
     
-    public void testCreateEntry() {
+    public void testCreateVU() {
         String ref = "1Pet.2.20";
         Passage passage = new VerseRange(ref);
         VariationUnit vu = vuRepo.create(passage);
@@ -50,7 +49,7 @@ public class VUTests extends TestCase {
         assertTrue(vu.getId() >= 0);
     }
     
-    public void testUpdateEntry() {
+    public void testUpdateVU() {
         String ref = "1Pet.2.20";
         String overview = "This is a short overview of this entry";
         Passage passage = new VerseRange(ref);
@@ -67,7 +66,7 @@ public class VUTests extends TestCase {
         assertEquals(overview, vu.getCommentary());
     }
     
-    public void testRetrieveEntry() {
+    public void testRetrieveVU() {
         String ref = "1Pet.2.20";
         String overview = "This is a short overview of this entry";
         Passage passage = new VerseRange(ref);
@@ -86,7 +85,7 @@ public class VUTests extends TestCase {
         assertNull(vu);
     }
     
-    public void testRemoveEntry() {
+    public void testRemoveVU() {
         String ref = "1Pet.2.20";
         String overview = "This is a short overview of this entry";
         Passage passage = new VerseRange(ref);

@@ -356,7 +356,7 @@ public class MySQLStructureRepository implements StructureRepository {
                 "SELECT " + FIELDS + ", structure_id " +
                 "  FROM TEXTS_Structures" + 
                 " WHERE work_uuid = ? AND " +
-                "       structure_name = ? AND start_pos <= ? AND end_pos > ?" +
+                "       structure_name = ? AND start_pos >= ? AND end_pos < ?" +
                 " ORDER BY start_pos ASC, end_pos DESC";
         
         SortedSet<Structure> structures = null;

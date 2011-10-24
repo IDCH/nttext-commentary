@@ -1,7 +1,10 @@
 /**
  * 
  */
-package org.nttext.commentary;
+package org.nttext.commentary.persist;
+
+import org.nttext.commentary.VariantReading;
+import org.nttext.commentary.VariationUnit;
 
 /**
  * Defines methods for creating, finding and removing variation units and variant readings.

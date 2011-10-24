@@ -11,14 +11,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
 
@@ -27,8 +19,6 @@ import openscriptures.ref.VerseRange;
  * 
  * @author Neal Audenaert
  */
-//@Entity
-//@Table(name="Entries")
 public class Entry {
     
     
@@ -63,7 +53,6 @@ public class Entry {
     //======================================================================================
     
 	/** Returns the unique identifier for this entry. */
-	@Id
 	public String getId() {
 	    return id.toString();
 	}
@@ -75,7 +64,6 @@ public class Entry {
 	/**
 	 * Returns a stringified version of the scripture reference that this Entry describes.
 	 */
-	@Basic
 	String getRefString() {
 	    return this.ref.toString();
 	}
@@ -88,14 +76,12 @@ public class Entry {
 	}
 	
 	/** Returns the scripture passage this entry refers to. */
-	@Transient
 	public Passage getReference() {
 		return this.ref;
 	}
 	
 	/** Returns the overview text associated with this entry. This is expected to be
 	 *  plain UTF-8 text. */
-	@Lob
 	public String getOverview() {
 	    return this.overview;
 	}
@@ -143,7 +129,6 @@ public class Entry {
 	 * 
 	 * @return
 	 */
-	@ManyToMany
 	// TODO more detail here!!
 	public SortedSet<VariationUnit> getVariationUnits() {
 	    return Collections.unmodifiableSortedSet(this.variants);
@@ -163,7 +148,6 @@ public class Entry {
 	    
 	}
 	
-	@Transient
 	public boolean isModifiable() {
 	    // This is business logic and should be migrated to a separate class
 	    // Entries should be modifiable only if they have not been published, and are not
@@ -184,12 +168,10 @@ public class Entry {
 	    return passages.keySet();
 	}
 	
-	@Transient
 	public String getText(String version) {
 	    return passages.get(version);
 	}
 	
-	@Transient
 	public String getMarkedText(String version) {
 	    String text = passages.get(version);
 	    

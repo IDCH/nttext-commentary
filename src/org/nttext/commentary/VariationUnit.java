@@ -10,13 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
 import openscriptures.text.Structure;
@@ -24,8 +17,6 @@ import openscriptures.text.Structure;
 /**
  * @author Neal Audenaert
  */
-//@Entity
-//@Table(name="VariationUnits")
 public class VariationUnit {
 	
     //===================================================================================
@@ -58,7 +49,6 @@ public class VariationUnit {
     //===================================================================================
     
 	/** Returns a unique identifier for this variation unit. */
-	@Id
  	public String getId() {
 	    return id.toString();
 	}
@@ -69,7 +59,6 @@ public class VariationUnit {
     }
 	
 	/** Returns a stringified version of the scripture reference associated with this VU. */
-    @Basic
     String getRefString() {
         // TODO we'll need to improve this in order to support query by passage
         return this.ref.toString();
@@ -83,14 +72,12 @@ public class VariationUnit {
     
     
  	/** Returns the passage this variation unit is found in. */
-    @Transient
 	public Passage getPassage() {
 	    return this.ref;
 	}
 		
 
 	/** Retrieves the commentary describing this variation unit. */
-    @Lob
 	public String getCommentary() {
 	    return commentary;
 	}

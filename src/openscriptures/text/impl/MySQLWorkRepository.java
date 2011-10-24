@@ -8,7 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -242,10 +244,186 @@ public class MySQLWorkRepository implements WorkRepository {
         return w;
     }
     
-    
-    public void save(Work work) {
+    /* (non-Javadoc)
+     * @see openscriptures.text.WorkRepository#getByWorkId(openscriptures.text.WorkId.Type)
+     */
+    @Override
+    public List<Work> findByType(String type) {
+        int worktype = 1;
+        String sql = "SELECT " + FIELDS + ", work_id " +
+        		     "  FROM TEXTS_Works " +
+        		     " WHERE work_type = ?";
         
+        List<Work> works = new ArrayList<Work>();
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(worktype, type);
+            
+            Work w = null;
+            ResultSet results = stmt.executeQuery();
+            while (results.next()) {
+                w = new Work(results.getLong(WORK_ID));
+                works.add(restore(w, results));
+            }
+        } catch (Exception ex) {
+            String msg = "Could not retrieve works by type (" + type + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            works.clear();
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return works;
     }
-   
+    
+    /* (non-Javadoc)
+     * @see openscriptures.text.WorkRepository#getByWorkId(openscriptures.text.WorkId.Type, java.lang.String)
+     */
+    @Override
+    public List<Work> findByType(String type, String lgCode) {
+        int worktype = 1, lg = 2;
+        String sql = "SELECT " + FIELDS + ", work_id " +
+                     "  FROM TEXTS_Works " +
+                     " WHERE work_type = ? AND language = ?";
+        
+        List<Work> works = new ArrayList<Work>();
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(worktype, type);
+            stmt.setString(lg, lgCode);
+            
+            Work w = null;
+            ResultSet results = stmt.executeQuery();
+            while (results.next()) {
+                w = new Work(results.getLong(WORK_ID));
+                works.add(restore(w, results));
+            }
+        } catch (Exception ex) {
+            String msg = "Could not retrieve works by type (" + type + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            works.clear();
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return works;
+    }
+    
 
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.WorkRepository#getByWorkId(java.lang.String)
+     */
+    @Override
+    public List<Work> findByAbbr(String abbreviation) {
+        int abbr = 1;
+        String sql = "SELECT " + FIELDS + ", work_id " +
+                     "  FROM TEXTS_Works " +
+                     " WHERE abbreviation = ?";
+       
+        List<Work> works = new ArrayList<Work>();
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(abbr, abbreviation);
+            
+            Work w = null;
+            ResultSet results = stmt.executeQuery();
+            while (results.next()) {
+                w = new Work(results.getLong(WORK_ID));
+                works.add(restore(w, results));
+            }
+        } catch (Exception ex) {
+            String msg = "Could not retrieve works by abbreviation (" + abbreviation + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            works.clear();
+        } finally {
+            repo.closeConnection(conn);
+        }
+       
+        return works;
+    }
+
+    public boolean save(Work w) {
+        int TITLE = 1, ABBV = 2, DESC = 3,
+            CREATOR = 4, PUBLISHER = 5, LG = 6, TYPE = 7, RIGHTS  = 8, 
+            SCOPE = 9, REF = 10, URL  = 11, PUB_DATE = 12, IMPORT_DATE = 13, ID = 14;
+        String sql =
+                "UPDATE TEXTS_Works SET" +
+                "  title = ?, " +
+                "  abbreviation = ?, " +
+                "  description = ?, " +
+                "  creator = ?, " +
+                "  publisher = ?, " +
+                "  language = ?, " +
+                "  work_type = ?, " +
+                "  copyright = ?, " +
+                "  scope = ?, " +
+                "  ref_system = ?, " +
+                "  soruce_url = ?, " +
+                "  publication_date = ?, " +
+                "  import_date = ? " +
+                "WHERE work_id = ?";
+        
+        boolean success = false;
+        Connection conn = null;
+        try {
+            // build the statement
+            conn = repo.openConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            
+            stmt.setLong(ID, w.getId());
+            
+            stmt.setString(TITLE, w.getTitle());
+            stmt.setString(ABBV, w.getAbbreviation());
+            stmt.setString(DESC, w.getDescription());
+            
+            stmt.setString(CREATOR, w.getCreator());
+            stmt.setString(PUBLISHER, w.getPublisher());
+            stmt.setString(PUB_DATE, w.getPublicationDate());
+            stmt.setString(LG, w.getLgCode());
+            stmt.setString(TYPE, w.getType());
+            stmt.setString(RIGHTS, w.getCopyright());
+            stmt.setString(SCOPE, w.getScope());
+            stmt.setString(REF, w.getRefSystem());
+            stmt.setString(URL, w.getSourceUrl());
+            
+            Date d = w.getImportDate();
+            if (d != null)
+                stmt.setDate(IMPORT_DATE, new java.sql.Date(d.getTime()));
+            else
+                stmt.setDate(IMPORT_DATE, null);
+            
+            
+            // execute the query
+            int numRowsChanged = stmt.executeUpdate();
+            success = numRowsChanged == 1;
+            if (numRowsChanged > 1) {
+                LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
+                            "while saving a work (" + w.getUUID() + "). Expected 1.");
+                repo.rollbackConnection(conn);
+            } else {
+                conn.commit();
+            }
+            
+        } catch (Exception ex) {
+            repo.rollbackConnection(conn);
+            
+            String msg = "Could not save work: " + w.getWorkId() + ". " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            w = null;
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return success;
+    }
+
+
+    
 }

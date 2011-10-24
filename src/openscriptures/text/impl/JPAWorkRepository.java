@@ -78,7 +78,7 @@ public class JPAWorkRepository extends JPARepository<Work> implements WorkReposi
      * @param type
      * @return
      */
-    public List<Work> getByWorkId(WorkId.Type type) {
+    public List<Work> findByType(String type) {
         CriteriaBuilder builder = m_emf.getCriteriaBuilder();
         CriteriaQuery<Work> criteria = builder.createQuery(Work.class);
         Root<Work> workRoot = criteria.from(Work.class);
@@ -92,7 +92,7 @@ public class JPAWorkRepository extends JPARepository<Work> implements WorkReposi
      * @param abbreviation
      * @return
      */
-    public List<Work> getByWorkId(String abbreviation) {
+    public List<Work> findByAbbr(String abbreviation) {
         CriteriaBuilder builder = m_emf.getCriteriaBuilder();
         CriteriaQuery<Work> criteria = builder.createQuery(Work.class);
         Root<Work> workRoot = criteria.from(Work.class);
@@ -107,7 +107,7 @@ public class JPAWorkRepository extends JPARepository<Work> implements WorkReposi
      * @param lgCode
      * @return
      */
-    public List<Work> getByWorkId(WorkId.Type type, String lgCode) {
+    public List<Work> findByType(String type, String lgCode) {
         CriteriaBuilder builder = m_emf.getCriteriaBuilder();
         CriteriaQuery<Work> criteria = builder.createQuery(Work.class);
         Root<Work> workRoot = criteria.from(Work.class);

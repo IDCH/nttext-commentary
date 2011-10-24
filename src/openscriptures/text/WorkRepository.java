@@ -21,10 +21,12 @@ public interface WorkRepository {
     
     public Work find(UUID id);
     
-//    public List<Work> getByWorkId(WorkId.Type type);
+    public List<Work> findByType(String type);
     
-//    public List<Work> getByWorkId(String abbreviation);
+    public List<Work> findByType(String type, String lgCode);
     
-//    public List<Work> getByWorkId(WorkId.Type type, String lgCode);
+    public List<Work> findByAbbr(String abbreviation);
+    
+    public boolean save(Work w);
 
 }

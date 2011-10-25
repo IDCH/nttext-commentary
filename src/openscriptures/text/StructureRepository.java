@@ -62,5 +62,7 @@ public interface StructureRepository {
     
     public SortedSet<Structure> find(Work w, String name, int start, int end, boolean strict);
     
+    public SortedSet<Structure> find(Work w, String name, String attribute, String value);
+    
     public boolean save(Structure s);
 }

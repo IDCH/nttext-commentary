@@ -118,4 +118,14 @@ public class JPAStructureRepository extends JPARepository<Structure> implements 
         // TODO Auto-generated method stub
         return null;
     }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String, java.lang.String, java.lang.String)
+     */
+    @Override
+    public SortedSet<Structure> find(Work w, String name, String attribute,
+            String value) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

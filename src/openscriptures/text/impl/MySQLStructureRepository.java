@@ -278,7 +278,7 @@ public class MySQLStructureRepository implements StructureRepository {
         
         return structures;
     }
-    
+   
     /* (non-Javadoc)
      * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
      */
@@ -431,6 +431,45 @@ public class MySQLStructureRepository implements StructureRepository {
         return structures;
     }
 
+    
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
+     */
+    @Override
+    public SortedSet<Structure> find(Work w, String name, String attribute, String value) {
+        // TODO LOTS of duplicated code. Refactor into delgate class.
+        int WORK_ID = 1, NAME = 2, ATTR = 3, VALUE = 4;
+        String sql = 
+                "SELECT " + FIELDS + ", S.structure_id AS structure_id" +
+                "  FROM TEXTS_Structures AS S, TEXTS_StructureAttributes AS A" + 
+                " WHERE S.structure_id = A.structure_id AND" +
+                "       S.work_uuid = ? AND " +
+                "       S.structure_name = ? AND" +
+                "       A.attr_key = ? AND" +
+                "       A.attr_value = ?" +
+                " ORDER BY start_pos ASC, end_pos DESC";
+        
+        SortedSet<Structure> structures = null;
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(WORK_ID, w.getUUID().toString());
+            stmt.setString(NAME,  name);
+            stmt.setString(ATTR,  attribute);
+            stmt.setString(VALUE,  value);
+            structures = find(stmt);
+        } catch (Exception ex) {
+            String msg = "Could not retrieve structures (" + name + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            structures.clear();
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return structures;
+    }
+    
     /**
      * 
      * @see openscriptures.text.StructureRepository#save(openscriptures.text.Structure)

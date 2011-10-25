@@ -99,6 +99,7 @@ public class MySQLVariationUnitRepository implements VURepository {
         
         long id = results.getLong(VU_ID);
         // TODO add caching
+        
         String ref = results.getString(PASSAGE);
         String overview = results.getString(OVERVIEW);
         Date created = results.getDate(CREATED);
@@ -115,26 +116,32 @@ public class MySQLVariationUnitRepository implements VURepository {
         return vu;
     }
     
-    
-    /* (non-Javadoc)
-     */
-    @Override
-    public VariationUnit find(long id) {
+    VariationUnit find(Connection conn, long id) throws SQLException {
         String sql = "SELECT " + FIELDS + ", vu_id " +
                      "  FROM NTTEXTComm_VUs " +
                      " WHERE vu_id = ?";
         
         VariationUnit vu = null;;
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        
+        stmt.setLong(1, id);
+        
+        ResultSet results = stmt.executeQuery();
+        if (results.next())
+            vu = restore(results);
+        
+        return vu;
+    }
+    
+    /* (non-Javadoc)
+     */
+    @Override
+    public VariationUnit find(long id) {
+        VariationUnit vu = null;;
         Connection conn = null;
         try {
             conn = repo.openReadOnlyConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            
-            stmt.setLong(1, id);
-            
-            ResultSet results = stmt.executeQuery();
-            if (results.next())
-                vu = restore(results);
+            vu = find(conn, id);
         } catch (Exception ex) {
             String msg = "Could not retrieve VU (" + id + "): " + ex.getMessage();
             LOGGER.warn(msg, ex);
@@ -145,8 +152,6 @@ public class MySQLVariationUnitRepository implements VURepository {
         
         return vu;
     }
-    
-    
     
     /* (non-Javadoc)
      * @see org.nttext.commentary.persist.EntryRepository#lookup(openscriptures.ref.Passage)

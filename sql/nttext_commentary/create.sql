@@ -55,8 +55,6 @@ CREATE TABLE IF NOT EXISTS NTTEXTComm_Rdgs (
     
 ) ENGINE=InnoDB CHARSET utf8;
 
-
-
 -- Mapping of Entries to the VU's those entries describe
 CREATE TABLE IF NOT EXISTS NTTEXTComm_EntryVUs (
     entry_id        BIGINT UNSIGNED NOT NULL,

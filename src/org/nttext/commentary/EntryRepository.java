@@ -4,6 +4,8 @@
 package org.nttext.commentary;
 
 
+import java.util.Set;
+
 import openscriptures.ref.Passage;
 
 /**
@@ -22,4 +24,10 @@ public interface EntryRepository {
     public boolean save(Entry entry);
     
     public boolean remove(Entry entry);
+    
+    public boolean associate(Entry entry, VariationUnit vu);
+    
+    public boolean disassociate(Entry entry, VariationUnit vu);
+    
+    public Set<VariationUnit> getVU(Entry entry);
 }

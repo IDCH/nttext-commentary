@@ -6,10 +6,9 @@ package org.nttext.commentary;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import openscriptures.ref.Passage;
 
@@ -29,7 +28,7 @@ public class Entry {
 	private String overview;
 	
 	// TODO need to supply a comparator
-	private SortedSet<VariationUnit> variants = new TreeSet<VariationUnit>();
+	private Set<VariationUnit> variants = new HashSet<VariationUnit>();
 	
 	//======================================================================================
 	// Constructors
@@ -127,8 +126,8 @@ public class Entry {
 	 * @return
 	 */
 	// TODO more detail here!!
-	public SortedSet<VariationUnit> getVariationUnits() {
-	    return Collections.unmodifiableSortedSet(this.variants);
+	public Set<VariationUnit> getVariationUnits() {
+	    return Collections.unmodifiableSet(this.variants);
 	}
 	
 	/**
@@ -139,7 +138,7 @@ public class Entry {
 	 */
     public void setVariationUnits(Set<VariationUnit> variationUnits) {
 	    // TODO use a comparator
-	    this.variants = new TreeSet<VariationUnit>();
+	    this.variants = new HashSet<VariationUnit>();
 	    this.variants.addAll(variationUnits);
 	    
 	}

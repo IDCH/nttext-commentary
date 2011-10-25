@@ -3,6 +3,8 @@
  */
 package org.nttext.commentary;
 
+import java.util.Set;
+
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
 
@@ -42,70 +44,88 @@ public class EntryTests extends TestCase {
         }
     }
     
-    public void testCreateEntry() {
-        String ref = "1Pet.2.20";
-        Passage passage = new VerseRange(ref);
+    private String ref = "1Pet.2.20";
+    private Passage passage = new VerseRange(ref);
+    String overview = "This is a short overview of this entry";
+    
+    private Entry createEntry() {
         Entry entry = entryRepo.create(passage);
-        
+    
+        entry.setOverview(overview);
+        entryRepo.save(entry);
+        return entry;
+    }
+    
+    public void checkEntry(Entry entry) {
+        this.checkEntry(entry, true);
+    }
+    
+    public void checkEntry(Entry entry, boolean checkOverview) {
         assertTrue(entry.getPassage().equals(passage));
         assertTrue(entry.getId() >= 0);
+        
+        if (checkOverview) 
+            assertEquals(overview, entry.getOverview());
+    }
+    
+    public void testCreateEntry() {
+        Entry entry = entryRepo.create(passage);
+        checkEntry(entry, false);
     }
     
     public void testUpdateEntry() {
-        String ref = "1Pet.2.20";
-        String overview = "This is a short overview of this entry";
-        Passage passage = new VerseRange(ref);
-        Entry entry = entryRepo.create(passage);
+        Entry entry = createEntry();
         
         long id = entry.getId();
-        entry.setOverview(overview);
-        entryRepo.save(entry);
         
         entry = entryRepo.find(id);
-        
-        assertTrue(entry.getPassage().equals(passage));
-        assertTrue(entry.getId() >= 0);
-        assertEquals(overview, entry.getOverview());
+        checkEntry(entry);
     }
     
     public void testRetrieveEntry() {
-        String ref = "1Pet.2.20";
-        String overview = "This is a short overview of this entry";
-        Passage passage = new VerseRange(ref);
-        Entry entry = entryRepo.create(passage);
-        
-        entry.setOverview(overview);
-        entryRepo.save(entry);
-        
-        entry = entryRepo.find(new VerseRange(ref));
-        
-        assertTrue(entry.getPassage().equals(passage));
-        assertTrue(entry.getId() >= 0);
-        assertEquals(overview, entry.getOverview());
+        createEntry();
+        Entry entry = entryRepo.find(passage);
+        checkEntry(entry);
         
         entry = entryRepo.find(new VerseRange("1Pet.2.22"));
         assertNull(entry);
     }
     
     public void testRemoveEntry() {
-        String ref = "1Pet.2.20";
-        String overview = "This is a short overview of this entry";
-        Passage passage = new VerseRange(ref);
-        Entry entry = entryRepo.create(passage);
+        createEntry();
         
-        entry.setOverview(overview);
-        entryRepo.save(entry);
-        
-        entry = entryRepo.find(new VerseRange(ref));
-        
-        assertTrue(entry.getPassage().equals(passage));
-        assertTrue(entry.getId() >= 0);
-        assertEquals(overview, entry.getOverview());
+        Entry entry = entryRepo.find(passage);
+        checkEntry(entry);
         
         boolean success = entryRepo.remove(entry);
         
         assertTrue(success);
-        entry = entryRepo.find(new VerseRange(ref));
+        entry = entryRepo.find(passage);
         assertNull(entry);
+    }
+    
+    public void testAssociateVU() {
+        Entry entry = createEntry();
+        VariationUnit vu1 = repo.getVURepository().create(passage);
+        VariationUnit vu2 = repo.getVURepository().create(passage);
+        
+        assertTrue(entryRepo.associate(entry, vu1));
+        assertTrue(entryRepo.associate(entry, vu2));
+        
+        Set<VariationUnit> VUs = entryRepo.getVU(entry);
+        assertEquals(2, VUs.size());
+        for (VariationUnit vu : VUs) {
+            long id = vu.getId();
+            assertTrue(id == vu1.getId().longValue() || id == vu2.getId().longValue());
+        }
+        
+        entry = entryRepo.find(entry.getId());
+        VUs = entry.getVariationUnits();
+        assertEquals(2, VUs.size());
+        for (VariationUnit vu : VUs) {
+            long id = vu.getId();
+            assertTrue(id == vu1.getId().longValue() || id == vu2.getId().longValue());
+        }
+        
     }
 }

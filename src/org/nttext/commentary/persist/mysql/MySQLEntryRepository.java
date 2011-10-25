@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
@@ -15,6 +17,7 @@ import openscriptures.ref.VerseRange;
 import org.apache.log4j.Logger;
 import org.nttext.commentary.Entry;
 import org.nttext.commentary.EntryRepository;
+import org.nttext.commentary.VariationUnit;
 
 /**
  * @author Neal_2
@@ -105,6 +108,9 @@ public class MySQLEntryRepository implements EntryRepository {
         Passage passage = new VerseRange(ref);
         entry = new Entry(id, passage, overview, created, modified);
         
+        Connection conn = results.getStatement().getConnection();
+        Set<VariationUnit> variationUnits = this.getVU(conn, entry);
+        entry.setVariationUnits(variationUnits);
         return entry;
     }
     
@@ -264,5 +270,137 @@ public class MySQLEntryRepository implements EntryRepository {
         }
         
         return success;
+    }
+
+    /* (non-Javadoc)
+     * @see org.nttext.commentary.EntryRepository#associate(org.nttext.commentary.Entry, org.nttext.commentary.VariationUnit)
+     */
+    @Override
+    public boolean associate(Entry entry, VariationUnit vu) {
+        int ENTRY_ID = 1, VU_ID = 2;
+        String sql = "INSERT INTO NTTEXTComm_EntryVUs (entry_id, vu_id)" +
+        		     "VALUES (?, ?)";
+        
+        boolean success = false;
+        Connection conn = null;
+        try {
+            // build the statement
+            conn = repo.openConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            
+            stmt.setLong(ENTRY_ID, entry.getId());
+            stmt.setLong(VU_ID, vu.getId());
+           
+            // execute the query
+            int numRowsChanged = stmt.executeUpdate();
+            success = numRowsChanged == 1;
+            if (numRowsChanged > 1) {
+                LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
+                            "while associating a variation unit (" + vu.getId() + ") " +
+                            "with and entry (" + entry.getId() + "). Expected 1.");
+                repo.rollbackConnection(conn);
+            } else {
+                if (success) entry.addVariationUnit(vu);
+                conn.commit();
+            }
+        } catch (Exception ex) {
+            repo.rollbackConnection(conn);
+            
+            String msg = "Could not associate a variation unit (" + vu.getId() + ") " +
+                         "with an entry (" + entry.getId() + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            entry = null;
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return success;
+    }
+
+    /* (non-Javadoc)
+     * @see org.nttext.commentary.EntryRepository#disassociate(org.nttext.commentary.Entry, org.nttext.commentary.VariationUnit)
+     */
+    @Override
+    public boolean disassociate(Entry entry, VariationUnit vu) {
+        int ENTRY_ID = 1, VU_ID = 2;
+        String sql = "DELETE FROM NTTEXTComm_EntryVUs " +
+        		     " WHERE entry_id = ? AND vu_id = ?";
+        
+        boolean success = false;
+        Connection conn = null;
+        try {
+            // build the statement
+            conn = repo.openConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            
+            stmt.setLong(ENTRY_ID, entry.getId());
+            stmt.setLong(VU_ID, vu.getId());
+           
+            // execute the query
+            int numRowsChanged = stmt.executeUpdate();
+            success = numRowsChanged == 1;
+            if (numRowsChanged > 1) {
+                LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
+                            "while disassociating a variation unit (" + vu.getId() + ") " +
+                            "with and entry (" + entry.getId() + "). Expected 1.");
+                repo.rollbackConnection(conn);
+            } else {
+                if (success) entry.removeVariationUnit(vu);
+                conn.commit();
+            }
+        } catch (Exception ex) {
+            repo.rollbackConnection(conn);
+            
+            String msg = "Could not disassociate a variation unit (" + vu.getId() + ") " +
+                         "with an entry (" + entry.getId() + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            entry = null;
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return success;
+    }
+    
+    Set<VariationUnit> getVU(Connection conn, Entry entry) throws SQLException {
+        int ENTRY_ID = 1, VU_ID = 1;
+        String sql = "SELECT vu_id FROM NTTEXTComm_EntryVUs WHERE entry_id = ? ";
+        
+        MySQLVariationUnitRepository vuRepo = 
+                (MySQLVariationUnitRepository)repo.getVURepository();
+        Set<VariationUnit> VUs = new HashSet<VariationUnit>();
+        
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setLong(ENTRY_ID, entry.getId());
+        
+        ResultSet results = stmt.executeQuery();
+        while (results.next()) {
+            long vuId = results.getLong(VU_ID);
+            VUs.add(vuRepo.find(conn, vuId));
+        }
+       
+        return VUs;
+    }
+
+    /* (non-Javadoc)
+     * @see org.nttext.commentary.EntryRepository#getVU(org.nttext.commentary.Entry)
+     */
+    @Override
+    public Set<VariationUnit> getVU(Entry entry) {
+        Set<VariationUnit> VUs = new HashSet<VariationUnit>();
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            VUs = getVU(conn, entry);
+            
+        } catch (Exception ex) {
+            String msg = "Could not retrieve associated VUs for  (" + entry.getId()+ "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            entry = null;
+        } finally {
+            repo.closeConnection(conn);
+        }
+       
+        return VUs;
     }
 }

@@ -127,5 +127,12 @@ public class EntryTests extends TestCase {
             assertTrue(id == vu1.getId().longValue() || id == vu2.getId().longValue());
         }
         
+        assertTrue(entryRepo.disassociate(entry, vu2));
+        VUs = entryRepo.getVU(entry);
+        assertEquals(1, VUs.size());
+        for (VariationUnit vu : VUs) {
+            long id = vu.getId();
+            assertTrue(id == vu1.getId().longValue());
+        }
     }
 }

@@ -1,41 +1,40 @@
 /**
  * 
  */
-package org.nttext.commentary.persist;
+package org.nttext.commentary.persist.mysql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
 
 import org.apache.log4j.Logger;
-import org.nttext.commentary.VariantReading;
-import org.nttext.commentary.VariationUnit;
+import org.nttext.commentary.Entry;
+import org.nttext.commentary.EntryRepository;
 
 /**
- * @author Neal Audenaert
+ * @author Neal_2
  */
-public class MySQLVariationUnitRepository implements VURepository {
-    private static final Logger LOGGER = Logger.getLogger(MySQLVariationUnitRepository.class);
+public class MySQLEntryRepository implements EntryRepository {
+    private static final Logger LOGGER = Logger.getLogger(MySQLEntryRepository.class);
 
     private static final int PASSAGE = 1;
     private static final int OVERVIEW = 2;
     private static final int CREATED = 3;
     private static final int MODIFIED = 4;
     
-    private static final int VU_ID = 5;
+    private static final int ENTRY_ID = 5;
     
     private static final String FIELDS =  
-            "passage, commentary, date_created, last_updated "; 
+            "passage, overview, date_created, last_updated "; 
     
     private MySQLCommentaryRepo repo = null;
     
-    MySQLVariationUnitRepository(MySQLCommentaryRepo repo) {
+    MySQLEntryRepository(MySQLCommentaryRepo repo) {
         this.repo = repo;
     }
     
@@ -43,21 +42,21 @@ public class MySQLVariationUnitRepository implements VURepository {
      * @see org.nttext.commentary.persist.EntryRepository#create(openscriptures.ref.Passage)
      */
     @Override
-    public VariationUnit create(Passage passage) {
-        return this.create(new VariationUnit(passage));
+    public Entry create(Passage passage) {
+        return this.create(new Entry(passage));
     }
    
     /**
      * 
-     * @param vu
+     * @param entry
      * @return
      */
-    public VariationUnit create(VariationUnit vu) {
-        assert (vu.getId() == null) : "This VU has already been created.";
-        if (vu.getId() != null)
+    public Entry create(Entry entry) {
+        assert (entry.getId() == null) : "This entry has already been created.";
+        if (entry.getId() != null)
             return null;
         
-        String sql = "INSERT INTO NTTEXTComm_VUs (" + FIELDS +") " +
+        String sql = "INSERT INTO NTTEXTComm_Entries (" + FIELDS +") " +
                      "VALUES (?, ?, now(), now())";
         Connection conn = null;
         try {
@@ -66,37 +65,37 @@ public class MySQLVariationUnitRepository implements VURepository {
             PreparedStatement stmt = conn.prepareStatement(sql, 
                     PreparedStatement.RETURN_GENERATED_KEYS);
             
-            stmt.setString(PASSAGE, vu.getPassage().toString());
-            stmt.setString(OVERVIEW, vu.getCommentary());
+            stmt.setString(PASSAGE, entry.getPassage().toString());
+            stmt.setString(OVERVIEW, entry.getOverview());
            
             // execute the query
             int numRowsChanged = stmt.executeUpdate();
             ResultSet results = stmt.getGeneratedKeys();
             if (numRowsChanged == 1 && results.next()) {
                 long id = results.getLong(1);
-                vu.setId(id);
+                entry.setId(id);
             } else {
-                vu = null;
+                entry = null;
             }
             
             conn.commit();
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
-            String msg = "Could not create VU: " + vu.getPassage() + ". " + ex.getMessage();
+            String msg = "Could not create entry: " + entry.getPassage() + ". " + ex.getMessage();
             LOGGER.warn(msg, ex);
-            vu = null;
+            entry = null;
         } finally {
             repo.closeConnection(conn);
         }
         
-        return vu;
+        return entry;
     }
 
-    private VariationUnit restore(ResultSet results) throws SQLException {
-        VariationUnit vu = null;
+    private Entry restore(ResultSet results) throws SQLException {
+        Entry entry = null;
         
-        long id = results.getLong(VU_ID);
+        long id = results.getLong(ENTRY_ID);
         // TODO add caching
         String ref = results.getString(PASSAGE);
         String overview = results.getString(OVERVIEW);
@@ -104,26 +103,22 @@ public class MySQLVariationUnitRepository implements VURepository {
         Date modified = results.getDate(MODIFIED);
         
         Passage passage = new VerseRange(ref);
-        vu = new VariationUnit(id, passage, overview, created, modified);
+        entry = new Entry(id, passage, overview, created, modified);
         
-        Connection conn = results.getStatement().getConnection();
-        MySQLVariantReadingRepository rdgRepo = 
-                (MySQLVariantReadingRepository)this.repo.getRdgRepository();
-        List<VariantReading> readings = rdgRepo.find(conn, vu);
-        vu.setReadings(readings);
-        return vu;
+        return entry;
     }
     
     
     /* (non-Javadoc)
+     * @see org.nttext.commentary.persist.EntryRepository#find(long)
      */
     @Override
-    public VariationUnit find(long id) {
-        String sql = "SELECT " + FIELDS + ", vu_id " +
-                     "  FROM NTTEXTComm_VUs " +
-                     " WHERE vu_id = ?";
+    public Entry find(long id) {
+        String sql = "SELECT " + FIELDS + ", entry_id " +
+                     "  FROM NTTEXTComm_Entries " +
+        		     " WHERE entry_id = ?";
         
-        VariationUnit vu = null;;
+        Entry entry = null;;
         Connection conn = null;
         try {
             conn = repo.openReadOnlyConnection();
@@ -133,16 +128,16 @@ public class MySQLVariationUnitRepository implements VURepository {
             
             ResultSet results = stmt.executeQuery();
             if (results.next())
-                vu = restore(results);
+                entry = restore(results);
         } catch (Exception ex) {
-            String msg = "Could not retrieve VU (" + id + "): " + ex.getMessage();
+            String msg = "Could not retrieve entry (" + id + "): " + ex.getMessage();
             LOGGER.warn(msg, ex);
-            vu = null;
+            entry = null;
         } finally {
             repo.closeConnection(conn);
         }
         
-        return vu;
+        return entry;
     }
     
     
@@ -151,12 +146,12 @@ public class MySQLVariationUnitRepository implements VURepository {
      * @see org.nttext.commentary.persist.EntryRepository#lookup(openscriptures.ref.Passage)
      */
     @Override
-    public VariationUnit find(Passage passage) {
-        String sql = "SELECT " + FIELDS + ", vu_id " +
-                     "  FROM NTTEXTComm_VUs " +
+    public Entry find(Passage passage) {
+        String sql = "SELECT " + FIELDS + ", entry_id " +
+                     "  FROM NTTEXTComm_Entries " +
                      " WHERE passage = ?";
        
-        VariationUnit vu = null;;
+        Entry entry = null;;
         Connection conn = null;
         try {
             conn = repo.openReadOnlyConnection();
@@ -166,35 +161,32 @@ public class MySQLVariationUnitRepository implements VURepository {
             
             ResultSet results = stmt.executeQuery();
             if (results.next())
-                vu = restore(results);
+                entry = restore(results);
         } catch (Exception ex) {
-            String msg = "Could not retrieve VU (" + passage + "): " + ex.getMessage();
+            String msg = "Could not retrieve entry (" + passage + "): " + ex.getMessage();
             LOGGER.warn(msg, ex);
-            vu = null;
+            entry = null;
         } finally {
             repo.closeConnection(conn);
         }
        
-        return vu;
+        return entry;
     }
 
     /* (non-Javadoc)
      * @see org.nttext.commentary.persist.EntryRepository#save(org.nttext.commentary.Entry)
      */
     @Override
-    public boolean save(VariationUnit vu) {
-        // Don't need to save changes to variant readings. These should only be 
-        // manipulated via the ReadingRepository.
-        
-        assert (vu.getId() != null) : "This VU has not been created.";
-        if (vu.getId() == null)
+    public boolean save(Entry entry) {
+        assert (entry.getId() != null) : "This entry has not been created.";
+        if (entry.getId() == null)
             return false;
         
         int ID = 2, OVERVIEW = 1;
-        String sql = "UPDATE NTTEXTComm_VUs SET " +
-                     "  commentary = ?, " +
-                     "  last_updated = now()" +
-                     "WHERE vu_id = ?";
+        String sql = "UPDATE NTTEXTComm_Entries SET " +
+        		     "  overview = ?, " +
+        		     "  last_updated = now()" +
+        		     "WHERE entry_id = ?";
         
         boolean success = false;
         Connection conn = null;
@@ -203,24 +195,23 @@ public class MySQLVariationUnitRepository implements VURepository {
             conn = repo.openConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             
-            stmt.setString(OVERVIEW, vu.getCommentary());
-            stmt.setLong(ID, vu.getId());
+            stmt.setString(OVERVIEW, entry.getOverview());
+            stmt.setLong(ID, entry.getId());
            
             // execute the query
             int numRowsChanged = stmt.executeUpdate();
             success = (numRowsChanged == 1);
             if (numRowsChanged > 1) {
                 LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
-                            "while saving a VU (" + vu.getId() + "). Expected 1.");
+                            "while saving an entry (" + entry.getId() + "). Expected 1.");
                 repo.rollbackConnection(conn);
             } else {
                 conn.commit();
             }
-            
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
-            String msg = "Could not create VU: " + vu.getPassage() + ". " + ex.getMessage();
+            String msg = "Could not create entry: " + entry.getPassage() + ". " + ex.getMessage();
             LOGGER.warn(msg, ex);
             success = false;
         } finally {
@@ -231,17 +222,17 @@ public class MySQLVariationUnitRepository implements VURepository {
     }
 
     /* (non-Javadoc)
+     * @see org.nttext.commentary.persist.EntryRepository#remove(org.nttext.commentary.Entry)
      */
     @Override
-    public boolean remove(VariationUnit vu) {
-        // DB will cascade this deletion to the associate readings
-        assert (vu.getId() != null) : "This VU has not been created.";
-        if (vu.getId() == null)
+    public boolean remove(Entry entry) {
+        assert (entry.getId() != null) : "This entry has not been created.";
+        if (entry.getId() == null)
             return false;
         
         int ID = 1;
-        String sql = "DELETE FROM NTTEXTComm_VUs " +
-                     " WHERE vu_id = ?";
+        String sql = "DELETE FROM NTTEXTComm_Entries " +
+                     " WHERE entry_id = ?";
         
         boolean success = false;
         Connection conn = null;
@@ -250,14 +241,14 @@ public class MySQLVariationUnitRepository implements VURepository {
             conn = repo.openConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             
-            stmt.setLong(ID, vu.getId());
+            stmt.setLong(ID, entry.getId());
            
             // execute the query
             int numRowsChanged = stmt.executeUpdate();
             success = (numRowsChanged == 1);
             if (numRowsChanged > 1) {
                 LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
-                            "while removing a VU (" + vu.getId() + "). Expected 1.");
+                            "while removing an entry (" + entry.getId() + "). Expected 1.");
                 repo.rollbackConnection(conn);
             } else {
                 conn.commit();
@@ -265,7 +256,7 @@ public class MySQLVariationUnitRepository implements VURepository {
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
-            String msg = "Could not remove VU: " + vu.getPassage() + ". " + ex.getMessage();
+            String msg = "Could not remove entry: " + entry.getPassage() + ". " + ex.getMessage();
             LOGGER.warn(msg, ex);
             success = false;
         } finally {
@@ -274,5 +265,4 @@ public class MySQLVariationUnitRepository implements VURepository {
         
         return success;
     }
-
 }

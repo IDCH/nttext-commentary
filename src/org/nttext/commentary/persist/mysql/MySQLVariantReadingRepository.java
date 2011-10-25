@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nttext.commentary.persist;
+package org.nttext.commentary.persist.mysql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.nttext.commentary.VariantReading;
+import org.nttext.commentary.VariantReadingRepository;
 import org.nttext.commentary.VariationUnit;
 
 /**

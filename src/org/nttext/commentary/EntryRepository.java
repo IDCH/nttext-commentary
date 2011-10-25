@@ -1,9 +1,8 @@
 /**
  * 
  */
-package org.nttext.commentary.persist;
+package org.nttext.commentary;
 
-import org.nttext.commentary.Entry;
 
 import openscriptures.ref.Passage;
 

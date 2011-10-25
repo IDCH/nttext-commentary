@@ -4,7 +4,7 @@
 package org.nttext.commentary;
 
 import org.idch.persist.RepositoryAccessException;
-import org.nttext.commentary.persist.MySQLCommentaryRepo;
+import org.nttext.commentary.persist.mysql.MySQLCommentaryRepo;
 
 import junit.framework.TestCase;
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nttext.commentary.persist;
+package org.nttext.commentary.persist.mysql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -11,6 +11,10 @@ import java.util.List;
 import org.idch.persist.DBBackedRepository;
 import org.idch.persist.DatabaseException;
 import org.idch.persist.RepositoryAccessException;
+import org.nttext.commentary.CommentaryRepo;
+import org.nttext.commentary.EntryRepository;
+import org.nttext.commentary.VURepository;
+import org.nttext.commentary.VariantReadingRepository;
 
 /**
  * @author Neal Audenaert

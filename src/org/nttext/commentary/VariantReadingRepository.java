@@ -1,12 +1,10 @@
 /**
  * 
  */
-package org.nttext.commentary.persist;
+package org.nttext.commentary;
 
 import java.util.List;
 
-import org.nttext.commentary.VariantReading;
-import org.nttext.commentary.VariationUnit;
 
 /**
  * @author Neal Audenaert

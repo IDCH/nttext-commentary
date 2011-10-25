@@ -7,8 +7,7 @@ import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
 
 import org.idch.persist.RepositoryAccessException;
-import org.nttext.commentary.persist.EntryRepository;
-import org.nttext.commentary.persist.MySQLCommentaryRepo;
+import org.nttext.commentary.persist.mysql.MySQLCommentaryRepo;
 
 import junit.framework.TestCase;
 

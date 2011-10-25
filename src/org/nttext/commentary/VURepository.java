@@ -1,11 +1,10 @@
 /**
  * 
  */
-package org.nttext.commentary.persist;
+package org.nttext.commentary;
 
 import openscriptures.ref.Passage;
 
-import org.nttext.commentary.VariationUnit;
 
 /**
  * @author Neal Audenaert

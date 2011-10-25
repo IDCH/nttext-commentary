@@ -109,6 +109,39 @@ public class RdgTests extends TestCase {
         assertEquals(wit, rdg2.getWitnessDescription());
     }
     
+    
+    public void testRemove() {
+        VariantReading rdg1 = rdgRepo.create(vu, "Reading 1", "Logos 1");
+        VariantReading rdg2 = rdgRepo.create(vu, "Reading 2", "Logos 2");
+        VariantReading rdg3 = rdgRepo.create(vu, "Reading 3", "Logos 3");
+        VariantReading rdg4 = rdgRepo.create(vu, "Reading 4", "Logos 4");
+        VariantReading rdg5 = rdgRepo.create(vu, "Reading 5", "Logos 5");
+        VariantReading rdg6 = rdgRepo.create(vu, "Reading 6", "Logos 6");
+        VariantReading rdg7 = rdgRepo.create(vu, "Reading 7", "Logos 7");
+        
+        List<VariantReading> readings = rdgRepo.find(vu);
+        assertEquals(7, readings.size());
+        assertEquals(rdg1.getId(), readings.get(0).getId());
+        assertEquals(rdg2.getId(), readings.get(1).getId());
+        assertEquals(rdg3.getId(), readings.get(2).getId());
+        assertEquals(rdg4.getId(), readings.get(3).getId());
+        assertEquals(rdg5.getId(), readings.get(4).getId());
+        assertEquals(rdg6.getId(), readings.get(5).getId());
+        assertEquals(rdg7.getId(), readings.get(6).getId());
+        
+        boolean success = rdgRepo.remove(rdg4);
+        assertTrue(success);
+        
+        readings = rdgRepo.find(vu);
+        assertEquals(6, readings.size());
+        assertEquals(rdg1.getId(), readings.get(0).getId());
+        assertEquals(rdg2.getId(), readings.get(1).getId());
+        assertEquals(rdg3.getId(), readings.get(2).getId());
+        assertEquals(rdg5.getId(), readings.get(3).getId());
+        assertEquals(rdg6.getId(), readings.get(4).getId());
+        assertEquals(rdg7.getId(), readings.get(5).getId());
+    }
+    
 
 //    public void testRemoveEntry() {
 //        String ref = "1Pet.2.20";

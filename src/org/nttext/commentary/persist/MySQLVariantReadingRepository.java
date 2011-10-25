@@ -208,7 +208,7 @@ public class MySQLVariantReadingRepository implements VariantReadingRepository {
      */
     @Override
     public boolean save(VariantReading rdg) {
-        assert (rdg.getId() != null) : "This reading has already been created.";
+        assert (rdg.getId() != null) : "This reading has not been created.";
         if (rdg.getId() == null)
             return false;
         
@@ -259,8 +259,75 @@ public class MySQLVariantReadingRepository implements VariantReadingRepository {
      */
     @Override
     public boolean remove(VariantReading rdg) {
-        // TODO Auto-generated method stub
-        return false;
+        assert (rdg.getId() != null) : "This reading has not been created.";
+        if (rdg.getId() == null)
+            return false;
+        
+        int RDG_ID = 1, VU_ID = 1, SEQ_NO = 2;
+        String select_sql = "SELECT seq_no FROM NTTEXTComm_Rdgs WHERE rdg_id = ?";
+        String delete_sql = "DELETE FROM NTTEXTComm_Rdgs WHERE rdg_id = ?";
+        String update_sql = "UPDATE NTTEXTComm_Rdgs SET" +
+        		            "       seq_no = seq_no - 1" +
+        		            " WHERE vu_id = ? AND seq_no > ?" +
+        		            " ORDER BY seq_no ASC";
+        
+        boolean success = false;
+        Connection conn = null;
+        try {
+            int seqNo = -1;
+            VariationUnit vu = rdg.getVariationUnit();
+            conn = repo.openConnection();
+            
+            // find the sequence number
+            PreparedStatement stmt = conn.prepareStatement(select_sql);
+            stmt.setLong(RDG_ID, rdg.getId());
+            ResultSet results = stmt.executeQuery();
+            if (results.next()) {
+                seqNo = results.getInt(1);
+            } else {
+                repo.rollbackConnection(conn);
+                return false;
+            }
+            
+            // delete the reading
+            stmt = conn.prepareStatement(delete_sql);
+            stmt.setLong(RDG_ID, rdg.getId());
+            int numRowsChanged = stmt.executeUpdate();
+            success = numRowsChanged == 1;
+            if (numRowsChanged > 1) {
+                LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
+                            "while saving a reading (" + rdg.getId() + "). Expected 1.");
+                repo.rollbackConnection(conn);
+                return false;
+            }
+            
+            // update the remaining sequence numbers
+            stmt = conn.prepareStatement(update_sql);
+            stmt.setLong(VU_ID, vu.getId());
+            stmt.setInt(SEQ_NO, seqNo);
+            stmt.executeUpdate();
+            
+            // remove this reading from the list associated with the VU
+            List<VariantReading> readings = vu.getReadings();
+            if (readings.contains(rdg)) {
+                List<VariantReading> rdgs = new ArrayList<VariantReading>();
+                rdgs.addAll(readings);
+                rdgs.remove(rdg);
+                vu.setReadings(rdgs);
+            }
+            
+            conn.commit();
+        } catch (Exception ex) {
+            repo.rollbackConnection(conn);
+            String msg = "Could not create variant reading for VU: " + 
+                        rdg.getVariationUnit().getId() + ". " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            rdg = null;
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return success;
     }
 
 }

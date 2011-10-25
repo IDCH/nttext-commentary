@@ -157,36 +157,19 @@ public class VariationUnit {
 	public List<VariantReading> getReadings() {
 	    return Collections.unmodifiableList(this.readings);
 	}
+
+    /**
+     * @param rdgs
+     */
+    public void setReadings(List<VariantReading> rdgs) {
+        this.readings = rdgs;
+    }
 	
 	public void addReading(VariantReading rdg) {
 	    this.readings.add(rdg);
 	}
 
-	/**
-	 * Creates a new reading for this variation unit.
-	 * @return the newly created variant reading.
-	 */
-	public VariantReading createReading() {
-	    // TODO move to repository method (probably)
-	    VariantReading rdg;
-	    synchronized(readings) {
-	        rdg = new VariantReading(this);
-	        readings.add(rdg);
-	    }
-	        
-	    return rdg;
-	}
 	
-	/**
-	 * Deletes the indicated variant reading.
-	 * 
-	 * @param rdg The reading to delete.
-	 * @return <tt>true</tt> if the supplied reading was a member of this VU. 
-	 */
-	public boolean deleteReading(VariantReading rdg) {
-	    // TODO move to repository method.
-	    return readings.remove(rdg);
-	}
 	
 	// TODO Support to move a reading
 	
@@ -238,6 +221,7 @@ public class VariationUnit {
 	        super(msg);
 	    }
 	}
+
     
 	
 }

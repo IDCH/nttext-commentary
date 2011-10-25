@@ -4,9 +4,9 @@
 package openscriptures.text;
 
 /**
- * @author Neal_2
+ * @author Neal Audenaert
  */
-public interface TextRepo {
+public interface TextRepository {
 
     public WorkRepository getWorkRepository(); 
     

@@ -38,7 +38,7 @@ public class ApplicationContext {
         return instance;
     }
     
-    public static ApplicationContext getApplicationContext(TextRepo repo) {
+    public static ApplicationContext getApplicationContext(TextRepository repo) {
         // TODO allow for multiple contexts? Right now this implements a simple 
         //      singleton pattern.
         if (instance == null) {
@@ -54,7 +54,7 @@ public class ApplicationContext {
     //=======================================================================================
     
     private EntityManagerFactory m_emf;
-    private TextRepo m_repo;
+    private TextRepository m_repo;
     
     private Map<String, Language> languages = new HashMap<String, Language>();
     
@@ -76,7 +76,7 @@ public class ApplicationContext {
         structures = new JPAStructureRepository(m_emf);
     }
     
-    ApplicationContext(TextRepo repo) {
+    ApplicationContext(TextRepository repo) {
         m_repo = repo;
         works = m_repo.getWorkRepository();
         structures = m_repo.getStructureRepository();

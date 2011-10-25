@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import openscriptures.text.StructureRepository;
-import openscriptures.text.TextRepo;
+import openscriptures.text.TextRepository;
 import openscriptures.text.TokenRepository;
 import openscriptures.text.WorkRepository;
 
@@ -20,7 +20,7 @@ import org.idch.persist.RepositoryAccessException;
 /**
  * @author Neal Audenaert
  */
-public class MySQLTextRepository extends DBBackedRepository implements TextRepo {
+public class MySQLTextRepository extends DBBackedRepository implements TextRepository {
 
     public final static String MODULE_NAME = "texts";
     

@@ -8,15 +8,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
 
 import org.apache.log4j.Logger;
+import org.nttext.commentary.VariantReading;
 import org.nttext.commentary.VariationUnit;
 
 /**
- * @author Neal_2
+ * @author Neal Audenaert
  */
 public class MySQLVariationUnitRepository implements VURepository {
     private static final Logger LOGGER = Logger.getLogger(MySQLVariationUnitRepository.class);
@@ -104,6 +106,11 @@ public class MySQLVariationUnitRepository implements VURepository {
         Passage passage = new VerseRange(ref);
         vu = new VariationUnit(id, passage, overview, created, modified);
         
+        Connection conn = results.getStatement().getConnection();
+        MySQLVariantReadingRepository rdgRepo = 
+                (MySQLVariantReadingRepository)this.repo.getRdgRepository();
+        List<VariantReading> readings = rdgRepo.find(conn, vu);
+        vu.setReadings(readings);
         return vu;
     }
     
@@ -176,6 +183,9 @@ public class MySQLVariationUnitRepository implements VURepository {
      */
     @Override
     public boolean save(VariationUnit vu) {
+        // Don't need to save changes to variant readings. These should only be 
+        // manipulated via the ReadingRepository.
+        
         assert (vu.getId() != null) : "This VU has not been created.";
         if (vu.getId() == null)
             return false;
@@ -206,6 +216,7 @@ public class MySQLVariationUnitRepository implements VURepository {
             } else {
                 conn.commit();
             }
+            
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
@@ -223,6 +234,7 @@ public class MySQLVariationUnitRepository implements VURepository {
      */
     @Override
     public boolean remove(VariationUnit vu) {
+        // DB will cascade this deletion to the associate readings
         assert (vu.getId() != null) : "This VU has not been created.";
         if (vu.getId() == null)
             return false;

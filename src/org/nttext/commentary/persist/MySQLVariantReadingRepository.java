@@ -134,37 +134,43 @@ public class MySQLVariantReadingRepository implements VariantReadingRepository {
         return rdg;
     }
     
-    /* (non-Javadoc)
-     * @see org.nttext.commentary.persist.VariantReadingRepository#find(org.nttext.commentary.VariationUnit)
-     */
-    @Override
-    public List<VariantReading> find(VariationUnit vu) {
+    List<VariantReading> find(Connection conn, VariationUnit vu) throws SQLException {
         String sql = "SELECT " + FIELDS + ", rdg_id " +
                      "  FROM NTTEXTComm_Rdgs " +
                      " WHERE vu_id = ?" +
                      " ORDER BY seq_no ASC";
 
         List<VariantReading> readings = new ArrayList<VariantReading>();
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setLong(1, vu.getId());
+
+        ResultSet results = stmt.executeQuery();
+        while (results.next()) {
+            long id = results.getLong(RDG_ID);
+            VariantReading rdg = new VariantReading(id, vu);
+            rdg = restore(rdg, results);
+            if (rdg != null) {
+                readings.add(rdg);
+            } else {
+                String msg = "Failed to restore reading: " + id + ". No such reading.";
+                LOGGER.warn(msg);
+                throw new SQLException(msg);
+            }
+        }
+
+        return readings;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.nttext.commentary.persist.VariantReadingRepository#find(org.nttext.commentary.VariationUnit)
+     */
+    @Override
+    public List<VariantReading> find(VariationUnit vu) {
+        List<VariantReading> readings = new ArrayList<VariantReading>();
         Connection conn = null;
         try {
             conn = repo.openReadOnlyConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setLong(1, vu.getId());
-
-            ResultSet results = stmt.executeQuery();
-            while (results.next()) {
-                long id = results.getLong(RDG_ID);
-                VariantReading rdg = new VariantReading(id, vu);
-                rdg = restore(rdg, results);
-                if (rdg != null) {
-                    readings.add(rdg);
-                } else {
-                    LOGGER.warn("Failed to restore reading: " + id);
-                    readings.clear();
-                    break;
-                }
-
-            }
+            readings = find(conn, vu);
         } catch (Exception ex) {
             String msg = "Could not retrieve variant readings for (" + vu.getId() + "): " + ex.getMessage();
             LOGGER.warn(msg, ex);

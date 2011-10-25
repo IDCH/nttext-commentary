@@ -3,6 +3,7 @@
  */
 package org.nttext.commentary;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -109,59 +110,50 @@ public class RdgTests extends TestCase {
         assertEquals(wit, rdg2.getWitnessDescription());
     }
     
-    
-    public void testRemove() {
-        VariantReading rdg1 = rdgRepo.create(vu, "Reading 1", "Logos 1");
-        VariantReading rdg2 = rdgRepo.create(vu, "Reading 2", "Logos 2");
-        VariantReading rdg3 = rdgRepo.create(vu, "Reading 3", "Logos 3");
-        VariantReading rdg4 = rdgRepo.create(vu, "Reading 4", "Logos 4");
-        VariantReading rdg5 = rdgRepo.create(vu, "Reading 5", "Logos 5");
-        VariantReading rdg6 = rdgRepo.create(vu, "Reading 6", "Logos 6");
-        VariantReading rdg7 = rdgRepo.create(vu, "Reading 7", "Logos 7");
+    private List<VariantReading> createReadings() {
+        List<VariantReading> readings = new ArrayList<VariantReading>();
+        readings.add(rdgRepo.create(vu, "Reading 1", "Logos 1"));
+        readings.add(rdgRepo.create(vu, "Reading 2", "Logos 2"));
+        readings.add(rdgRepo.create(vu, "Reading 3", "Logos 3"));
+        readings.add(rdgRepo.create(vu, "Reading 4", "Logos 4"));
+        readings.add(rdgRepo.create(vu, "Reading 5", "Logos 5"));
+        readings.add(rdgRepo.create(vu, "Reading 6", "Logos 6"));
+        readings.add(rdgRepo.create(vu, "Reading 7", "Logos 7"));
         
-        List<VariantReading> readings = rdgRepo.find(vu);
-        assertEquals(7, readings.size());
-        assertEquals(rdg1.getId(), readings.get(0).getId());
-        assertEquals(rdg2.getId(), readings.get(1).getId());
-        assertEquals(rdg3.getId(), readings.get(2).getId());
-        assertEquals(rdg4.getId(), readings.get(3).getId());
-        assertEquals(rdg5.getId(), readings.get(4).getId());
-        assertEquals(rdg6.getId(), readings.get(5).getId());
-        assertEquals(rdg7.getId(), readings.get(6).getId());
-        
-        boolean success = rdgRepo.remove(rdg4);
-        assertTrue(success);
-        
-        readings = rdgRepo.find(vu);
-        assertEquals(6, readings.size());
-        assertEquals(rdg1.getId(), readings.get(0).getId());
-        assertEquals(rdg2.getId(), readings.get(1).getId());
-        assertEquals(rdg3.getId(), readings.get(2).getId());
-        assertEquals(rdg5.getId(), readings.get(3).getId());
-        assertEquals(rdg6.getId(), readings.get(4).getId());
-        assertEquals(rdg7.getId(), readings.get(5).getId());
+        return readings;
     }
     
+    private void compareReadings(List<VariantReading> expected, List<VariantReading> observed) {
+        assertEquals(expected.size(), observed.size());
+        
+        int sz = expected.size();
+        for (int i = 0; i < sz; i++) {
+            assertEquals(expected.get(i).getId(), observed.get(i).getId());
+            assertEquals(expected.get(i).getEnglishReading(), observed.get(i).getEnglishReading());
+            assertEquals(expected.get(i).getGreekReading(), observed.get(i).getGreekReading());
+            assertEquals(expected.get(i).getWitnessDescription(), observed.get(i).getWitnessDescription());
+        }
+    }
+    
+    public void testRemove() {
+        List<VariantReading> rdgs = createReadings();
+        compareReadings(rdgs, rdgRepo.find(vu));
+        
+        VariantReading removed = rdgs.remove(3);
+        boolean success = rdgRepo.remove(removed);
+        assertTrue(success);
+        compareReadings(rdgs, rdgRepo.find(vu));
+    }
+    
+    /** Tests to see that variant readings are properly restored along with the 
+     *  variation unit. */
+    public void testRestoreVU() {
+        List<VariantReading> rdgs = createReadings();
+        
+        VariationUnit vu2 = repo.getVURepository().find(vu.getId());
+        assertFalse(vu2 == vu);
+        
+        compareReadings(rdgs, vu2.getReadings());
+    }
 
-//    public void testRemoveEntry() {
-//        String ref = "1Pet.2.20";
-//        String overview = "This is a short overview of this entry";
-//        Passage passage = new VerseRange(ref);
-//        VariationUnit vu = vuRepo.create(passage);
-//        
-//        vu.setCommentary(overview);
-//        vuRepo.save(vu);
-//        
-//        vu = vuRepo.find(new VerseRange(ref));
-//        
-//        assertTrue(vu.getPassage().equals(passage));
-//        assertTrue(vu.getId() >= 0);
-//        assertEquals(overview, vu.getCommentary());
-//        
-//        boolean success = vuRepo.remove(vu);
-//        
-//        assertTrue(success);
-//        vu = vuRepo.find(new VerseRange(ref));
-//        assertNull(vu);
-//    }
 }

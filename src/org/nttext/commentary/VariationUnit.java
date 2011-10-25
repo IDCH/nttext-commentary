@@ -3,6 +3,7 @@
  */
 package org.nttext.commentary;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class VariationUnit {
 	private String commentary;
 	private Passage ref;
 	
-	private List<VariantReading> readings;
+	private List<VariantReading> readings = new ArrayList<VariantReading>();
 	private Map<String, VUReference> references = new HashMap<String, VUReference>();
 	
 	//===================================================================================
@@ -156,6 +157,10 @@ public class VariationUnit {
 	public List<VariantReading> getReadings() {
 	    return Collections.unmodifiableList(this.readings);
 	}
+	
+	public void addReading(VariantReading rdg) {
+	    this.readings.add(rdg);
+	}
 
 	/**
 	 * Creates a new reading for this variation unit.
@@ -227,7 +232,9 @@ public class VariationUnit {
     // INVALID REFERENCE EXCEPTION
     //=====================================================================================
 	public static class InvalidReferenceException extends RuntimeException {
-	    InvalidReferenceException(String msg) {
+        private static final long serialVersionUID = 1183679262481129955L;
+
+        InvalidReferenceException(String msg) {
 	        super(msg);
 	    }
 	}

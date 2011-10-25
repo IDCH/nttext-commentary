@@ -37,3 +37,5 @@ syntax: regexp
 ^etc/META-INF/persistence\.xml$
 syntax: regexp
 ^src/repositories\.properties$
+syntax: regexp
+^src/openscriptures/Main\.java$

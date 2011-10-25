@@ -6,7 +6,6 @@ package org.nttext.commentary;
 import java.util.Collections;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.UUID;
 
 import org.nttext.mss.Manuscript;
 
@@ -23,7 +22,7 @@ public class VariantReading {
     // MEMBER VARIABLES
     //=================================================================================
     
-    private UUID id;
+    private Long id;
     
     private VariationUnit vu;
     private String englishRdg = "";
@@ -45,6 +44,11 @@ public class VariantReading {
         this.vu = vu;
     }
     
+    public VariantReading(long id, VariationUnit vu) {
+        this.id = id;
+        this.vu = vu;
+    }
+    
     public VariantReading(VariationUnit vu, String greek) {
         this.vu = vu;
         this.greekRdg = greek;
@@ -62,9 +66,9 @@ public class VariantReading {
     
     
     /** Returns the unique identifier for this reading. */
-    public String getId() {
-        return id.toString();
-    }
+    public Long getId() { return id; }
+    
+    public void setId(Long id) { this.id = id; }
     
     /** Returns the variation unit this is a reading of. */
     public VariationUnit getVariationUnit() {
@@ -113,6 +117,10 @@ public class VariantReading {
      */
     public String getWitnessDescription() {
         return this.witnessDescription;
+    }
+    
+    public void setWitnessDescription(String desc) {
+        this.witnessDescription = desc;
     }
     
     /** Returns a list of manuscripts that are known to have this reading. */

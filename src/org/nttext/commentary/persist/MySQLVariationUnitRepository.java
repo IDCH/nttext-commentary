@@ -19,8 +19,7 @@ import org.nttext.commentary.VariationUnit;
  * @author Neal_2
  */
 public class MySQLVariationUnitRepository implements VURepository {
-    
-    private static final Logger LOGGER = Logger.getLogger(MySQLEntryRepository.class);
+    private static final Logger LOGGER = Logger.getLogger(MySQLVariationUnitRepository.class);
 
     private static final int PASSAGE = 1;
     private static final int OVERVIEW = 2;

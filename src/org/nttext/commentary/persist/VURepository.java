@@ -8,7 +8,7 @@ import openscriptures.ref.Passage;
 import org.nttext.commentary.VariationUnit;
 
 /**
- * @author Neal_2
+ * @author Neal Audenaert
  */
 public interface VURepository {
 

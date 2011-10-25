@@ -1,14 +1,8 @@
 -- A Commentary Entry
 CREATE TABLE IF NOT EXISTS NTTEXTComm_Entries (
     entry_id     SERIAL  PRIMARY KEY,  
-    -- The scripture passage this entry refers to
     passage      VARCHAR(64) NOT NULL, 
-    -- A overview of the variants found in this passage 
     overview     TEXT,                 
-    -- The username of the user who owns this entry This implies that usernames should not 
-    -- be modified. Otherwise, we could use id, possibly UUID. 
-    owned_by     VARCHAR(64),          
-    status       VARCHAR(64),
     
     date_created TIMESTAMP DEFAULT now(),
     last_updated TIMESTAMP NOT NULL
@@ -49,7 +43,11 @@ CREATE TABLE IF NOT EXISTS NTTEXTComm_Rdgs (
     -- English language gloss of this reading
     english_rdg     TEXT NOT NULL,              
     -- description or list of manuscripts that have this reading 
-    witnesses       VARCHAR(255),               
+    witnesses       VARCHAR(255), 
+    -- list ordering field
+    seq_no          INT NOT NULL,
+    
+    UNIQUE (vu_id, seq_no),
     
     FOREIGN KEY (vu_id)
       REFERENCES NTTEXTComm_VUs (vu_id)

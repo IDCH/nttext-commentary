@@ -95,7 +95,74 @@ public class MySQLStructureRepository implements StructureRepository {
     }
 
     //===================================================================================
-    // METHOS
+    // HELPER METHODS
+    //===================================================================================
+
+    private void saveAttributes(Connection conn, Structure s) throws SQLException {
+        assert s.getId() != null;
+        if (s.getId() == null) {
+            // FIXME need to use RepositoryAccessException.
+            throw new SQLException("Structure not yet save -- FIXME this should be a different exception class.");
+        }
+        
+        Map<String, String> attributes = s.getAttributes();
+        if (attributes != null && attributes.size() > 0) {
+            this.attrs.createOrUpdate(conn, s.getId(), s.getAttributes());
+        }
+    }
+
+    private boolean update(Structure s) {
+        int NAME = 1, PERSPECTIVE = 2, START = 3, END = 4, ID = 5;
+        String sql = 
+                "UPDATE TEXTS_Structures SET " +
+                "    structure_name = ?, " +
+                "    perspective = ?, " + 
+                "    start_pos = ?, " + 
+                "    end_pos = ? " +
+                "WHERE structure_id = ?";
+        
+        boolean success = false;
+        Connection conn = null;
+        try {
+            conn = repo.openConnection();
+            
+            // save the attributes
+            saveAttributes(conn, s);
+            
+            // build the statement
+            PreparedStatement stmt = conn.prepareStatement(sql); 
+            
+            stmt.setString(NAME, s.getName());
+            stmt.setString(PERSPECTIVE, s.getPerspective());
+            setParameter(stmt, START, s.getStartTokenPosition());
+            setParameter(stmt, END, s.getEndTokenPosition());
+            stmt.setLong(ID, s.getId());
+
+            // execute the query
+            int numRowsChanged = stmt.executeUpdate();
+            success = (numRowsChanged != 1);
+            if (numRowsChanged > 1) {
+                LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
+                            "while saving a structure (" + s.getUUID() + "). Expected 1.");
+                repo.rollbackConnection(conn);
+            } else {
+                conn.commit();
+            }
+        } catch (Exception ex) {
+            repo.rollbackConnection(conn);
+            
+            String msg = "Could not save structure: " + s.getName() + ". " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            success = false;
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return success;
+    }
+    
+    //===================================================================================
+    // CREATION AND UPDATE METHOS
     //===================================================================================
 
     /* (non-Javadoc)
@@ -103,8 +170,7 @@ public class MySQLStructureRepository implements StructureRepository {
      */
     @Override
     public Structure create(Work work, String name) {
-        Structure s = new Structure(work, name);
-        return create(s);
+        return create(new Structure(work, name));
     }
 
     /* (non-Javadoc)
@@ -112,18 +178,20 @@ public class MySQLStructureRepository implements StructureRepository {
      */
     @Override
     public Structure create(Work work, String name, Token start, Token end) {
-        Structure s = new Structure(work, name, start, end);
-        return create(s);
+        return create(new Structure(work, name, start, end));
     }
 
-    
+        
     public Structure create(Structure s) {
+        // TODO change to return boolean
         assert (s.getId() == null) : "This structure has already been created.";
         if (s.getId() != null)
             return null;
         
         String sql = "INSERT INTO TEXTS_Structures (" + FIELDS + ") " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
+        
+        boolean success = false;
         Connection conn = null;
         try {
             // build the statement
@@ -144,6 +212,8 @@ public class MySQLStructureRepository implements StructureRepository {
             if (numRowsChanged == 1 && results.next()) {
                 long id = results.getLong(1);
                 s.setId(id);
+                saveAttributes(conn, s);
+                success = true;
             }
             
             conn.commit();
@@ -152,12 +222,35 @@ public class MySQLStructureRepository implements StructureRepository {
             
             String msg = "Could not create structure: " + s.getName() + ". " + ex.getMessage();
             LOGGER.warn(msg, ex);
+            success = false;
             s = null;
         } finally {
             repo.closeConnection(conn);
         }
         
-        return s;
+        return success ? s : null;
+    }
+    
+    
+    
+    /**
+     * 
+     * @see openscriptures.text.StructureRepository#save(openscriptures.text.Structure)
+     */
+    @Override
+    public boolean save(Structure s) {
+        // NOTE this should be the default method for saving/creating structures.
+        assert s != null : "Cannot save a null structure.";
+        if (s == null) {
+            throw new NullPointerException("Cannot save a null structure");
+        }
+        
+        // This is a new structure. We should create it instead.
+        if (s.getId() == null) {
+            return create(s) != null;
+        } else {
+            return update(s);
+        }
     }
     
     /* (non-Javadoc)
@@ -188,14 +281,18 @@ public class MySQLStructureRepository implements StructureRepository {
         return hasStructures;
     }
     
-    public Structure find(long id) {
-        return synchronize(new Structure(id));
-    }
-    
-    public Structure find(UUID id) {
-        return synchronize(new Structure(id));
-    }
-    
+
+    //===================================================================================
+    // RETRIEVAL METHOS
+    //===================================================================================
+
+    /**
+     * 
+     * @param s
+     * @param results
+     * @return
+     * @throws SQLException
+     */
     private Structure restore(Structure s, ResultSet results) throws SQLException {
         s.setUUIDString(results.getString(S_UUID));
         s.setName(results.getString(NAME));
@@ -213,6 +310,37 @@ public class MySQLStructureRepository implements StructureRepository {
         
         return s;
     }
+    
+    private void restore(Map<UUID, SortedSet<Structure>> structures, ResultSet results) 
+            throws SQLException {
+        Structure s = new Structure(results.getLong(STRUCTURE_ID));
+        s = restore(s, results);
+        
+        UUID uuid = s.getWorkUUID();
+        SortedSet<Structure> structs = structures.get(uuid);
+        if (structs == null) {
+            structs = new TreeSet<Structure>(new StructureComparator());
+            structures.put(uuid, structs);
+        }
+        
+        structs.add(s);
+    }
+    
+    private SortedSet<Structure> find(PreparedStatement stmt) throws SQLException {
+        SortedSet<Structure> structures = new TreeSet<Structure>(new StructureComparator()); 
+        
+        Structure s; 
+        ResultSet results = stmt.executeQuery();
+        while (results.next()) {
+            s = new Structure(results.getLong(STRUCTURE_ID));
+            structures.add(restore(s, results));
+        }
+        
+        return structures;
+    }
+    
+    
+    
     
     /**
      * 
@@ -266,19 +394,19 @@ public class MySQLStructureRepository implements StructureRepository {
         return s;
     }
     
-    private SortedSet<Structure> find(PreparedStatement stmt) throws SQLException {
-        SortedSet<Structure> structures = new TreeSet<Structure>(new StructureComparator()); 
-        
-        Structure s; 
-        ResultSet results = stmt.executeQuery();
-        while (results.next()) {
-            s = new Structure(results.getLong(STRUCTURE_ID));
-            structures.add(restore(s, results));
-        }
-        
-        return structures;
+    /**
+     * 
+     * @param id
+     * @return
+     */
+    public Structure find(long id) {
+        return synchronize(new Structure(id));
     }
-   
+    
+    public Structure find(UUID id) {
+        return synchronize(new Structure(id));
+    }
+    
     /* (non-Javadoc)
      * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
      */
@@ -431,26 +559,11 @@ public class MySQLStructureRepository implements StructureRepository {
         return structures;
     }
     
-    private void restore(Map<String, SortedSet<Structure>> structures, ResultSet results) 
-            throws SQLException {
-        Structure s = new Structure(results.getLong(STRUCTURE_ID));
-        s = restore(s, results);
-        
-        String uuid = s.getUUID().toString();
-        SortedSet<Structure> structs = structures.get(uuid);
-        if (structs == null) {
-            structs = new TreeSet<Structure>(new StructureComparator());
-            structures.put(uuid, structs);
-        }
-        
-        structs.add(s);
-    }
-    
     /* (non-Javadoc)
      * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
      */
     @Override
-    public Map<String, SortedSet<Structure>> find(String name, String attribute, String value) {
+    public Map<UUID, SortedSet<Structure>> find(String name, String attribute, String value) {
         // TODO LOTS of duplicated code. Refactor into delgate class.
         int NAME = 1, ATTR = 2, VALUE = 3;
         String sql = 
@@ -462,8 +575,8 @@ public class MySQLStructureRepository implements StructureRepository {
                 "       A.attr_value = ?" +
                 " ORDER BY start_pos ASC, end_pos DESC";
         
-        Map<String, SortedSet<Structure>> structures = 
-                new HashMap<String, SortedSet<Structure>>();
+        Map<UUID, SortedSet<Structure>> structures = 
+                new HashMap<UUID, SortedSet<Structure>>();
         Connection conn = null;
         try {
             conn = repo.openReadOnlyConnection();
@@ -526,60 +639,7 @@ public class MySQLStructureRepository implements StructureRepository {
         return structures;
     }
     
-    /**
-     * 
-     * @see openscriptures.text.StructureRepository#save(openscriptures.text.Structure)
-     */
-    @Override
-    public boolean save(Structure s) {
-        int NAME = 1, PERSPECTIVE = 2, START = 3, END = 4, ID = 5;
-        String sql = 
-                "UPDATE TEXTS_Structures SET " +
-                "    structure_name = ?, " +
-                "    perspective = ?, " + 
-                "    start_pos = ?, " + 
-                "    end_pos = ? " +
-                "WHERE structure_id = ?";
-        
-        boolean success = false;
-        Connection conn = null;
-        try {
-            conn = repo.openConnection();
-            
-            // save the attributes
-            this.attrs.createOrUpdate(conn, s.getId(), s.getAttributes());
-            
-            // build the statement
-            PreparedStatement stmt = conn.prepareStatement(sql); 
-            
-            stmt.setString(NAME, s.getName());
-            stmt.setString(PERSPECTIVE, s.getPerspective());
-            setParameter(stmt, START, s.getStartTokenPosition());
-            setParameter(stmt, END, s.getEndTokenPosition());
-            stmt.setLong(ID, s.getId());
 
-            // execute the query
-            int numRowsChanged = stmt.executeUpdate();
-            success = numRowsChanged == 1;
-            if (numRowsChanged > 1) {
-                LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
-                            "while saving a structure (" + s.getUUID() + "). Expected 1.");
-                repo.rollbackConnection(conn);
-            } else {
-                conn.commit();
-            }
-        } catch (Exception ex) {
-            repo.rollbackConnection(conn);
-            
-            String msg = "Could not save structure: " + s.getName() + ". " + ex.getMessage();
-            LOGGER.warn(msg, ex);
-            s = null;
-        } finally {
-            repo.closeConnection(conn);
-        }
-        
-        return success;
-    }
     
     
     //===================================================================================

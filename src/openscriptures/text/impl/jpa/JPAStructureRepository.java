@@ -134,7 +134,7 @@ public class JPAStructureRepository extends JPARepository<Structure> implements 
      * @see openscriptures.text.StructureRepository#find(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
-    public Map<String, SortedSet<Structure>> find(String name,
+    public Map<UUID, SortedSet<Structure>> find(String name,
             String attribute, String value) {
         // TODO Auto-generated method stub
         return null;

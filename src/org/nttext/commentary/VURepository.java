@@ -3,6 +3,7 @@
  */
 package org.nttext.commentary;
 
+
 import openscriptures.ref.Passage;
 
 
@@ -20,4 +21,5 @@ public interface VURepository {
     public boolean save(VariationUnit entry);
     
     public boolean remove(VariationUnit entry);
+    
 }

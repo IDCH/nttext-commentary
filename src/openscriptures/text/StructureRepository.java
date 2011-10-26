@@ -65,7 +65,7 @@ public interface StructureRepository {
     
     public SortedSet<Structure> find(Work w, String name, String attribute, String value);
     
-    public Map<String, SortedSet<Structure>> find(String name, String attribute, String value);
+    public Map<UUID, SortedSet<Structure>> find(String name, String attribute, String value);
     
     public boolean save(Structure s);
 }

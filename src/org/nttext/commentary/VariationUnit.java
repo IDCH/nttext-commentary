@@ -6,13 +6,10 @@ package org.nttext.commentary;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import openscriptures.ref.Passage;
-import openscriptures.text.Structure;
 
 /**
  * @author Neal Audenaert
@@ -28,7 +25,6 @@ public class VariationUnit {
 	private Passage ref;
 	
 	private List<VariantReading> readings = new ArrayList<VariantReading>();
-	private Map<String, VUReference> references = new HashMap<String, VUReference>();
 	
 	//===================================================================================
     // CONSTRUCTORS
@@ -78,71 +74,7 @@ public class VariationUnit {
     public void setCommentary(String commentary) {
         this.commentary = commentary;
     }
-    
-    // REFEREMCE METHODS
-    //=============================================================
-    
-    /** 
-     * Lists all NT edition for which a reference to this VU has been defined.
-     * @return the names of all of the NT editions for which a reference to 
-     *      this VU has been defined.
-     */
-    public Set<String> listReferences() {
-        return Collections.unmodifiableSet(references.keySet());
-    }
-    
-    /**
-     * Indicates whether this VU has a reference to the supplied variation unit.
-     * @param edition The edition to check.
-     * 
-     * @return <tt>true</tt> if a reference to the supplied edition has been defined 
-     *      for this VU.
-     */
-    public boolean hasReference(String edition) {
-        return this.references.containsKey(edition);
-    }
 
-    /**
-     * Returns a reference to this variation for the specified edition of the New Testament.
-     * 
-     * @param edition The short name for the edition to retrieve (e.g., SBLGNT, KJV, HCSB).
-     * @return An object describing this reference.
-     */
-    public VUReference getReference(String edition) {
-        return this.references.get(edition);
-    }
-    
-	/**
-	 * Adds a reference for this variation unit for a New Testament edition. 
-	 * 
-	 * @param ref The structure that defines the text span in an edition of the 
-	 *     NT corresponding to this VU. 
-	 * @throws InvalidReferenceException if this VU already has a reference to the 
-	 *     corresponding edition.
-	 */
-	public VUReference addReference(VUReference reference) {
-	    String edition = reference.getEdition();
-
-	    synchronized (references) {
-	        if (this.references.containsKey(edition)) {
-	            throw new InvalidReferenceException("Could not add reference: " +
-	            		"A reference to this edition (" + edition + ") already exists.");
-	        } else { 
-	            this.references.put(edition, reference);
-	        }
-	    }
-	    
-	    return reference;
-	}
-	
-	/**
-	 * Removes a reference to an NT edition.
-	 * @param edition The edition that should be removed.
-	 * @return the removed reference.
-	 */
-	public VUReference deleteReference(String edition) {
-	    return this.references.remove(edition);
-	}
 	
 	// READINGS METHODS
     //=============================================================

@@ -3,7 +3,7 @@
  */
 package openscriptures.text;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -115,6 +115,15 @@ public abstract class StructureWrapper extends Structure {
         return me.getEndToken();
     }
     
+    @Override 
+    public Integer getStartTokenPosition() { return me.getStartTokenPosition(); }
+    public void setEndTokenPosition(Integer pos) { me.setStartTokenPosition(pos); }
+
+    
+    @Override 
+    public Integer getEndTokenPosition() { return me.getStartTokenPosition(); }
+    public void setEndEndPosition(Integer pos) { me.setEndTokenPosition(pos); }
+    
     //========================================================================================
     // MUTATORS
     //========================================================================================
@@ -186,6 +195,14 @@ public abstract class StructureWrapper extends Structure {
 //========================================================================================
 // METHODS FOR REPRESENTING ATTRIBUTES, CONTENT, AND HIERARCHICAL STRUCTURES
 //========================================================================================
+    /* (non-Javadoc)
+     * @see openscriptures.text.Structure#listAttributes()
+     */
+    @Override
+    public Set<String> listAttributes() {
+        return me.listAttributes();
+    }
+    
     /*
      * 
      */
@@ -194,33 +211,22 @@ public abstract class StructureWrapper extends Structure {
         return me.getAttribute(name);
 	}
 
-    /* (non-Javadoc)
-     * @see openscriptures.text.Structure#listAttributes()
-     */
-    @Override
-    public Set<String> listAttributes() {
-        return me.listAttributes();
-    }
-        
     /**
-     * Retrieves the parent of this structure. This along with {@see #getChildren()} 
-     * allows for the hierarchical nesting of structures. While the structures within
-     * a text are not strictly or exclusively hierarcical, hierarchies do represent an 
-     * important set of relationships between structures. For example, verses are not 
-     * simply structures that happen to be found only within chapters, verses are 
-     * specifically a sub-division
-     *   
+     * 
      * @return
      */
-    @Override
-    public Structure getParent() {
-        return me.getParent();
+    public Map<String, String> getAttributes() {
+        return me.getAttributes();
     }
-
-    @Override
-    public List<Structure> listChildren() {
-        return me.listChildren();
+    
+    /**
+     * 
+     * @param attrs
+     */
+    public void setAttributes(Map<String, String> attrs) {
+        me.setAttributes(attrs);
     }
+    
     
     @Override
     public String getPerspective() {

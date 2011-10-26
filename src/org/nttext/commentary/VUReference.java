@@ -1,8 +1,12 @@
 package org.nttext.commentary;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import openscriptures.text.Structure;
+import openscriptures.text.StructureRepository;
 import openscriptures.text.StructureWrapper;
 import openscriptures.text.Work;
 
@@ -26,14 +30,13 @@ public class VUReference extends StructureWrapper {
      * 
      * @see openscriptures.text.Structure
      */
-    public static VUReference init(CommentaryModule repo, Structure structure, VariationUnit vu) {
-        VUReference ref = new VUReference(repo, structure);
-        ref.vu = vu;
+    public static VUReference init(Structure structure, VariationUnit vu) {
+        VUReference ref = new VUReference(vu, structure);
         
         String vuId = vu.getId().toString();
         String attr = structure.getAttribute(VU_ATTR);
         if (attr == null) {
-            structure.setAttribute(VU_ATTR, vu.getId().toString());
+            structure.setAttribute(VU_ATTR, vuId);
         } else if (!attr.equals(vuId)) {
             assert false : "Tried to initialize an existing VU structure to a different VU.";
             // TODO do something more intelligent here. 
@@ -43,22 +46,64 @@ public class VUReference extends StructureWrapper {
         return ref;
     }
     
+    public static VUReference findReference(StructureRepository repo, Work w, VariationUnit vu) {
+        SortedSet<Structure> structures = 
+                repo.find(w, STRUCTURE_NAME, VU_ATTR, vu.getId().toString());
+        if (structures.size() > 1) {
+//          LOGGER.warn("Found multiple references for the work: " + workId);
+        }
+          
+        VUReference ref = null;
+        if (structures.size() > 0) {
+            ref = new VUReference(vu, structures.first());
+        }
+        
+        return ref;
+    }
+    
+    /**
+     * 
+     * @param repo
+     * @param vu
+     * @return
+     */
+    public static Map<UUID, VUReference> findReferences(
+            StructureRepository repo, VariationUnit vu) {
+        
+        Map<UUID, SortedSet<Structure>> structures =
+                repo.find(STRUCTURE_NAME, VU_ATTR, vu.getId().toString());
+
+        Map<UUID, VUReference>  references = new HashMap<UUID, VUReference>();
+        for (UUID workId : structures.keySet()) {
+            SortedSet<Structure> structs = structures.get(workId); 
+            if (structs.size() > 1) {
+//                LOGGER.warn("Found multiple references for the work: " + workId);
+            }
+            
+            if (structs.size() > 0) {
+                VUReference ref = new VUReference(vu, structs.first());
+                references.put(workId, ref);
+            }
+        }
+        
+        return references;
+    }
+    
+    
     public static boolean isVUReference(Structure s) {
         return s.getName().equals(STRUCTURE_NAME);
     }
     
-    private final CommentaryModule repo;
+//    private final CommentaryModule repo;
     private VariationUnit vu = null;
-    private String edition = null;
     
     //=======================================================================================
     // CONSTRUCTORS
     //=======================================================================================
 
-    public VUReference(CommentaryModule repo, Structure s) {
+    public VUReference(VariationUnit vu, Structure s) {
         super(s);
-        
-        this.repo = repo;
+        this.vu = vu;
     }
 
     //=======================================================================================
@@ -88,34 +133,6 @@ public class VUReference extends StructureWrapper {
     }
 
     public VariationUnit getVariationUnit() {
-        if (vu != null) 
-            return vu;
-
-        Long vuId = null;
-        try {
-            vuId = Long.parseLong(this.getAttribute(VU_ATTR));
-            vu = repo.getVURepository().find(vuId);
-        } catch (NumberFormatException nfe) {
-            // TODO handle this somehow.
-        }
-        
         return vu;
-    }
-    
-    public Work getWork() {
-        UUID workUUID = this.getWorkUUID();
-        return this.repo.getWorkRepository().find(workUUID);
-    }
-    
-    public String getEdition() {
-        if (edition != null) 
-            return edition;
-        
-        Work w = this.getWork();
-        if (w != null) {
-            edition = w.getAbbreviation();
-        }
-        
-        return (edition != null) ? edition : "unknown";
     }
 }

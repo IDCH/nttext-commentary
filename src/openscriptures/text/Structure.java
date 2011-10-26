@@ -517,40 +517,6 @@ public class Structure extends AbstractTokenSequence {
         this.attributes = attrs;
     }
     
-    /**
-     * Retrieves the parent of this structure. This along with {@see #getChildren()} 
-     * allows for the hierarchical nesting of structures. While the structures within
-     * a text are not strictly or exclusively hierarcical, hierarchies do represent an 
-     * important set of relationships between structures. For example, verses are not 
-     * simply structures that happen to be found only within chapters, verses are 
-     * specifically a sub-division
-     *   
-     * @return
-     */
-    @Transient
-    public Structure getParent() { 
-        return this.parent;
-    }
-    
-    public void setParent(Structure parent) {
-        // TODO find a way to check to see if structures are properly nested
-        if (this.parent != null) {
-            this.parent.children.remove(this);
-        }
-        
-        this.parent = parent;
-        if (parent != null)
-            parent.children.add(this);
-    }
-    
-    /**
-     * 
-     */
-    public List<Structure> listChildren() {
-        return Collections.unmodifiableList((List<? extends Structure>)children);
-    }
-    
-   
     //========================================================================================
     // UTILITY METHODS 
     //========================================================================================

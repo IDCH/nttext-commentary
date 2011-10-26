@@ -4,8 +4,8 @@
 package org.nttext.commentary;
 
 import openscriptures.text.StructureRepository;
-import openscriptures.text.TextRepository;
-import openscriptures.text.TokenModule;
+import openscriptures.text.TextModule;
+import openscriptures.text.TokenRepository;
 import openscriptures.text.WorkRepository;
 
 /**
@@ -19,11 +19,11 @@ public interface CommentaryModule {
     
     public VariantReadingRepository getRdgRepository();
     
-    public TextRepository getTextRepository();
+    public TextModule getTextRepository();
     
     public WorkRepository getWorkRepository(); 
     
-    public TokenModule getTokenRepository(); 
+    public TokenRepository getTokenRepository(); 
     
     public StructureRepository getStructureRepository(); 
     

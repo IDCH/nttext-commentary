@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * @author Neal Audenaert
  */
-public interface TokenModule {
+public interface TokenRepository {
     
     public Token create(Token t);
     

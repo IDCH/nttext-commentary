@@ -11,37 +11,23 @@ import java.util.UUID;
 
 import openscriptures.text.Structure;
 import openscriptures.text.StructureRepository;
-import openscriptures.text.TextRepository;
+import openscriptures.text.TextModule;
 import openscriptures.text.Token;
-import openscriptures.text.TokenModule;
+import openscriptures.text.TokenRepository;
 import openscriptures.text.TokenSequence;
 import openscriptures.text.Work;
 import openscriptures.text.WorkRepository;
 
 import org.idch.persist.DBBackedRepository;
 import org.idch.persist.DatabaseException;
-import org.idch.persist.RepositoryAccessException;
 
 /**
  * @author Neal Audenaert
  */
-public class MySQLTextModule extends DBBackedRepository implements TextRepository {
+public class MySQLTextModule extends DBBackedRepository implements TextModule {
 
-    public final static String MODULE_NAME = "texts";
-    
-    /** 
-     * 
-     * 
-     * @return
-     * @throws RepositoryAccessException
-     */
-    public static final MySQLTextModule get()
-            throws RepositoryAccessException {
-        return (MySQLTextModule)get(MODULE_NAME);
-    }
-    
     private WorkRepository m_worksRepo = new MySQLWorkRepository(this);
-    private TokenModule m_tokensRepo = new MySQLTokenRepository(this);;
+    private TokenRepository m_tokensRepo = new MySQLTokenRepository(this);;
     private StructureRepository m_structuresRepo = new MySQLStructureRepository(this);;
     
     //========================================================================
@@ -51,7 +37,7 @@ public class MySQLTextModule extends DBBackedRepository implements TextRepositor
         return this.m_worksRepo;
     }
     
-    public TokenModule getTokenRepository() {
+    public TokenRepository getTokenRepository() {
         return this.m_tokensRepo;
     }
     

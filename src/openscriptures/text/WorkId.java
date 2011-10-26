@@ -181,8 +181,7 @@ public class WorkId {
 	@Transient public Language getLanguage() { return this.language; }
 	@Basic String getLgCode() { return (language != null) ? this.language.getCode() : null; }
 	void setLgCode(String lgCode) {
-	    ApplicationContext ctx = ApplicationContext.getApplicationContext();
-	    this.language = ctx.getLanguage(lgCode); 
+	    this.language = Language.lookup(lgCode); 
 	}
 	
 	/** Returns the publisher of this work. */

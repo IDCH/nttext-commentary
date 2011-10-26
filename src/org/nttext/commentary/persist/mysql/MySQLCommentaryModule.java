@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import openscriptures.text.StructureRepository;
-import openscriptures.text.TextRepository;
-import openscriptures.text.TokenModule;
+import openscriptures.text.TextModule;
+import openscriptures.text.TextModuleInstance;
+import openscriptures.text.TokenRepository;
 import openscriptures.text.WorkRepository;
-import openscriptures.text.impl.MySQLTextModule;
 
 import org.idch.persist.DBBackedRepository;
 import org.idch.persist.DatabaseException;
@@ -44,7 +44,7 @@ public final static String MODULE_NAME = "nttext_commentary";
     private VURepository vuRepo; 
     private VariantReadingRepository rdgRepo;
     
-    private TextRepository textRepo;
+    private TextModule textRepo;
 
     public MySQLCommentaryModule() throws RepositoryAccessException {
         entryRepo = new MySQLEntryRepository(this);
@@ -52,7 +52,7 @@ public final static String MODULE_NAME = "nttext_commentary";
         rdgRepo = new MySQLVariantReadingRepository(this);
         
         // connect to texts repository.
-        textRepo = MySQLTextModule.get();
+        textRepo = TextModuleInstance.get();
     }
     
     /**
@@ -70,7 +70,7 @@ public final static String MODULE_NAME = "nttext_commentary";
         return rdgRepo;
     }
     
-    public TextRepository getTextRepository() {
+    public TextModule getTextRepository() {
         return this.textRepo;
     }
     
@@ -78,7 +78,7 @@ public final static String MODULE_NAME = "nttext_commentary";
         return textRepo.getWorkRepository(); 
     } 
     
-    public TokenModule getTokenRepository() { 
+    public TokenRepository getTokenRepository() { 
         return textRepo.getTokenRepository(); 
     }
     

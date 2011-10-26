@@ -9,7 +9,7 @@ import java.util.SortedSet;
 
 import openscriptures.text.Structure;
 import openscriptures.text.StructureRepository;
-import openscriptures.text.TextRepository;
+import openscriptures.text.TextModule;
 import openscriptures.text.Work;
 
 /**
@@ -32,7 +32,7 @@ public class Chapter extends WorkStructureWrapper {
      * @param osisId
      * @return
      */
-    public static Chapter init(TextRepository repo, Structure structure, String osisId) {
+    public static Chapter init(TextModule repo, Structure structure, String osisId) {
         Chapter chapter = new Chapter(repo, structure);
         
         structure.setPerspective(STRUCTURE_PERSPECTIVE);
@@ -43,7 +43,7 @@ public class Chapter extends WorkStructureWrapper {
         return chapter;
     }
     
-    public static Chapter getChapter(TextRepository repo, Work w, String osisId) {
+    public static Chapter getChapter(TextModule repo, Work w, String osisId) {
         Chapter chapter = null;
         SortedSet<Structure> structures = 
                 repo.getStructureRepository().find(w, STRUCTURE_NAME, ATTR_OSIS_ID, osisId);
@@ -63,7 +63,7 @@ public class Chapter extends WorkStructureWrapper {
     // CONSTRUCTORS
     //======================================================================================
 
-    public Chapter(TextRepository repo, Structure s) {
+    public Chapter(TextModule repo, Structure s) {
         super(repo, s);
     }
 

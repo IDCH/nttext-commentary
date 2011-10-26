@@ -6,7 +6,7 @@ package openscriptures.text.structures;
 import java.util.SortedSet;
 
 import openscriptures.text.Structure;
-import openscriptures.text.TextRepository;
+import openscriptures.text.TextModule;
 import openscriptures.text.Work;
 
 /**
@@ -29,7 +29,7 @@ public class Verse extends WorkStructureWrapper {
      * @param osisId
      * @return
      */
-    public static Verse init(TextRepository repo, Structure structure, String osisId) {
+    public static Verse init(TextModule repo, Structure structure, String osisId) {
         Verse verse = new Verse(repo, structure);
         
         structure.setPerspective(STRUCTURE_PERSPECTIVE);
@@ -40,7 +40,7 @@ public class Verse extends WorkStructureWrapper {
         return verse;
     }
     
-    public static Verse getVerse(TextRepository repo, Work w, String osisId) {
+    public static Verse getVerse(TextModule repo, Work w, String osisId) {
         Verse verse = null;
         SortedSet<Structure> structures = 
                 repo.getStructureRepository().find(w, STRUCTURE_NAME, ATTR_OSIS_ID, osisId);
@@ -59,7 +59,7 @@ public class Verse extends WorkStructureWrapper {
     // CONSTRUCTORS
     //======================================================================================
 
-    public Verse(TextRepository repo, Structure s) {
+    public Verse(TextModule repo, Structure s) {
         super(repo, s);
         
     }

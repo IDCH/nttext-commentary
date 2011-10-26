@@ -6,9 +6,9 @@ package openscriptures.text.importer.sblgnt;
 
 import org.apache.log4j.Logger;
 
-import openscriptures.text.TextRepository;
+import openscriptures.text.TextModule;
+import openscriptures.text.TextModuleInstance;
 import openscriptures.text.Work;
-import openscriptures.text.impl.MySQLTextModule;
 import openscriptures.text.importer.Context;
 import openscriptures.text.importer.Importer;
 
@@ -24,17 +24,17 @@ public class SBLGNTImporter {
     private long elapsedTime = 0;
     private Work work = null;
     
-    private TextRepository m_repo;
-    public SBLGNTImporter(TextRepository repo) {
+    private TextModule m_repo;
+    public SBLGNTImporter(TextModule repo) {
         m_repo = repo;
     }
     
-    public SBLGNTImporter(String filename, TextRepository repo) {
+    public SBLGNTImporter(String filename, TextModule repo) {
         this.filename = filename;
         m_repo = repo;
     }
     
-    public void setFilename(String filename, TextRepository repo) {
+    public void setFilename(String filename, TextModule repo) {
         this.filename = filename;
         m_repo = repo;
     }
@@ -90,7 +90,7 @@ public class SBLGNTImporter {
         
         SBLGNTImporter importer;
         try {
-            importer = new SBLGNTImporter(filename, MySQLTextModule.get());
+            importer = new SBLGNTImporter(filename, TextModuleInstance.get());
             importer.doImport();
 
             System.out.println();

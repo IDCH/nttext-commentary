@@ -16,7 +16,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.idch.util.Cache;
 
-import openscriptures.text.TokenModule;
+import openscriptures.text.TokenRepository;
 import openscriptures.text.Work;
 import openscriptures.text.WorkId;
 import openscriptures.text.WorkRepository;
@@ -66,7 +66,7 @@ public class MySQLWorkRepository implements WorkRepository {
      * 
      */
     @Override
-    public TokenModule getTokenRepository() {
+    public TokenRepository getTokenRepository() {
         return repo.getTokenRepository();
     }
 

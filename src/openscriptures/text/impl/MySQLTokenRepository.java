@@ -17,14 +17,14 @@ import org.idch.util.Cache;
 
 import openscriptures.text.Structure;
 import openscriptures.text.Token;
-import openscriptures.text.TokenModule;
+import openscriptures.text.TokenRepository;
 import openscriptures.text.Work;
 import openscriptures.text.WorkRepository;
 
 /**
  * @author Neal_2
  */
-public class MySQLTokenRepository implements TokenModule {
+public class MySQLTokenRepository implements TokenRepository {
     private final static Logger LOGGER = Logger.getLogger(MySQLTokenRepository.class);
     
     MySQLTextModule repo = null;
@@ -305,7 +305,7 @@ public class MySQLTokenRepository implements TokenModule {
      * @param start The starting position (inclusive) of the tokens to retrieve.
      * @param end The ending position (exclusive) of the tokens to retrieve.
      * 
-     * @see openscriptures.text.TokenModule#find(openscriptures.text.Work, int, int)
+     * @see openscriptures.text.TokenRepository#find(openscriptures.text.Work, int, int)
      */
     @Override
     public List<Token> find(Work w, int start, int end) {
@@ -347,7 +347,7 @@ public class MySQLTokenRepository implements TokenModule {
      * 
      * @param s The structure whose tokens should be retrieved.
      * @return The list of tokens associated with that structure.
-     * @see openscriptures.text.TokenModule#find(openscriptures.text.Structure)
+     * @see openscriptures.text.TokenRepository#find(openscriptures.text.Structure)
      */
     @Override
     public List<Token> find(Structure s) {

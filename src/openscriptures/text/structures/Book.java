@@ -9,7 +9,7 @@ import java.util.SortedSet;
 
 import openscriptures.text.Structure;
 import openscriptures.text.StructureRepository;
-import openscriptures.text.TextRepository;
+import openscriptures.text.TextModule;
 import openscriptures.text.Work;
 
 /**
@@ -31,7 +31,7 @@ public class Book extends WorkStructureWrapper {
      * @param osisId
      * @return
      */
-    public static Book init(TextRepository repo, Structure structure, String osisId) {
+    public static Book init(TextModule repo, Structure structure, String osisId) {
         Book book = new Book(repo, structure);
         
         structure.setPerspective(STRUCTURE_PERSPECTIVE);
@@ -44,7 +44,7 @@ public class Book extends WorkStructureWrapper {
         return s.getName().equals(STRUCTURE_NAME);
     }
     
-    public static Book getBook(TextRepository repo, Work w, String osisId) {
+    public static Book getBook(TextModule repo, Work w, String osisId) {
         Book book = null;
         SortedSet<Structure> structures = 
                 repo.getStructureRepository().find(w, STRUCTURE_NAME, ATTR_OSIS_ID, osisId);
@@ -55,7 +55,7 @@ public class Book extends WorkStructureWrapper {
         return book;
     }
     
-    public static List<Book> getBooks(TextRepository repo, Work w) {
+    public static List<Book> getBooks(TextModule repo, Work w) {
         List<Book> books = new ArrayList<Book>();
         SortedSet<Structure> structures = 
                 repo.getStructureRepository().find(w, STRUCTURE_NAME);
@@ -75,7 +75,7 @@ public class Book extends WorkStructureWrapper {
     // CONSTRUCTORS
     //======================================================================================
 
-    public Book(TextRepository repo, Structure s) {
+    public Book(TextModule repo, Structure s) {
         super(repo, s);
     }
 

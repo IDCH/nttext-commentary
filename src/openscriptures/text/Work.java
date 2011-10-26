@@ -24,6 +24,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.idch.persist.RepositoryAccessException;
 import org.idch.util.Cache;
 
 import openscriptures.text.Work;
@@ -73,8 +74,7 @@ public class Work extends AbstractTokenSequence {
 	// TOKENS AND CACHING
 	//===============================
 	
-	private ApplicationContext ac = null; 
-	private TokenModule tokens = null;
+	private TokenRepository tokens = null;
 	
     // Of dubious value - cache at the repo level
 	private Cache<Integer, Token> tokenCache = new Cache<Integer, Token>("tokens", 1000);
@@ -114,12 +114,15 @@ public class Work extends AbstractTokenSequence {
 	}
 	
 	@Transient 
-	public TokenModule getTokenRepository() {
-	    if (ac == null)
-	        ac = ApplicationContext.getApplicationContext();
+	public TokenRepository getTokenRepository() {
 	    
-	    if (this.tokens == null)
-	        this.tokens = ac.getTokens(this);
+	    if (this.tokens == null) {
+            try {
+                this.tokens = TextModuleInstance.get().getTokenRepository();
+            } catch (RepositoryAccessException e) {
+                this.tokens = null;
+            } 
+	    }
 	    
 	    assert this.tokens != null : "Could not load token repository.";
 	    if (this.tokens == null) {
@@ -200,7 +203,7 @@ public class Work extends AbstractTokenSequence {
         t = tokenCache.get(index);
         synchronized (tokenCache) {
             if (t == null) {
-                TokenModule tokens = this.getTokenRepository();
+                TokenRepository tokens = this.getTokenRepository();
                 t = tokens.find(this, index);
                 
                 tokenCache.cache(t.getPosition(), t);
@@ -214,7 +217,7 @@ public class Work extends AbstractTokenSequence {
 //        if (this.size >= 0)
 //            return this.size;
         
-        TokenModule tokens = this.getTokenRepository();
+        TokenRepository tokens = this.getTokenRepository();
         int size = tokens.getNumberOfTokens(this);
         return size;
     }
@@ -315,8 +318,7 @@ public class Work extends AbstractTokenSequence {
     /** Returns the primary language used in this work. */
     @Transient
     public Language getLanguage() { 
-        ApplicationContext ac = ApplicationContext.getApplicationContext();
-        return ac.getLanguage(this.language); 
+        return Language.lookup(this.language);
     }
     /** Sets the primary language used in this work. */
     public void setLanguage(Language lg) { this.language = lg.getCode(); }
@@ -416,7 +418,7 @@ public class Work extends AbstractTokenSequence {
      */
     @Transient
     public int getEnd() {
-        TokenModule tokens = this.getTokenRepository();
+        TokenRepository tokens = this.getTokenRepository();
         
         
         return tokens.getNumberOfTokens(this);

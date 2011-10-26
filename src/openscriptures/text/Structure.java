@@ -18,6 +18,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.idch.persist.RepositoryAccessException;
+
 
 /**
  * @author Neal Audenaert
@@ -342,8 +344,17 @@ public class Structure extends AbstractTokenSequence {
     }
     
     private Token getToken(int pos) {
-        ApplicationContext ac = ApplicationContext.getApplicationContext();
-        return ac.getToken(workUUID, pos);
+        Token t = null;
+        TextModule textModule;
+        try {
+            textModule = TextModuleInstance.get();
+            Work w = textModule.getWork(this);
+            t = textModule.getTokenRepository().find(w, pos);
+        } catch (RepositoryAccessException e) {
+            t = null;
+        }
+        
+        return t;
     }
     
     /** Returns the token at which this structure starts. */

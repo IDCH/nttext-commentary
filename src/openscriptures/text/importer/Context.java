@@ -9,7 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import openscriptures.text.StructureRepository;
-import openscriptures.text.TextRepository;
+import openscriptures.text.TextModule;
 import openscriptures.text.Work;
 import openscriptures.text.WorkRepository;
 
@@ -37,7 +37,7 @@ public class Context {
      *  it encounters. */
     private boolean inText = false;
     
-    private TextRepository repo = null;
+    private TextModule repo = null;
     
     //=====================================================================================
     // PRIVATE STATE VARIABLES
@@ -68,7 +68,7 @@ public class Context {
      *           how objects are created and retrieved.
      *      
      */
-    public Context(TextRepository repo) {
+    public Context(TextModule repo) {
         this.repo = repo;
     }
     
@@ -167,7 +167,7 @@ public class Context {
         return d;
     }
     
-    public TextRepository getTextRepo() {
+    public TextModule getTextRepo() {
         return this.repo;
     }
     

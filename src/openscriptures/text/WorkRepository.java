@@ -11,7 +11,7 @@ import java.util.UUID;
  */
 public interface WorkRepository {
     
-    public TokenModule getTokenRepository();
+    public TokenRepository getTokenRepository();
     
     public Work create(String workId);
     

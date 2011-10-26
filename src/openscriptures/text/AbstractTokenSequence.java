@@ -8,6 +8,8 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import org.idch.persist.RepositoryAccessException;
+
 
 /**
  * @author Neal Audenaert
@@ -130,8 +132,17 @@ public abstract class AbstractTokenSequence implements TokenSequence {
     public Token get(int index) {
         checkIndexInBounds(index);
         
-        ApplicationContext ac = ApplicationContext.getApplicationContext();
-        return ac.getToken(this.getWorkUUID(), this.getStart() + index);
+        Token t = null;
+        TextModule textModule;
+        try {
+            textModule = TextModuleInstance.get();
+            Work w = textModule.getWork(this);
+            t = textModule.getTokenRepository().find(w, this.getStart() + index);
+        } catch (RepositoryAccessException e) {
+            t = null;
+        }
+        
+        return t;
     }
 
     /* (non-Javadoc)

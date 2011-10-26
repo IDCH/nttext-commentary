@@ -5,7 +5,7 @@ package openscriptures.text.structures;
 
 import openscriptures.text.Structure;
 import openscriptures.text.StructureWrapper;
-import openscriptures.text.TextRepository;
+import openscriptures.text.TextModule;
 import openscriptures.text.Work;
 import openscriptures.text.WorkRepository;
 
@@ -15,9 +15,9 @@ import openscriptures.text.WorkRepository;
 public abstract class WorkStructureWrapper extends StructureWrapper {
     public static final String ATTR_OSIS_ID = "osisId";
     
-    protected final TextRepository repo;
+    protected final TextModule repo;
     
-    public WorkStructureWrapper(TextRepository repo, Structure s) {
+    public WorkStructureWrapper(TextModule repo, Structure s) {
         super(s);
         
         this.repo = repo;

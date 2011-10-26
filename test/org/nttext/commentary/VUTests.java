@@ -3,9 +3,13 @@
  */
 package org.nttext.commentary;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
+import openscriptures.text.Work;
+import openscriptures.text.WorkRepository;
 
 import org.idch.persist.RepositoryAccessException;
 import org.nttext.commentary.persist.mysql.MySQLCommentaryRepo;
@@ -14,8 +18,12 @@ import org.nttext.commentary.persist.mysql.MySQLCommentaryRepo;
  * @author Neal Audenaert
  */
 public class VUTests extends TestCase {
-    MySQLCommentaryRepo repo = null;
-    VURepository vuRepo = null;
+    private MySQLCommentaryRepo repo = null;
+    private VURepository vuRepo = null;
+    
+    private String ref = "1Pet.2.20";
+    private Passage passage = new VerseRange(ref);
+    String overview = "This is a short overview of this entry";
     
     public void setUp() {
         try {
@@ -31,6 +39,26 @@ public class VUTests extends TestCase {
         }
     }
     
+    private VariationUnit createVU() {
+        VariationUnit vu = vuRepo.create(passage);
+    
+        vu.setCommentary(overview);
+        vuRepo.save(vu);
+        return vu;
+    }
+    
+    private void checkVU(VariationUnit vu) {
+        checkVU(vu, true);
+    }
+    
+    private void checkVU(VariationUnit vu, boolean checkCommentary) {
+        assertTrue(vu.getPassage().equals(passage));
+        assertTrue(vu.getId() >= 0);
+        
+        if (checkCommentary) 
+            assertEquals(overview, vu.getCommentary());
+    }
+    
     public void tearDown() {
         try {
             repo.drop();
@@ -40,69 +68,40 @@ public class VUTests extends TestCase {
     }
     
     public void testCreateVU() {
-        String ref = "1Pet.2.20";
-        Passage passage = new VerseRange(ref);
         VariationUnit vu = vuRepo.create(passage);
-        
-        assertTrue(vu.getPassage().equals(passage));
-        assertTrue(vu.getId() >= 0);
+        checkVU(vu, false);
     }
     
     public void testUpdateVU() {
-        String ref = "1Pet.2.20";
-        String overview = "This is a short overview of this entry";
-        Passage passage = new VerseRange(ref);
-        VariationUnit vu = vuRepo.create(passage);
-        
-        long id = vu.getId();
-        vu.setCommentary(overview);
-        vuRepo.save(vu);
-        
-        vu = vuRepo.find(id);
-        
-        assertTrue(vu.getPassage().equals(passage));
-        assertTrue(vu.getId() >= 0);
-        assertEquals(overview, vu.getCommentary());
+        VariationUnit vu = createVU();
+        checkVU(vuRepo.find(vu.getId()));
     }
     
     public void testRetrieveVU() {
-        String ref = "1Pet.2.20";
-        String overview = "This is a short overview of this entry";
-        Passage passage = new VerseRange(ref);
-        VariationUnit vu = vuRepo.create(passage);
+        vuRepo.create(passage);
+        checkVU(vuRepo.find(passage));
         
-        vu.setCommentary(overview);
-        vuRepo.save(vu);
-        
-        vu = vuRepo.find(new VerseRange(ref));
-        
-        assertTrue(vu.getPassage().equals(passage));
-        assertTrue(vu.getId() >= 0);
-        assertEquals(overview, vu.getCommentary());
-        
-        vu = vuRepo.find(new VerseRange("1Pet.2.22"));
+        VariationUnit vu = vuRepo.find(new VerseRange("1Pet.2.22"));
         assertNull(vu);
     }
     
     public void testRemoveVU() {
-        String ref = "1Pet.2.20";
-        String overview = "This is a short overview of this entry";
-        Passage passage = new VerseRange(ref);
-        VariationUnit vu = vuRepo.create(passage);
+        createVU();
         
-        vu.setCommentary(overview);
-        vuRepo.save(vu);
+        VariationUnit vu = vuRepo.find(passage);
+        checkVU(vu);
         
-        vu = vuRepo.find(new VerseRange(ref));
-        
-        assertTrue(vu.getPassage().equals(passage));
-        assertTrue(vu.getId() >= 0);
-        assertEquals(overview, vu.getCommentary());
-        
-        boolean success = vuRepo.remove(vu);
-        
-        assertTrue(success);
+        assertTrue(vuRepo.remove(vu));
         vu = vuRepo.find(new VerseRange(ref));
         assertNull(vu);
+    }
+    
+    public void testVerseReference() {
+        // TODO this needs to be tied into a test harness for the texts framework.
+        
+        WorkRepository worksRepo = repo.getWorkRepository();
+        Work sblgnt = worksRepo.find(11L);
+        
+        
     }
 }

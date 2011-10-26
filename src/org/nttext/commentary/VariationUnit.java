@@ -120,20 +120,19 @@ public class VariationUnit {
 	 * @throws InvalidReferenceException if this VU already has a reference to the 
 	 *     corresponding edition.
 	 */
-	public VUReference addReference(Structure structure) {
-	    VUReference r = new VUReference(this, structure);
-	    String edition = r.getEdition();
+	public VUReference addReference(VUReference reference) {
+	    String edition = reference.getEdition();
 
 	    synchronized (references) {
 	        if (this.references.containsKey(edition)) {
 	            throw new InvalidReferenceException("Could not add reference: " +
 	            		"A reference to this edition (" + edition + ") already exists.");
 	        } else { 
-	            this.references.put(edition, r);
+	            this.references.put(edition, reference);
 	        }
 	    }
 	    
-	    return r;
+	    return reference;
 	}
 	
 	/**
@@ -144,8 +143,6 @@ public class VariationUnit {
 	public VUReference deleteReference(String edition) {
 	    return this.references.remove(edition);
 	}
-	
-	
 	
 	// READINGS METHODS
     //=============================================================

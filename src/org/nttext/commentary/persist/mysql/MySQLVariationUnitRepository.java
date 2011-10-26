@@ -8,12 +8,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
+import openscriptures.text.Structure;
+import openscriptures.text.StructureComparator;
+import openscriptures.text.StructureRepository;
+import openscriptures.text.Token;
+import openscriptures.text.Work;
 
 import org.apache.log4j.Logger;
+import org.nttext.commentary.VUReference;
 import org.nttext.commentary.VURepository;
 import org.nttext.commentary.VariantReading;
 import org.nttext.commentary.VariationUnit;
@@ -93,7 +103,42 @@ public class MySQLVariationUnitRepository implements VURepository {
         
         return vu;
     }
+    
+    public VUReference createReference(VariationUnit vu, Token start, Token end) {
+        Work w = start.getWork();
+        StructureRepository structRepo = this.repo.getStructureRepository();
 
+        
+        Structure s = structRepo.create(w, VUReference.STRUCTURE_NAME, start, end);
+        VUReference ref = VUReference.init(repo, s, vu);
+        boolean success = structRepo.save(ref);
+        
+        return success ? ref : null;
+    }
+    
+    public Map<String, SortedSet<VUReference>> findReferences(VariationUnit vu) {
+        StructureRepository structRepo = this.repo.getStructureRepository();
+        
+        String vuId = vu.getId().toString();
+        Map<String, SortedSet<Structure>> structures =
+                structRepo.find(VUReference.STRUCTURE_NAME, VUReference.VU_ATTR, vuId);
+
+        Map<String, SortedSet<VUReference>>  references = 
+                new HashMap<String, SortedSet<VUReference>>();
+        for (String workId : structures.keySet()) {
+            SortedSet<Structure> structs = structures.get(workId); 
+            SortedSet<VUReference> refs = 
+                    new TreeSet<VUReference>(new StructureComparator());
+            references.put(workId, refs);
+            
+            for (Structure s : structs) {
+                refs.add(new VUReference(repo, s));
+            }
+        }
+        
+        return references;
+    }
+    
     private VariationUnit restore(ResultSet results) throws SQLException {
         VariationUnit vu = null;
         

@@ -8,6 +8,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import openscriptures.text.StructureRepository;
+import openscriptures.text.TextRepository;
+import openscriptures.text.TokenRepository;
+import openscriptures.text.WorkRepository;
+import openscriptures.text.impl.MySQLTextRepository;
+
 import org.idch.persist.DBBackedRepository;
 import org.idch.persist.DatabaseException;
 import org.idch.persist.RepositoryAccessException;
@@ -37,11 +43,16 @@ public final static String MODULE_NAME = "nttext_commentary";
     private EntryRepository entryRepo;
     private VURepository vuRepo; 
     private VariantReadingRepository rdgRepo;
+    
+    private TextRepository textRepo;
 
-    public MySQLCommentaryRepo() {
+    public MySQLCommentaryRepo() throws RepositoryAccessException {
         entryRepo = new MySQLEntryRepository(this);
         vuRepo = new MySQLVariationUnitRepository(this);
         rdgRepo = new MySQLVariantReadingRepository(this);
+        
+        // connect to texts repository.
+        textRepo = MySQLTextRepository.get();
     }
     
     /**
@@ -57,6 +68,22 @@ public final static String MODULE_NAME = "nttext_commentary";
     
     public VariantReadingRepository getRdgRepository() {
         return rdgRepo;
+    }
+    
+    public TextRepository getTextRepository() {
+        return this.textRepo;
+    }
+    
+    public WorkRepository getWorkRepository() { 
+        return textRepo.getWorkRepository(); 
+    } 
+    
+    public TokenRepository getTokenRepository() { 
+        return textRepo.getTokenRepository(); 
+    }
+    
+    public StructureRepository getStructureRepository() { 
+        return textRepo.getStructureRepository(); 
     }
     
     //========================================================================

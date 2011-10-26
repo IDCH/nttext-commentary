@@ -43,6 +43,17 @@ public class Chapter extends WorkStructureWrapper {
         return chapter;
     }
     
+    public static Chapter getChapter(TextRepository repo, Work w, String osisId) {
+        Chapter chapter = null;
+        SortedSet<Structure> structures = 
+                repo.getStructureRepository().find(w, STRUCTURE_NAME, ATTR_OSIS_ID, osisId);
+        if (structures.size() >= 1) {
+            chapter = new Chapter(repo, structures.first());
+        }
+        
+        return chapter;
+    }
+    
     public static boolean isChapter(Structure s) {
         return s.getName().equals(STRUCTURE_NAME);
     }

@@ -20,6 +20,7 @@ import openscriptures.utils.License;
 /**
  * @author Neal Audenaert
  */
+@Deprecated
 public class ApplicationContext {
     
     public static ApplicationContext instance = null;

@@ -64,7 +64,6 @@ public class Book extends WorkStructureWrapper {
         }
         
         return books;
-        
     }
     
     //======================================================================================

@@ -3,13 +3,9 @@
  */
 package org.nttext.commentary;
 
-import java.util.List;
-
 import junit.framework.TestCase;
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
-import openscriptures.text.Work;
-import openscriptures.text.WorkRepository;
 
 import org.idch.persist.RepositoryAccessException;
 import org.nttext.commentary.persist.mysql.MySQLCommentaryRepo;
@@ -94,14 +90,5 @@ public class VUTests extends TestCase {
         assertTrue(vuRepo.remove(vu));
         vu = vuRepo.find(new VerseRange(ref));
         assertNull(vu);
-    }
-    
-    public void testVerseReference() {
-        // TODO this needs to be tied into a test harness for the texts framework.
-        
-        WorkRepository worksRepo = repo.getWorkRepository();
-        Work sblgnt = worksRepo.find(11L);
-        
-        
     }
 }

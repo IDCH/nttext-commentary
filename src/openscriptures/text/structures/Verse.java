@@ -3,8 +3,11 @@
  */
 package openscriptures.text.structures;
 
+import java.util.SortedSet;
+
 import openscriptures.text.Structure;
 import openscriptures.text.TextRepository;
+import openscriptures.text.Work;
 
 /**
  * @author Neal Audenaert
@@ -33,6 +36,17 @@ public class Verse extends WorkStructureWrapper {
         structure.setAttribute(ATTR_OSIS_ID, osisId);
         
         // TODO set verse number
+        
+        return verse;
+    }
+    
+    public static Verse getVerse(TextRepository repo, Work w, String osisId) {
+        Verse verse = null;
+        SortedSet<Structure> structures = 
+                repo.getStructureRepository().find(w, STRUCTURE_NAME, ATTR_OSIS_ID, osisId);
+        if (structures.size() >= 1) {
+            verse = new Verse(repo, structures.first());
+        }
         
         return verse;
     }

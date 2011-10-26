@@ -43,9 +43,7 @@ public class SBLGNTImporter {
         long start = System.currentTimeMillis();
         Context context = null;
         try {
-            context = new Context(
-                    m_repo.getWorkRepository(), 
-                    m_repo.getStructureRepository());
+            context = new Context(m_repo);
             Importer importer = new Importer(filename, context);
             
             importer.addHandler(new WordHandler());

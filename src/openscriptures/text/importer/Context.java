@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import openscriptures.text.StructureRepository;
+import openscriptures.text.TextRepository;
 import openscriptures.text.Work;
 import openscriptures.text.WorkRepository;
 
@@ -36,10 +37,7 @@ public class Context {
      *  it encounters. */
     private boolean inText = false;
     
-    private WorkRepository works = null;
-    
-    /** Used to create structure instances. */
-    private StructureRepository structures = null;
+    private TextRepository repo = null;
     
     //=====================================================================================
     // PRIVATE STATE VARIABLES
@@ -70,10 +68,8 @@ public class Context {
      *           how objects are created and retrieved.
      *      
      */
-    public Context(WorkRepository workRepo, 
-            StructureRepository structureRepo) {
-        this.works = workRepo;
-        this.structures = structureRepo;
+    public Context(TextRepository repo) {
+        this.repo = repo;
     }
     
     //=====================================================================================
@@ -170,13 +166,18 @@ public class Context {
         LOGGER.debug("Retreived numeric property: '" + key + "'=" + d);
         return d;
     }
+    
+    public TextRepository getTextRepo() {
+        return this.repo;
+    }
+    
 
     public WorkRepository getWorksRepo() {
-        return this.works;
+        return this.repo.getWorkRepository();
     }
     
     public StructureRepository getStructureRepo() {
-        return this.structures;
+        return this.repo.getStructureRepository();
     }
     
     //=====================================================================================

@@ -4,17 +4,17 @@
 package openscriptures.text.structures;
 
 import openscriptures.text.Structure;
-import openscriptures.text.StructureWrapper;
+import openscriptures.text.TextRepository;
 
 /**
  * @author Neal Audenaert
  */
-public class Verse extends StructureWrapper {
+public class Verse extends WorkStructureWrapper {
     
     public static final String STRUCTURE_NAME = "verse"; 
     public static final String STRUCTURE_PERSPECTIVE = "bcv";       // book, chapter, verse 
     
-    public static final String ATTR_OSIS_ID = "osisId";
+    
     public static final String ATTR_NUMBER = "n";
     
     /**
@@ -26,8 +26,8 @@ public class Verse extends StructureWrapper {
      * @param osisId
      * @return
      */
-    public static Verse init(Structure structure, String osisId) {
-        Verse verse = new Verse(structure);
+    public static Verse init(TextRepository repo, Structure structure, String osisId) {
+        Verse verse = new Verse(repo, structure);
         
         structure.setPerspective(STRUCTURE_PERSPECTIVE);
         structure.setAttribute(ATTR_OSIS_ID, osisId);
@@ -45,8 +45,9 @@ public class Verse extends StructureWrapper {
     // CONSTRUCTORS
     //======================================================================================
 
-    public Verse(Structure s) {
-        super(s);
+    public Verse(TextRepository repo, Structure s) {
+        super(repo, s);
+        
     }
 
     public boolean accepts(Structure s) {
@@ -57,18 +58,6 @@ public class Verse extends StructureWrapper {
     // CUSTOM ACCESSORS AND MUTATORS
     //======================================================================================
 
-    /**
-     * 
-     * @return
-     */
-    public String getOsisId() {
-        return this.getAttribute(ATTR_OSIS_ID);
-    }
-    
-    public void setOsisId(String id) {
-        // TODO check pattern?
-        this.setAttribute(ATTR_OSIS_ID, id);
-    }
     
     public int getVerseNumber() {
         // NOTE we're assuming numeric verse numbers. That might need to change to be more

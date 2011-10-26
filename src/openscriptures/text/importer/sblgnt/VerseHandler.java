@@ -32,7 +32,7 @@ public class VerseHandler extends StructureHandler {
             String osisId = p.getAttribute("osisID");
             
             Structure struct = createStructure(Verse.STRUCTURE_NAME);
-            verse = Verse.init(struct, osisId);       // initializes the new chapter
+            verse = Verse.init(ctx.getTextRepo(), struct, osisId);       // initializes the new chapter
             
             LOGGER.info("Creating verse: " + verse.getOsisId());
         } else if (p.hasAttribute("eID")) {     // ending verse milestone marker

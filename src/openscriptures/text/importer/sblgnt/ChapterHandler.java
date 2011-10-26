@@ -31,7 +31,7 @@ public class ChapterHandler extends StructureHandler {
             String osisId = p.getAttribute("osisID");
             
             Structure struct = createStructure(Chapter.STRUCTURE_NAME);
-            chapter = Chapter.init(struct, osisId);       // initializes the new chapter
+            chapter = Chapter.init(ctx.getTextRepo(), struct, osisId);       // initializes the new chapter
             
             LOGGER.info("Creating chapter: " + chapter.getOsisId());
             

@@ -3,18 +3,23 @@
  */
 package openscriptures.text.structures;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedSet;
+
 import openscriptures.text.Structure;
-import openscriptures.text.StructureWrapper;
+import openscriptures.text.StructureRepository;
+import openscriptures.text.TextRepository;
+import openscriptures.text.Work;
 
 /**
  * @author Neal Audenaert
  */
-public class Book extends StructureWrapper {
+public class Book extends WorkStructureWrapper {
     
     public static final String STRUCTURE_NAME = "book"; 
     public static final String STRUCTURE_PERSPECTIVE = "bcv";       // book, chapter, verse 
     
-    public static final String ATTR_OSIS_ID = "osisId";
     public static final String ATTR_TITLE = "title";
     
     /**
@@ -26,8 +31,8 @@ public class Book extends StructureWrapper {
      * @param osisId
      * @return
      */
-    public static Book init(Structure structure, String osisId) {
-        Book book = new Book(structure);
+    public static Book init(TextRepository repo, Structure structure, String osisId) {
+        Book book = new Book(repo, structure);
         
         structure.setPerspective(STRUCTURE_PERSPECTIVE);
         structure.setAttribute(ATTR_OSIS_ID, osisId);
@@ -39,34 +44,50 @@ public class Book extends StructureWrapper {
         return s.getName().equals(STRUCTURE_NAME);
     }
     
+    public static Book getBook(TextRepository repo, Work w, String osisId) {
+        Book book = null;
+        SortedSet<Structure> structures = 
+                repo.getStructureRepository().find(w, STRUCTURE_NAME, ATTR_OSIS_ID, osisId);
+        if (structures.size() >= 1) {
+            book = new Book(repo, structures.first());
+        }
+        
+        return book;
+    }
+    
+    public static List<Book> getBooks(TextRepository repo, Work w) {
+        List<Book> books = new ArrayList<Book>();
+        SortedSet<Structure> structures = 
+                repo.getStructureRepository().find(w, STRUCTURE_NAME);
+        for (Structure s : structures) {
+            books.add(new Book(repo, s));
+        }
+        
+        return books;
+        
+    }
+    
+    //======================================================================================
+    // MEMBER VARIABLES
+    //======================================================================================
+
+    private List<Chapter> chapters = null;
     //======================================================================================
     // CONSTRUCTORS
     //======================================================================================
 
-    public Book(Structure s) {
-        super(s);
+    public Book(TextRepository repo, Structure s) {
+        super(repo, s);
     }
 
     public boolean accepts(Structure s) {
-        return s.getName().equals(STRUCTURE_NAME);
+        return isBook(s);
     }
    
     //======================================================================================
     // CUSTOM ACCESSORS AND MUTATORS
     //======================================================================================
 
-    /**
-     * 
-     * @return
-     */
-    public String getOsisId() {
-        return this.getAttribute(ATTR_OSIS_ID);
-    }
-    
-    public void setOsisId(String id) {
-        // TODO check pattern?
-        this.setAttribute(ATTR_OSIS_ID, id);
-    }
     
     public String getTitle() {
         return this.getAttribute(ATTR_TITLE);
@@ -74,5 +95,48 @@ public class Book extends StructureWrapper {
     
     public String setTitle(String title) {
         return this.setAttribute(ATTR_TITLE, title);
+    }
+    
+    public List<Chapter> getChapters() {
+        return getChapters(false);
+    }
+    
+    public List<Chapter> getChapters(boolean forceUpdate) {
+        if (chapters != null && !forceUpdate) 
+            return chapters;
+        
+        Work w = getWork();
+        StructureRepository structRepo = repo.getStructureRepository();
+        
+        chapters = new ArrayList<Chapter>();
+        SortedSet<Structure> structures = 
+                structRepo.find(w, Chapter.STRUCTURE_NAME, this.getStart(), this.getEnd());
+        
+        for (Structure s : structures) {
+            chapters.add(new Chapter(repo, s));
+        }
+        
+        return chapters;
+    }
+    
+    public int getNumberOfChapters() {
+        return getChapters(false).size();
+    }
+    
+    public Chapter getChapter(int num) {
+        StructureRepository structRepo = repo.getStructureRepository();
+        Work w = getWork();
+        
+        Chapter chapter = null;
+        String osisId = this.getOsisId() + "." + num;
+        SortedSet<Structure> structures = 
+                structRepo.find(w, Chapter.STRUCTURE_NAME, ATTR_OSIS_ID, osisId);
+        if (structures.size() == 1) {
+            chapter = new Chapter(repo, structures.first());
+        } else {
+            // TODO figure out what to do here.
+        }
+        
+        return chapter;
     }
 }

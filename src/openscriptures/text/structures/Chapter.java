@@ -3,18 +3,23 @@
  */
 package openscriptures.text.structures;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedSet;
+
 import openscriptures.text.Structure;
-import openscriptures.text.StructureWrapper;
+import openscriptures.text.StructureRepository;
+import openscriptures.text.TextRepository;
+import openscriptures.text.Work;
 
 /**
  * @author Neal Audenaert
  */
-public class Chapter extends StructureWrapper {
+public class Chapter extends WorkStructureWrapper {
     
     public static final String STRUCTURE_NAME = "chapter"; 
     public static final String STRUCTURE_PERSPECTIVE = "bcv";       // book, chapter, verse 
     
-    public static final String ATTR_OSIS_ID = "osisId";
     public static final String ATTR_TITLE = "title";   // ?? is this relevant - probably
     public static final String ATTR_NUMBER = "n";
     
@@ -27,8 +32,8 @@ public class Chapter extends StructureWrapper {
      * @param osisId
      * @return
      */
-    public static Chapter init(Structure structure, String osisId) {
-        Chapter chapter = new Chapter(structure);
+    public static Chapter init(TextRepository repo, Structure structure, String osisId) {
+        Chapter chapter = new Chapter(repo, structure);
         
         structure.setPerspective(STRUCTURE_PERSPECTIVE);
         structure.setAttribute(ATTR_OSIS_ID, osisId);
@@ -42,12 +47,13 @@ public class Chapter extends StructureWrapper {
         return s.getName().equals(STRUCTURE_NAME);
     }
     
+    private List<Verse> verses = null;
     //======================================================================================
     // CONSTRUCTORS
     //======================================================================================
 
-    public Chapter(Structure s) {
-        super(s);
+    public Chapter(TextRepository repo, Structure s) {
+        super(repo, s);
     }
 
     public boolean accepts(Structure s) {
@@ -58,18 +64,6 @@ public class Chapter extends StructureWrapper {
     // CUSTOM ACCESSORS AND MUTATORS
     //======================================================================================
 
-    /**
-     * 
-     * @return
-     */
-    public String getOsisId() {
-        return this.getAttribute(ATTR_OSIS_ID);
-    }
-    
-    public void setOsisId(String id) {
-        // TODO check pattern?
-        this.setAttribute(ATTR_OSIS_ID, id);
-    }
     
     public String getTitle() {
         return this.getAttribute(ATTR_TITLE);
@@ -88,5 +82,47 @@ public class Chapter extends StructureWrapper {
     
     public void setChapterNumber(int num) {
         this.setAttribute(ATTR_NUMBER, Integer.toString(num));
+    }
+    
+    public List<Verse> getVerses() {
+        return getVerses(false);
+    }
+    
+    public List<Verse> getVerses(boolean forceUpdate) {
+        if (verses != null && !forceUpdate) 
+            return verses;
+        
+        Work w = getWork();
+        StructureRepository structRepo = repo.getStructureRepository();
+        
+        verses = new ArrayList<Verse>();
+        SortedSet<Structure> structures = 
+                structRepo.find(w, Verse.STRUCTURE_NAME, this.getStart(), this.getEnd());
+        
+        for (Structure s : structures) {
+            verses.add(new Verse(repo, s));
+        }
+        
+        return verses;
+    }
+    
+    public int getNumberOfVerses() {
+        return getVerses(false).size();
+    }
+    
+    public Verse getVerse(int num) {
+        StructureRepository structRepo = repo.getStructureRepository();
+        
+        Verse verse = null;
+        String osisId = this.getOsisId() + "." + num;
+        SortedSet<Structure> structures = 
+                structRepo.find(getWork(), Verse.STRUCTURE_NAME, ATTR_OSIS_ID, osisId);
+        if (structures.size() == 1) {
+            verse = new Verse(repo, structures.first());
+        } else {
+            // TODO figure out what to do here.
+        }
+        
+        return verse;
     }
 }

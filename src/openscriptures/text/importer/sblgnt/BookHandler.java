@@ -35,7 +35,7 @@ public class BookHandler extends StructureHandler {
         String osisId = p.getAttribute("osisID");
         
         Structure struct = createStructure(Book.STRUCTURE_NAME);
-        book = Book.init(struct, osisId);       // initializes the 
+        book = Book.init(ctx.getTextRepo(), struct, osisId);       // initializes the 
         
         LOGGER.info("Creating book: " + book.getOsisId());
     }

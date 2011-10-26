@@ -33,9 +33,9 @@ public class MySQLVariantReadingRepository implements VariantReadingRepository {
     private static final String FIELDS =  
                 "vu_id, greek_rdg, english_rdg, witnesses, seq_no ";        // , rdg_id
     
-    MySQLCommentaryRepo repo = null;
+    MySQLCommentaryModule repo = null;
     
-    MySQLVariantReadingRepository(MySQLCommentaryRepo repo) {
+    MySQLVariantReadingRepository(MySQLCommentaryModule repo) {
         this.repo = repo;
     }
 

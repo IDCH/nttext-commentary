@@ -26,7 +26,7 @@ public class VUReference extends StructureWrapper {
      * 
      * @see openscriptures.text.Structure
      */
-    public static VUReference init(CommentaryRepo repo, Structure structure, VariationUnit vu) {
+    public static VUReference init(CommentaryModule repo, Structure structure, VariationUnit vu) {
         VUReference ref = new VUReference(repo, structure);
         ref.vu = vu;
         
@@ -47,7 +47,7 @@ public class VUReference extends StructureWrapper {
         return s.getName().equals(STRUCTURE_NAME);
     }
     
-    private final CommentaryRepo repo;
+    private final CommentaryModule repo;
     private VariationUnit vu = null;
     private String edition = null;
     
@@ -55,7 +55,7 @@ public class VUReference extends StructureWrapper {
     // CONSTRUCTORS
     //=======================================================================================
 
-    public VUReference(CommentaryRepo repo, Structure s) {
+    public VUReference(CommentaryModule repo, Structure s) {
         super(s);
         
         this.repo = repo;

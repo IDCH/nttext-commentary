@@ -44,9 +44,9 @@ public class MySQLVariationUnitRepository implements VURepository {
     private static final String FIELDS =  
             "passage, commentary, date_created, last_updated "; 
     
-    private MySQLCommentaryRepo repo = null;
+    private MySQLCommentaryModule repo = null;
     
-    MySQLVariationUnitRepository(MySQLCommentaryRepo repo) {
+    MySQLVariationUnitRepository(MySQLCommentaryModule repo) {
         this.repo = repo;
     }
     

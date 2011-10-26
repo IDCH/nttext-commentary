@@ -130,7 +130,7 @@ public class ApplicationContext {
      * @param w
      * @return
      */
-    public TokenRepository getTokens(Work w) {
+    public TokenModule getTokens(Work w) {
         // TODO look up the appropriate work repo for the supplied work
         return works.getTokenRepository();
     }

@@ -16,7 +16,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.idch.util.Cache;
 
-import openscriptures.text.TokenRepository;
+import openscriptures.text.TokenModule;
 import openscriptures.text.Work;
 import openscriptures.text.WorkId;
 import openscriptures.text.WorkRepository;
@@ -51,13 +51,13 @@ public class MySQLWorkRepository implements WorkRepository {
             "creator, publisher, language, work_type, copyright, scope, ref_system, soruce_url, " +
             "publication_date, import_date";
     
-    MySQLTextRepository repo = null;
+    MySQLTextModule repo = null;
     
     private Cache<String, Work> worksByUUID = new Cache<String, Work>("works", 20);
     private Cache<Long, Work> worksById = new Cache<Long, Work>("works", 20);
     private Object cacheMutex = new Object();
     
-    MySQLWorkRepository(MySQLTextRepository repo) {
+    MySQLWorkRepository(MySQLTextModule repo) {
         this.repo = repo;
     }
     
@@ -66,7 +66,7 @@ public class MySQLWorkRepository implements WorkRepository {
      * 
      */
     @Override
-    public TokenRepository getTokenRepository() {
+    public TokenModule getTokenRepository() {
         return repo.getTokenRepository();
     }
 

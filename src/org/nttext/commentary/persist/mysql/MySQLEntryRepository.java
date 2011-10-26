@@ -35,9 +35,9 @@ public class MySQLEntryRepository implements EntryRepository {
     private static final String FIELDS =  
             "passage, overview, date_created, last_updated "; 
     
-    private MySQLCommentaryRepo repo = null;
+    private MySQLCommentaryModule repo = null;
     
-    MySQLEntryRepository(MySQLCommentaryRepo repo) {
+    MySQLEntryRepository(MySQLCommentaryModule repo) {
         this.repo = repo;
     }
     

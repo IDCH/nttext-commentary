@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import openscriptures.text.TextRepository;
 import openscriptures.text.Work;
-import openscriptures.text.impl.MySQLTextRepository;
+import openscriptures.text.impl.MySQLTextModule;
 import openscriptures.text.importer.Context;
 import openscriptures.text.importer.Importer;
 
@@ -90,7 +90,7 @@ public class SBLGNTImporter {
         
         SBLGNTImporter importer;
         try {
-            importer = new SBLGNTImporter(filename, MySQLTextRepository.get());
+            importer = new SBLGNTImporter(filename, MySQLTextModule.get());
             importer.doImport();
 
             System.out.println();

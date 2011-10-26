@@ -74,7 +74,7 @@ public class Work extends AbstractTokenSequence {
 	//===============================
 	
 	private ApplicationContext ac = null; 
-	private TokenRepository tokens = null;
+	private TokenModule tokens = null;
 	
     // Of dubious value - cache at the repo level
 	private Cache<Integer, Token> tokenCache = new Cache<Integer, Token>("tokens", 1000);
@@ -114,7 +114,7 @@ public class Work extends AbstractTokenSequence {
 	}
 	
 	@Transient 
-	public TokenRepository getTokenRepository() {
+	public TokenModule getTokenRepository() {
 	    if (ac == null)
 	        ac = ApplicationContext.getApplicationContext();
 	    
@@ -200,7 +200,7 @@ public class Work extends AbstractTokenSequence {
         t = tokenCache.get(index);
         synchronized (tokenCache) {
             if (t == null) {
-                TokenRepository tokens = this.getTokenRepository();
+                TokenModule tokens = this.getTokenRepository();
                 t = tokens.find(this, index);
                 
                 tokenCache.cache(t.getPosition(), t);
@@ -214,7 +214,7 @@ public class Work extends AbstractTokenSequence {
 //        if (this.size >= 0)
 //            return this.size;
         
-        TokenRepository tokens = this.getTokenRepository();
+        TokenModule tokens = this.getTokenRepository();
         int size = tokens.getNumberOfTokens(this);
         return size;
     }
@@ -416,7 +416,7 @@ public class Work extends AbstractTokenSequence {
      */
     @Transient
     public int getEnd() {
-        TokenRepository tokens = this.getTokenRepository();
+        TokenModule tokens = this.getTokenRepository();
         
         
         return tokens.getNumberOfTokens(this);

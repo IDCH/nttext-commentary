@@ -15,13 +15,13 @@ import javax.persistence.criteria.Root;
 
 import openscriptures.text.Structure;
 import openscriptures.text.Token;
-import openscriptures.text.TokenRepository;
+import openscriptures.text.TokenModule;
 import openscriptures.text.Work;
 
 /**
  * @author Neal Audenaert
  */
-public class JPATokenRepository extends JPARepository<Token> implements TokenRepository {
+public class JPATokenRepository extends JPARepository<Token> implements TokenModule {
 //    private static final Logger LOGGER = Logger.getLogger(JPATokenRepository.class);
     
     //=======================================================================================

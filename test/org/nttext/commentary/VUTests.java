@@ -8,13 +8,13 @@ import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
 
 import org.idch.persist.RepositoryAccessException;
-import org.nttext.commentary.persist.mysql.MySQLCommentaryRepo;
+import org.nttext.commentary.persist.mysql.MySQLCommentaryModule;
 
 /**
  * @author Neal Audenaert
  */
 public class VUTests extends TestCase {
-    private MySQLCommentaryRepo repo = null;
+    private MySQLCommentaryModule repo = null;
     private VURepository vuRepo = null;
     
     private String ref = "1Pet.2.20";
@@ -23,7 +23,7 @@ public class VUTests extends TestCase {
     
     public void setUp() {
         try {
-            repo = MySQLCommentaryRepo.get();
+            repo = MySQLCommentaryModule.get();
             if (!repo.probe()) {
                 repo.create();
             }

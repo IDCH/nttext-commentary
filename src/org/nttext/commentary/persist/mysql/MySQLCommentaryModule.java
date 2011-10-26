@@ -10,14 +10,14 @@ import java.util.List;
 
 import openscriptures.text.StructureRepository;
 import openscriptures.text.TextRepository;
-import openscriptures.text.TokenRepository;
+import openscriptures.text.TokenModule;
 import openscriptures.text.WorkRepository;
-import openscriptures.text.impl.MySQLTextRepository;
+import openscriptures.text.impl.MySQLTextModule;
 
 import org.idch.persist.DBBackedRepository;
 import org.idch.persist.DatabaseException;
 import org.idch.persist.RepositoryAccessException;
-import org.nttext.commentary.CommentaryRepo;
+import org.nttext.commentary.CommentaryModule;
 import org.nttext.commentary.EntryRepository;
 import org.nttext.commentary.VURepository;
 import org.nttext.commentary.VariantReadingRepository;
@@ -25,7 +25,7 @@ import org.nttext.commentary.VariantReadingRepository;
 /**
  * @author Neal Audenaert
  */
-public class MySQLCommentaryRepo extends DBBackedRepository implements CommentaryRepo {
+public class MySQLCommentaryModule extends DBBackedRepository implements CommentaryModule {
 
 public final static String MODULE_NAME = "nttext_commentary";
     
@@ -35,9 +35,9 @@ public final static String MODULE_NAME = "nttext_commentary";
      * @return
      * @throws RepositoryAccessException
      */
-    public static final MySQLCommentaryRepo get()
+    public static final MySQLCommentaryModule get()
             throws RepositoryAccessException {
-        return (MySQLCommentaryRepo)get(MODULE_NAME);
+        return (MySQLCommentaryModule)get(MODULE_NAME);
     }
     
     private EntryRepository entryRepo;
@@ -46,13 +46,13 @@ public final static String MODULE_NAME = "nttext_commentary";
     
     private TextRepository textRepo;
 
-    public MySQLCommentaryRepo() throws RepositoryAccessException {
+    public MySQLCommentaryModule() throws RepositoryAccessException {
         entryRepo = new MySQLEntryRepository(this);
         vuRepo = new MySQLVariationUnitRepository(this);
         rdgRepo = new MySQLVariantReadingRepository(this);
         
         // connect to texts repository.
-        textRepo = MySQLTextRepository.get();
+        textRepo = MySQLTextModule.get();
     }
     
     /**
@@ -78,7 +78,7 @@ public final static String MODULE_NAME = "nttext_commentary";
         return textRepo.getWorkRepository(); 
     } 
     
-    public TokenRepository getTokenRepository() { 
+    public TokenModule getTokenRepository() { 
         return textRepo.getTokenRepository(); 
     }
     

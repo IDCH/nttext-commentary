@@ -10,20 +10,20 @@ import junit.framework.TestCase;
 import openscriptures.ref.VerseRange;
 
 import org.idch.persist.RepositoryAccessException;
-import org.nttext.commentary.persist.mysql.MySQLCommentaryRepo;
+import org.nttext.commentary.persist.mysql.MySQLCommentaryModule;
 
 /**
  * @author Neal Audenaert
  */
 public class RdgTests extends TestCase {
-    MySQLCommentaryRepo repo = null;
+    MySQLCommentaryModule repo = null;
     VariantReadingRepository rdgRepo = null;
     
     VariationUnit vu = null;
     
     public void setUp() {
         try {
-            repo = MySQLCommentaryRepo.get();
+            repo = MySQLCommentaryModule.get();
             if (!repo.probe()) {
                 repo.create();
             }

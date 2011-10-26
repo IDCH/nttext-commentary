@@ -4,7 +4,7 @@
 package org.nttext.commentary;
 
 import org.idch.persist.RepositoryAccessException;
-import org.nttext.commentary.persist.mysql.MySQLCommentaryRepo;
+import org.nttext.commentary.persist.mysql.MySQLCommentaryModule;
 
 import junit.framework.TestCase;
 
@@ -13,11 +13,11 @@ import junit.framework.TestCase;
  */
 public class CommentaryTests extends TestCase {
     
-    MySQLCommentaryRepo repo = null;
+    MySQLCommentaryModule repo = null;
     
     public void setUp() {
         try {
-            repo = MySQLCommentaryRepo.get();
+            repo = MySQLCommentaryModule.get();
         } catch (RepositoryAccessException e) {
             repo = null;
             e.printStackTrace();

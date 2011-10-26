@@ -12,7 +12,7 @@ public interface TextRepository {
 
     public WorkRepository getWorkRepository(); 
     
-    public TokenRepository getTokenRepository();
+    public TokenModule getTokenRepository();
     
     public StructureRepository getStructureRepository();
     

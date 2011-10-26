@@ -11,7 +11,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import openscriptures.text.TokenRepository;
+import openscriptures.text.TokenModule;
 import openscriptures.text.Work;
 import openscriptures.text.WorkId;
 import openscriptures.text.WorkRepository;
@@ -24,7 +24,7 @@ public class JPAWorkRepository extends JPARepository<Work> implements WorkReposi
     // TODO cross walk with FRBR.
     //      I think we have work = type, expression = <lg, slug>, manifestation = <publisher, edition> 
     
-    private TokenRepository tokens;
+    private TokenModule tokens;
     
     public JPAWorkRepository(EntityManagerFactory emf) {
         super(emf);
@@ -33,7 +33,7 @@ public class JPAWorkRepository extends JPARepository<Work> implements WorkReposi
         this.tokens = new JPATokenRepository(emf);
     }
     
-    public TokenRepository getTokenRepository() {
+    public TokenModule getTokenRepository() {
         return this.tokens;
     }
     

@@ -78,7 +78,7 @@ public class MySQLStructureRepository implements StructureRepository {
     // MEMBER VARIABLES
     //===================================================================================
     
-    private MySQLTextRepository repo = null;
+    private MySQLTextModule repo = null;
     private AttrRepo attrs = null;
     
     //===================================================================================
@@ -89,7 +89,7 @@ public class MySQLStructureRepository implements StructureRepository {
      * 
      * @param repo
      */
-    MySQLStructureRepository(MySQLTextRepository repo) {
+    MySQLStructureRepository(MySQLTextModule repo) {
         this.repo = repo;
         this.attrs = new AttrRepo();
     }

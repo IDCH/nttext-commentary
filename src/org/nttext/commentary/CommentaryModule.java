@@ -5,13 +5,13 @@ package org.nttext.commentary;
 
 import openscriptures.text.StructureRepository;
 import openscriptures.text.TextRepository;
-import openscriptures.text.TokenRepository;
+import openscriptures.text.TokenModule;
 import openscriptures.text.WorkRepository;
 
 /**
  * @author Neal Audenaert
  */
-public interface CommentaryRepo {
+public interface CommentaryModule {
 
     public EntryRepository getEntryRepository();
     
@@ -23,7 +23,7 @@ public interface CommentaryRepo {
     
     public WorkRepository getWorkRepository(); 
     
-    public TokenRepository getTokenRepository(); 
+    public TokenModule getTokenRepository(); 
     
     public StructureRepository getStructureRepository(); 
     

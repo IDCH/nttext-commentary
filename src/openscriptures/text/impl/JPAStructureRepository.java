@@ -3,6 +3,7 @@
  */
 package openscriptures.text.impl;
 
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.UUID;
 
@@ -125,6 +126,16 @@ public class JPAStructureRepository extends JPARepository<Structure> implements 
     @Override
     public SortedSet<Structure> find(Work w, String name, String attribute,
             String value) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(java.lang.String, java.lang.String, java.lang.String)
+     */
+    @Override
+    public Map<String, SortedSet<Structure>> find(String name,
+            String attribute, String value) {
         // TODO Auto-generated method stub
         return null;
     }

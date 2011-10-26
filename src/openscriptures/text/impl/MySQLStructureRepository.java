@@ -23,7 +23,7 @@ import openscriptures.text.Token;
 import openscriptures.text.Work;
 
 /**
- * @author Neal_2
+ * @author Neal Audenaert
  */
 public class MySQLStructureRepository implements StructureRepository {
     
@@ -430,7 +430,63 @@ public class MySQLStructureRepository implements StructureRepository {
         
         return structures;
     }
-
+    
+    private void restore(Map<String, SortedSet<Structure>> structures, ResultSet results) 
+            throws SQLException {
+        Structure s = new Structure(results.getLong(STRUCTURE_ID));
+        s = restore(s, results);
+        
+        String uuid = s.getUUID().toString();
+        SortedSet<Structure> structs = structures.get(uuid);
+        if (structs == null) {
+            structs = new TreeSet<Structure>(new StructureComparator());
+            structures.put(uuid, structs);
+        }
+        
+        structs.add(s);
+    }
+    
+    /* (non-Javadoc)
+     * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)
+     */
+    @Override
+    public Map<String, SortedSet<Structure>> find(String name, String attribute, String value) {
+        // TODO LOTS of duplicated code. Refactor into delgate class.
+        int NAME = 1, ATTR = 2, VALUE = 3;
+        String sql = 
+                "SELECT " + FIELDS + ", S.structure_id AS structure_id" +
+                "  FROM TEXTS_Structures AS S, TEXTS_StructureAttributes AS A" + 
+                " WHERE S.structure_id = A.structure_id AND" +
+                "       S.structure_name = ? AND" +
+                "       A.attr_key = ? AND" +
+                "       A.attr_value = ?" +
+                " ORDER BY start_pos ASC, end_pos DESC";
+        
+        Map<String, SortedSet<Structure>> structures = 
+                new HashMap<String, SortedSet<Structure>>();
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(NAME,  name);
+            stmt.setString(ATTR,  attribute);
+            stmt.setString(VALUE,  value);
+            
+            ResultSet results = stmt.executeQuery();
+            while (results.next()) {
+                restore(structures, results);
+            }
+            
+        } catch (Exception ex) {
+            String msg = "Could not retrieve structures (" + name + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            structures.clear();
+        } finally {
+            repo.closeConnection(conn);
+        }
+        
+        return structures;
+    }
     
     /* (non-Javadoc)
      * @see openscriptures.text.StructureRepository#find(openscriptures.text.Work, java.lang.String)

@@ -3,6 +3,7 @@
  */
 package openscriptures.text;
 
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.UUID;
 
@@ -63,6 +64,8 @@ public interface StructureRepository {
     public SortedSet<Structure> find(Work w, String name, int start, int end, boolean strict);
     
     public SortedSet<Structure> find(Work w, String name, String attribute, String value);
+    
+    public Map<String, SortedSet<Structure>> find(String name, String attribute, String value);
     
     public boolean save(Structure s);
 }

@@ -11,8 +11,8 @@ import javax.persistence.EntityManagerFactory;
 
 import org.idch.util.PersistenceUtil;
 
-import openscriptures.text.impl.JPAStructureRepository;
-import openscriptures.text.impl.JPAWorkRepository;
+import openscriptures.text.impl.jpa.JPAStructureRepository;
+import openscriptures.text.impl.jpa.JPAWorkRepository;
 import openscriptures.utils.Language;
 import openscriptures.utils.Language.Direction;
 import openscriptures.utils.License;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.text.impl;
+package openscriptures.text.impl.jpa;
 
 import java.util.Map;
 import java.util.SortedSet;

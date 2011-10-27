@@ -149,35 +149,7 @@ public class Entry {
 	    // pending review. These states are not currently represented
 	    return true;
 	}
-	
-	//===================================================================================
-	// STUB METHODS/MEMBERS TO ACCESS SOURCE TEXTS
-    //===================================================================================
-	
-	/**
-	 * TODO IMPLEMENT This is currently placeholder 
-	 */
-	private Map<String, String> passages = new HashMap<String, String>();
-	
-	public Set<String> listVersions() {
-	    return passages.keySet();
-	}
-	
-	public String getText(String version) {
-	    return passages.get(version);
-	}
-	
-	public String getMarkedText(String version) {
-	    String text = passages.get(version);
-	    
-	    // mark this text
-	    return text;
-	}
-	
-	void setText(String version, String text) {
-	    this.passages.put(version, text);
-	}
-	
+
 	//===================================================================================
     // EXCEPTION CLASS
     //===================================================================================

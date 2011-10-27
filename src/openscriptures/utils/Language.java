@@ -3,6 +3,9 @@
  */
 package openscriptures.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -24,9 +27,29 @@ public class Language implements Comparable<Language> {
 		LTR, RTL;
 	}
 	
+	private static Map<String, Language> languages = new HashMap<String, Language>();
+	
+	static {
+	    define("English", "eng");
+	    define("Greek", "grc");
+	}
+	
+	public static Language define(String name, String code) {
+	    Language lg = new Language(name, code);
+	    languages.put(code, lg);
+	    
+	    return lg;
+	}
+	
+	
 	public static Language lookup(String code) {
 		// TODO IMPLEMENT - need to lookup from some catalog and/or database.
-		return new Language("", code);
+	    Language lg = languages.get(code);
+	    if (lg == null) {
+	        lg = define("", code);
+	    }
+	    
+	    return lg;
 	}
 	
 	//==============================================================================

@@ -9,15 +9,22 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import openscriptures.ref.Passage;
+import openscriptures.ref.VerseRange;
+import openscriptures.text.Work;
+import openscriptures.utils.Language;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.idch.persist.RepositoryAccessException;
 import org.idch.util.Filenames;
+import org.nttext.commentary.persist.mysql.MySQLCommentaryModule;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -27,9 +34,13 @@ import freemarker.template.TemplateException;
  * @author Neal Audenaert
  */
 public class EntryServlet extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(EntryServlet.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(EntryServlet.class);
     
     private Configuration config = null;
+    private CommentaryModule commentaryModule = null;
+    
+    private Work sblgnt = null;
+    private Work hcsb = null;
     
     /**
      * Initializes the template configuration. To specify a custom directory to
@@ -57,8 +68,7 @@ public class EntryServlet extends HttpServlet {
                 msg += "Tried '" +  templateDir.getAbsolutePath() + "'";
             }
             
-            LOGGER.warning(msg);
-//            LogService.logError(msg, LOGGER);
+            LOGGER.warn(msg);
             throw new ServletException(msg);
         }
             
@@ -68,8 +78,7 @@ public class EntryServlet extends HttpServlet {
             config.setDirectoryForTemplateLoading(templateDir);
         } catch (IOException e) {
             String msg = "Failed to load tempalte configuration";
-            LOGGER.warning(msg);
-//            LogService.logError(msg, LOGGER, e);
+            LOGGER.warn(msg, e);
             throw new ServletException(msg, e);
         }
         
@@ -79,8 +88,25 @@ public class EntryServlet extends HttpServlet {
     public void init() throws ServletException {
         this.config = loadTemplateConfiguration();
         
+        try {
+            MySQLCommentaryModule mod = MySQLCommentaryModule.get();
+            // FIXME TEMPORARY TEST HARNESS CODE -- REMOVE THIS FOR PRODUCTION
+            if (!mod.probe()) {
+                mod.create();
+            }
+
+            // FIXME END TEMPORARY TEST HARNESS CODE -- REMOVE THIS FOR PRODUCTION
+            this.commentaryModule = mod;
+            
+            // load references to Work objects
+            sblgnt = this.commentaryModule.getWorkRepository().find(11L);
+        } catch (RepositoryAccessException rae) {
+            String msg = "Could not initialize commentary module.";
+            LOGGER.warn(msg, rae);
+            throw new ServletException(msg, rae);
+        }
     }
-    
+
     /**
      * Retrieve the requested entry based on the HTTP request.
      * 
@@ -91,7 +117,7 @@ public class EntryServlet extends HttpServlet {
      */
     private Entry getEntry(HttpServletRequest req, HttpServletResponse resp) 
     throws IOException {
-        Entry e = TestEntryFactory.getDefaultEntry();
+        Entry e = TestEntryFactory.getDefaultEntry(commentaryModule);
         
         return e;
     }
@@ -105,7 +131,7 @@ public class EntryServlet extends HttpServlet {
             data.put("navigation", new Navigation());
             
             Entry e = getEntry(req, resp);
-            data.put("entry", new EntryData(e));
+            data.put("entry", new EntryData(commentaryModule, e));
             
             template.process(data, page);
         } catch (TemplateException e) {
@@ -118,7 +144,6 @@ public class EntryServlet extends HttpServlet {
         PrintWriter out = resp.getWriter();
         out.write(page.getBuffer().toString());
         out.flush();
-        
     }
 
 }

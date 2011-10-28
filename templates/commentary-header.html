@@ -1,7 +1,7 @@
 <div id="scripture-wrapper">
   <div id="scripture">
-    <h2>${entry.primaryScripture.language} <span class="version">(${entry.primaryScripture.version})</span></h2>
-    <p class="main-scripture">${entry.primaryScripture.markedText}</p>
+    <h2>${entry.primaryPassage.language!""}<span class="version">(${entry.primaryPassage.version!""})</span></h2>
+    <p class="main-scripture">${entry.primaryPassage.markedText!""}</p>
     
     <h2>Greek <span class="version">(SBLGNT)</span></h2>
     <p class="secondary-scripture greek" lang="el">
@@ -11,7 +11,7 @@
     </p>
   </div>
   <div id="overview">
-    <h2>Textual Overview <span class="reference">${entry.reference}</span></h2>
-    ${entry.overview}
+    <h2>Textual Overview <span class="reference">${entry.passage!""}</span></h2>
+    ${entry.overview!""}
   </div>
 </div>

@@ -3,6 +3,15 @@
  */
 package org.nttext.commentary;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import openscriptures.text.TextModule;
+import openscriptures.text.Work;
+import openscriptures.text.structures.Verse;
+
 /**
  * A lightweight facade to provide Java bean access to the content of an entry 
  * as needed for use in the view layer. 
@@ -11,56 +20,107 @@ package org.nttext.commentary;
  */
 public class EntryData {
     private Entry entry;
+    private CommentaryModule module;
     
-    public EntryData(Entry e) {
+    private VUComparator sblgntRefComparator;
+    
+    public EntryData(CommentaryModule module, Entry e) {
         this.entry = e;
+        this.module = module;
+        
+        Work sblgnt = module.getWorkRepository().find(11L);
+        sblgntRefComparator = new VUComparator(module.getStructureRepository(), sblgnt);
     }
     
-    public String getReference() {
+    /**
+     * 
+     * @return
+     */
+    public String getPassage() {
+        // TODO convert to English language reference (e.g. 1Pet.2.20 to 1 Peter 2:20)
+        //      In theory, we should use a general purpose formatter :
+        //              "${bkName} ${chapterNumber!""}:${verseNumber!""}"  
+        //      with the appropriate revisions to ensure that the colon is handled properly
+        //      and to support multi-verse passages.
         return this.entry.getPassage().toString();
     }
     
-    public ScriptureReference getPrimaryScripture() {
-        String text = this.entry.getMarkedText("HCSB");
-        return new ScriptureReference("English", "en", "HCSB", text);
+    /**
+     * 
+     * @return
+     */
+    public PassageReference getPrimaryPassage() {
+        // TODO change to HCSB
+        Work sblgnt = module.getWorkRepository().find(11L);
+        return new PassageReference(module, sblgnt, entry);
     }
     
-    public ScriptureReference getSecondaryScripture() {
-        String text = this.entry.getMarkedText("SBLGNT");
-        return new ScriptureReference("Greek", "el", "SBLGNT", text);
+    /**
+     * 
+     * @return
+     */
+    public PassageReference getSecondaryPassage() {
+        Work sblgnt = module.getWorkRepository().find(11L);
+        return new PassageReference(module, sblgnt, entry);
     }
     
+    /**
+     * 
+     * @return
+     */
     public String getOverview() {
         return this.entry.getOverview();
     }
     
-    public static class ScriptureReference {
-        private String markedText;
-        private String language;
-        private String lg;
-        private String version;
+    public List<VUData> getVariationUnits() {
         
-        public ScriptureReference(String language, String lg, String version, String text) {
-            this.markedText = text;
-            this.language = language;
-            this.lg = lg;
-            this.version = version;
+        // get the variants as a sorted set based on their SBLGNT reference
+        SortedSet<VariationUnit> vus = new TreeSet<VariationUnit>(sblgntRefComparator);
+        vus.addAll(this.entry.getVariationUnits());
+        
+        int ix = 0;
+        List<VUData> variants = new ArrayList<VUData>();
+        for (VariationUnit vu : vus) {
+            variants.add(new VUData(vu, ++ix));
+        }
+        
+        return variants;
+    }
+    
+    //===================================================================================
+    // INNER CLASS TO REPRESENT A SCRIPTURE REFERENCE FOR A PASSAGE
+    //===================================================================================
+    /**
+     * 
+     * @author Neal Audenaert
+     */
+    public static class PassageReference {
+        private CommentaryModule module;
+        private Work work;
+        private Entry entry;
+        
+        public PassageReference(CommentaryModule module, Work w, Entry e) {
+            this.module = module;
+            this.work = w;
+            this.entry = e;
         }
         
         public String getMarkedText() {
-            return this.markedText;
+            TextModule textModule = module.getTextRepository();
+            Verse vs = Verse.getVerse(textModule, work, entry.getPassage().toString());
+            return textModule.toString(vs);
         }
         
         public String getLanguage() {
-            return this.language;
+            return this.work.getLanguage().getName();
         }
         
         public String getLg() {
-            return this.lg;
+            return this.work.getLgCode();
         }
         
         public String getVersion() {
-            return this.version;
+            return this.work.getAbbreviation();
         }
     }
 }

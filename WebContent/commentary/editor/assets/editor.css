@@ -1,0 +1,223 @@
+/*
+VERSION: 1.0
+CREATED: August 2011
+AUTHOR: Peter Gurry
+AUTHOR URI: http://gurrydesign.com/
+*/
+
+/* --------- CONTENTS --------------------------------------
+
+	============================
+	=0: Navigation
+	============================
+	=1: Main Content
+	----------------------------
+		=1a: Current Status
+		=1b: Staff Assignments
+		=1c: NT Overview
+	============================
+	=2: Editable Content
+	----------------------------
+		=2a: X
+		=2b: X
+		=2c: X
+	============================
+		
+--------------------------------------------------------- */
+
+
+/*	=0: Navigation
+========================================================= */
+
+#sub-nav {
+	background-color:#eeeff4;
+	border-bottom:1px solid #d6dbe5;
+	clear:both;
+	overflow:auto;
+	margin:0 -30px 0;
+	box-shadow:0 -1px 0 #fff inset;
+	-moz-box-shadow:0 -1px 0 #fff inset;
+	-webkit-box-shadow:0 -1px 0 #fff inset;
+}
+#sub-nav h3 {
+	font-weight:bold;
+	text-shadow:0 1px 0 #fff;
+	padding:0 30px;
+	margin:12px 0;
+}
+#sub-nav ul {
+	margin:0;
+	padding:0;
+}
+#sub-nav ul li {
+	list-style-type:none;
+	float:left;
+	padding-right:23px;
+	padding:2px 30px 0 13px;
+	margin-bottom:1px;
+	text-shadow:0 1px 0 rgba(255,255,255,0.6);
+	text-transform:uppercase;
+	letter-spacing:1px;
+	font:bold 12px/32px corbel, Verdana, Arial, Helvetica, sans-serif;
+}
+#sub-nav ul li:first-child { /* selects the first <li> */
+	padding-left:20px;
+}
+#sub-nav ul li:nth-last-of-type(2) { /* selects the second-to-last <li> */
+	background:#dee0e9 url(images/bg_subnav_arrow.png) no-repeat right bottom;
+}
+#sub-nav ul li:nth-last-of-type(3) { /* selects the third-to-last <li> */
+	background:#cfd2df url(images/bg_subnav_arrow.png) no-repeat right top;	
+}
+
+/*	=1: Main Content
+========================================================= */
+
+#editorial {
+	padding:0 10px 10px;
+}
+#editorial h4:first-child {
+	border-bottom:1px solid #b2b2b2;
+	padding-bottom:7px;
+	margin-top:40px;
+}
+.quick-status {
+	font:12px/22px verdana,'helvetica neua',helvetica,arial,sans-serif;
+	color:#363636;
+	letter-spacing:0;
+	text-transform:none;
+	padding-left:20px;
+	background:url(images/bg_tiny_arrow.png) no-repeat 5px center;
+}
+.quick-status span {
+	font-weight:bold;
+	font-size:11px;
+}
+.quick-status .waiting-approval {
+	color:#fff;
+	background-color:#c50100;
+	padding:2px 4px;
+	text-shadow:0 1px 0 rgba(0,0,0,.2);
+	border-radius:2px;
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+}
+.quick-status .in-process {
+	color:#fff;
+	background-color:#e78e01;
+	text-shadow:0 1px 0 rgba(0,0,0,.1);
+	padding:2px 4px;
+	border-radius:2px;
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+}
+.quick-status .approved {
+	color:#fff;
+	background-color:#00a651;
+	text-shadow:0 1px 0 rgba(0,0,0,.2);
+	padding:2px 4px;
+	border-radius:2px;
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+}
+.total, .quick-status .total {
+	font-weight:normal;
+	color:#898989;
+	padding-left:5px;
+}
+ol.book-status {
+	font-weight:bold; /* styles the list numbers */
+	font-size:11px;
+	padding-left:20px;
+}
+ol.book-status li {
+	padding:5px 0;
+	border-top:1px dotted #ccc;
+	position:relative; /* enables the staff popup to be positioned absolutely */
+}
+ol.book-status li:last-child {
+	border-bottom:1px dotted #ccc;
+}
+ol.book-status li a {
+	display:block;
+	float:left;
+	margin-right:1px;
+	color:#fff;
+	background:#b7b7b7 url(images/bg_verse_gradient.png) repeat-x center bottom;
+	width:9px;
+	text-shadow:0 -1px 0 rgba(0,0,0,.1);
+	text-indent:25px;
+	text-align:center;
+	overflow:hidden;
+	/* animations */
+	-webkit-transition-property: width, text-indent; 
+	-webkit-transition-duration: 0.3s;
+	-webkit-transition-timing-function: ease-in;
+	-moz-transition-property: width, text-indent; 
+	-moz-transition-duration: 0.3s;
+	-moz-transition-timing-function: ease-in;
+}
+ol.book-status li a:hover {
+	text-indent:-5000px;
+	border-bottom:none;
+	text-indent:0;
+	width:30px;
+	/* animations */
+	-webkit-transition-property: width, text-indent; 
+	-webkit-transition-duration: 0.2s;
+	-webkit-transition-timing-function: ease-in;
+	-moz-transition-property: width; 
+	-moz-transition-duration: 0.2s;
+	-moz-transition-timing-function: ease-in;
+}
+ol.book-status li a.waiting-approval {
+	background-color:#c50100;
+}
+ol.book-status li a.in-process {
+	background-color:#e78e01;
+}
+ol.book-status li a.approved {
+	background-color:#00a651;
+}
+.staff-popup {
+	position:absolute;
+	top:-30px;
+	width:230px;
+	padding-bottom:11px;
+	background:transparent url(images/bg_staff_popup.png) no-repeat bottom center;
+	opacity:0.9;
+}
+.staff-popup span {
+	box-shadow:0 2px 3px rgba(0,0,0,.4);
+	font-weight:normal;
+	text-shadow:0 1px 0 #000;
+	line-height:25px;
+	border:1px solid #000;
+	display:block;
+	color:#ccc;
+	text-align:center;
+	opacity:0.9;
+	background-color:#222;
+	
+}
+
+/*	=1a: Current Status
+--------------------------------------------------------- */
+
+
+/*	=1b: Staff Assignments
+--------------------------------------------------------- */
+
+
+/*	=1c: NT Overview
+--------------------------------------------------------- */
+
+
+/*	=2: Editable Content
+========================================================= */
+
+
+/*	=2a: X
+--------------------------------------------------------- */
+
+

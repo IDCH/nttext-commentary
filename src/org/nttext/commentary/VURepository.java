@@ -18,8 +18,8 @@ public interface VURepository {
     
     public VariationUnit find(Passage passage);
     
-    public boolean save(VariationUnit entry);
+    public boolean save(VariationUnit vu);
     
-    public boolean remove(VariationUnit entry);
+    public boolean remove(VariationUnit vu);
     
 }

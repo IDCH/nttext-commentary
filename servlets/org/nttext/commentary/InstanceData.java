@@ -13,19 +13,19 @@ import openscriptures.text.Work;
 import openscriptures.text.structures.Verse;
 
 /**
- * A lightweight facade to provide Java bean access to the content of an entry 
+ * A lightweight facade to provide Java bean access to the content of an instance 
  * as needed for use in the view layer. 
  * 
  * @author Neal Audenaert
  */
-public class EntryData {
-    private Entry entry;
+public class InstanceData {
+    private EntryInstance instance;
     private CommentaryModule module;
     
     private VUComparator sblgntRefComparator;
     
-    public EntryData(CommentaryModule module, Entry e) {
-        this.entry = e;
+    public InstanceData(CommentaryModule module, EntryInstance inst) {
+        this.instance = inst;
         this.module = module;
         
         Work sblgnt = module.getWorkRepository().find(11L);
@@ -42,7 +42,7 @@ public class EntryData {
         //              "${bkName} ${chapterNumber!""}:${verseNumber!""}"  
         //      with the appropriate revisions to ensure that the colon is handled properly
         //      and to support multi-verse passages.
-        return this.entry.getPassage().toString();
+        return this.instance.getPassage().toString();
     }
     
     /**
@@ -52,7 +52,7 @@ public class EntryData {
     public PassageReference getPrimaryPassage() {
         // TODO change to HCSB
         Work sblgnt = module.getWorkRepository().find(11L);
-        return new PassageReference(module, sblgnt, entry);
+        return new PassageReference(module, sblgnt, instance);
     }
     
     /**
@@ -61,7 +61,7 @@ public class EntryData {
      */
     public PassageReference getSecondaryPassage() {
         Work sblgnt = module.getWorkRepository().find(11L);
-        return new PassageReference(module, sblgnt, entry);
+        return new PassageReference(module, sblgnt, instance);
     }
     
     /**
@@ -69,14 +69,14 @@ public class EntryData {
      * @return
      */
     public String getOverview() {
-        return this.entry.getOverview();
+        return this.instance.getOverview();
     }
     
     public List<VUData> getVariationUnits() {
         
         // get the variants as a sorted set based on their SBLGNT reference
         SortedSet<VariationUnit> vus = new TreeSet<VariationUnit>(sblgntRefComparator);
-        vus.addAll(this.entry.getVariationUnits());
+        vus.addAll(this.instance.getVariationUnits());
         
         int ix = 0;
         List<VUData> variants = new ArrayList<VUData>();
@@ -97,17 +97,17 @@ public class EntryData {
     public static class PassageReference {
         private CommentaryModule module;
         private Work work;
-        private Entry entry;
+        private EntryInstance instance;
         
-        public PassageReference(CommentaryModule module, Work w, Entry e) {
+        public PassageReference(CommentaryModule module, Work w, EntryInstance inst) {
             this.module = module;
             this.work = w;
-            this.entry = e;
+            this.instance = inst;
         }
         
         public String getMarkedText() {
             TextModule textModule = module.getTextRepository();
-            Verse vs = Verse.getVerse(textModule, work, entry.getPassage().toString());
+            Verse vs = Verse.getVerse(textModule, work, instance.getPassage().toString());
             return textModule.toString(vs);
         }
         

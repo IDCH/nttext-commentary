@@ -6,7 +6,7 @@ package org.nttext.editor;
 import java.util.Date;
 
 /**
- * Represents a task that can be assigned to a user, such as reviewing an entry.
+ * Represents a task that can be assigned to a user, such as reviewing an entry instance.
  * @author Neal Audenaert
  */
 public interface Task {

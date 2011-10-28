@@ -10,7 +10,7 @@ import openscriptures.ref.VerseRange;
 /**
  * @author Neal Audenaert
  */
-public class TestEntryFactory {
+public class TestInstanceFactory {
     
     private static final Passage passage = new VerseRange("1Pet.2.20");
     
@@ -108,25 +108,25 @@ public class TestEntryFactory {
     /*
      * TODO TEMPORARY METHOD FOR TESTING PURPOSES
      */
-    static Entry getDefaultEntry(CommentaryModule commentaryModule) {
-        EntryRepository repo = commentaryModule.getEntryRepository();
+    static EntryInstance getDefaultInstance(CommentaryModule commentaryModule) {
+        InstanceRepository repo = commentaryModule.getInstanceRepository();
         
-        Entry e = repo.find(new VerseRange("1Pet.2.20"));
-        if (e == null) {
+        EntryInstance instance = repo.find(new VerseRange("1Pet.2.20"));
+        if (instance == null) {
             // normally throw a not found error, but for now, we'll create the entry.
-            e = repo.create(passage);
-            e.setOverview(ENTRY_OVERVIEW);
+            instance = repo.create(passage);
+            instance.setOverview(ENTRY_OVERVIEW);
             
             // create variation units
             VariationUnit vu1 = createVU1(commentaryModule);
             VariationUnit vu2 = createVU2(commentaryModule);
             
-            repo.associate(e, vu1);
-            repo.associate(e, vu2);
+            repo.associate(instance, vu1);
+            repo.associate(instance, vu2);
             
-            repo.save(e);
+            repo.save(instance);
         }
         
-        return e;
+        return instance;
     }
 }

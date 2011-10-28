@@ -15,51 +15,50 @@ import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
 
 import org.apache.log4j.Logger;
-import org.nttext.commentary.Entry;
-import org.nttext.commentary.EntryRepository;
+import org.nttext.commentary.EntryInstance;
+import org.nttext.commentary.InstanceRepository;
 import org.nttext.commentary.VariationUnit;
 
 /**
- * @author Neal_2
+ * @author Neal Audenaert
  */
-public class MySQLEntryRepository implements EntryRepository {
-    private static final Logger LOGGER = Logger.getLogger(MySQLEntryRepository.class);
+public class MySQLEntryInstanceRepository implements InstanceRepository {
+    private static final Logger LOGGER = Logger.getLogger(MySQLEntryInstanceRepository.class);
 
     private static final int PASSAGE = 1;
     private static final int OVERVIEW = 2;
     private static final int CREATED = 3;
     private static final int MODIFIED = 4;
     
-    private static final int ENTRY_ID = 5;
+    private static final int INSTANCE_ID = 5;
     
     private static final String FIELDS =  
             "passage, overview, date_created, last_updated "; 
     
     private MySQLCommentaryModule repo = null;
     
-    MySQLEntryRepository(MySQLCommentaryModule repo) {
+    MySQLEntryInstanceRepository(MySQLCommentaryModule repo) {
         this.repo = repo;
     }
     
     /* (non-Javadoc)
-     * @see org.nttext.commentary.persist.EntryRepository#create(openscriptures.ref.Passage)
      */
     @Override
-    public Entry create(Passage passage) {
-        return this.create(new Entry(passage));
+    public EntryInstance create(Passage passage) {
+        return this.create(new EntryInstance(passage));
     }
    
     /**
      * 
-     * @param entry
+     * @param instance
      * @return
      */
-    public Entry create(Entry entry) {
-        assert (entry.getId() == null) : "This entry has already been created.";
-        if (entry.getId() != null)
+    public EntryInstance create(EntryInstance instance) {
+        assert (instance.getId() == null) : "This instance has already been created.";
+        if (instance.getId() != null)
             return null;
         
-        String sql = "INSERT INTO NTTEXTComm_Entries (" + FIELDS +") " +
+        String sql = "INSERT INTO NTTEXTComm_Instances (" + FIELDS +") " +
                      "VALUES (?, ?, now(), now())";
         Connection conn = null;
         try {
@@ -68,37 +67,37 @@ public class MySQLEntryRepository implements EntryRepository {
             PreparedStatement stmt = conn.prepareStatement(sql, 
                     PreparedStatement.RETURN_GENERATED_KEYS);
             
-            stmt.setString(PASSAGE, entry.getPassage().toString());
-            stmt.setString(OVERVIEW, entry.getOverview());
+            stmt.setString(PASSAGE, instance.getPassage().toString());
+            stmt.setString(OVERVIEW, instance.getOverview());
            
             // execute the query
             int numRowsChanged = stmt.executeUpdate();
             ResultSet results = stmt.getGeneratedKeys();
             if (numRowsChanged == 1 && results.next()) {
                 long id = results.getLong(1);
-                entry.setId(id);
+                instance.setId(id);
             } else {
-                entry = null;
+                instance = null;
             }
             
             conn.commit();
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
-            String msg = "Could not create entry: " + entry.getPassage() + ". " + ex.getMessage();
+            String msg = "Could not create instance: " + instance.getPassage() + ". " + ex.getMessage();
             LOGGER.warn(msg, ex);
-            entry = null;
+            instance = null;
         } finally {
             repo.closeConnection(conn);
         }
         
-        return entry;
+        return instance;
     }
 
-    private Entry restore(ResultSet results) throws SQLException {
-        Entry entry = null;
+    private EntryInstance restore(ResultSet results) throws SQLException {
+        EntryInstance instance = null;
         
-        long id = results.getLong(ENTRY_ID);
+        long id = results.getLong(INSTANCE_ID);
         // TODO add caching
         String ref = results.getString(PASSAGE);
         String overview = results.getString(OVERVIEW);
@@ -106,25 +105,24 @@ public class MySQLEntryRepository implements EntryRepository {
         Date modified = results.getDate(MODIFIED);
         
         Passage passage = new VerseRange(ref);
-        entry = new Entry(id, passage, overview, created, modified);
+        instance = new EntryInstance(id, passage, overview, created, modified);
         
         Connection conn = results.getStatement().getConnection();
-        Set<VariationUnit> variationUnits = this.getVU(conn, entry);
-        entry.setVariationUnits(variationUnits);
-        return entry;
+        Set<VariationUnit> variationUnits = this.getVU(conn, instance);
+        instance.setVariationUnits(variationUnits);
+        return instance;
     }
     
     
     /* (non-Javadoc)
-     * @see org.nttext.commentary.persist.EntryRepository#find(long)
      */
     @Override
-    public Entry find(long id) {
-        String sql = "SELECT " + FIELDS + ", entry_id " +
-                     "  FROM NTTEXTComm_Entries " +
-        		     " WHERE entry_id = ?";
+    public EntryInstance find(long id) {
+        String sql = "SELECT " + FIELDS + ", instance_id " +
+                     "  FROM NTTEXTComm_Instances " +
+        		     " WHERE instance_id = ?";
         
-        Entry entry = null;;
+        EntryInstance instance = null;;
         Connection conn = null;
         try {
             conn = repo.openReadOnlyConnection();
@@ -134,30 +132,29 @@ public class MySQLEntryRepository implements EntryRepository {
             
             ResultSet results = stmt.executeQuery();
             if (results.next())
-                entry = restore(results);
+                instance = restore(results);
         } catch (Exception ex) {
-            String msg = "Could not retrieve entry (" + id + "): " + ex.getMessage();
+            String msg = "Could not retrieve instance (" + id + "): " + ex.getMessage();
             LOGGER.warn(msg, ex);
-            entry = null;
+            instance = null;
         } finally {
             repo.closeConnection(conn);
         }
         
-        return entry;
+        return instance;
     }
     
     
     
     /* (non-Javadoc)
-     * @see org.nttext.commentary.persist.EntryRepository#lookup(openscriptures.ref.Passage)
      */
     @Override
-    public Entry find(Passage passage) {
-        String sql = "SELECT " + FIELDS + ", entry_id " +
-                     "  FROM NTTEXTComm_Entries " +
+    public EntryInstance find(Passage passage) {
+        String sql = "SELECT " + FIELDS + ", instance_id " +
+                     "  FROM NTTEXTComm_Instances " +
                      " WHERE passage = ?";
        
-        Entry entry = null;;
+        EntryInstance instance = null;;
         Connection conn = null;
         try {
             conn = repo.openReadOnlyConnection();
@@ -167,32 +164,31 @@ public class MySQLEntryRepository implements EntryRepository {
             
             ResultSet results = stmt.executeQuery();
             if (results.next())
-                entry = restore(results);
+                instance = restore(results);
         } catch (Exception ex) {
-            String msg = "Could not retrieve entry (" + passage + "): " + ex.getMessage();
+            String msg = "Could not retrieve instance (" + passage + "): " + ex.getMessage();
             LOGGER.warn(msg, ex);
-            entry = null;
+            instance = null;
         } finally {
             repo.closeConnection(conn);
         }
        
-        return entry;
+        return instance;
     }
 
     /* (non-Javadoc)
-     * @see org.nttext.commentary.persist.EntryRepository#save(org.nttext.commentary.Entry)
      */
     @Override
-    public boolean save(Entry entry) {
-        assert (entry.getId() != null) : "This entry has not been created.";
-        if (entry.getId() == null)
+    public boolean save(EntryInstance instance) {
+        assert (instance.getId() != null) : "This instance has not been created.";
+        if (instance.getId() == null)
             return false;
         
         int ID = 2, OVERVIEW = 1;
-        String sql = "UPDATE NTTEXTComm_Entries SET " +
+        String sql = "UPDATE NTTEXTComm_Instances SET " +
         		     "  overview = ?, " +
         		     "  last_updated = now()" +
-        		     "WHERE entry_id = ?";
+        		     "WHERE instance_id = ?";
         
         boolean success = false;
         Connection conn = null;
@@ -201,15 +197,15 @@ public class MySQLEntryRepository implements EntryRepository {
             conn = repo.openConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             
-            stmt.setString(OVERVIEW, entry.getOverview());
-            stmt.setLong(ID, entry.getId());
+            stmt.setString(OVERVIEW, instance.getOverview());
+            stmt.setLong(ID, instance.getId());
            
             // execute the query
             int numRowsChanged = stmt.executeUpdate();
             success = (numRowsChanged == 1);
             if (numRowsChanged > 1) {
                 LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
-                            "while saving an entry (" + entry.getId() + "). Expected 1.");
+                            "while saving an instance (" + instance.getId() + "). Expected 1.");
                 repo.rollbackConnection(conn);
             } else {
                 conn.commit();
@@ -217,7 +213,7 @@ public class MySQLEntryRepository implements EntryRepository {
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
-            String msg = "Could not create entry: " + entry.getPassage() + ". " + ex.getMessage();
+            String msg = "Could not create instance: " + instance.getPassage() + ". " + ex.getMessage();
             LOGGER.warn(msg, ex);
             success = false;
         } finally {
@@ -228,17 +224,16 @@ public class MySQLEntryRepository implements EntryRepository {
     }
 
     /* (non-Javadoc)
-     * @see org.nttext.commentary.persist.EntryRepository#remove(org.nttext.commentary.Entry)
      */
     @Override
-    public boolean remove(Entry entry) {
-        assert (entry.getId() != null) : "This entry has not been created.";
-        if (entry.getId() == null)
+    public boolean remove(EntryInstance instance) {
+        assert (instance.getId() != null) : "This instance has not been created.";
+        if (instance.getId() == null)
             return false;
         
         int ID = 1;
-        String sql = "DELETE FROM NTTEXTComm_Entries " +
-                     " WHERE entry_id = ?";
+        String sql = "DELETE FROM NTTEXTComm_Instances " +
+                     " WHERE instance_id = ?";
         
         boolean success = false;
         Connection conn = null;
@@ -247,14 +242,14 @@ public class MySQLEntryRepository implements EntryRepository {
             conn = repo.openConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             
-            stmt.setLong(ID, entry.getId());
+            stmt.setLong(ID, instance.getId());
            
             // execute the query
             int numRowsChanged = stmt.executeUpdate();
             success = (numRowsChanged == 1);
             if (numRowsChanged > 1) {
                 LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
-                            "while removing an entry (" + entry.getId() + "). Expected 1.");
+                            "while removing an instance (" + instance.getId() + "). Expected 1.");
                 repo.rollbackConnection(conn);
             } else {
                 conn.commit();
@@ -262,7 +257,7 @@ public class MySQLEntryRepository implements EntryRepository {
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
-            String msg = "Could not remove entry: " + entry.getPassage() + ". " + ex.getMessage();
+            String msg = "Could not remove instance: " + instance.getPassage() + ". " + ex.getMessage();
             LOGGER.warn(msg, ex);
             success = false;
         } finally {
@@ -273,12 +268,11 @@ public class MySQLEntryRepository implements EntryRepository {
     }
 
     /* (non-Javadoc)
-     * @see org.nttext.commentary.EntryRepository#associate(org.nttext.commentary.Entry, org.nttext.commentary.VariationUnit)
      */
     @Override
-    public boolean associate(Entry entry, VariationUnit vu) {
-        int ENTRY_ID = 1, VU_ID = 2;
-        String sql = "INSERT INTO NTTEXTComm_EntryVUs (entry_id, vu_id)" +
+    public boolean associate(EntryInstance instance, VariationUnit vu) {
+        int INSTANCE_ID = 1, VU_ID = 2;
+        String sql = "INSERT INTO NTTEXTComm_EntryVUs (instance_id, vu_id)" +
         		     "VALUES (?, ?)";
         
         boolean success = false;
@@ -288,7 +282,7 @@ public class MySQLEntryRepository implements EntryRepository {
             conn = repo.openConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             
-            stmt.setLong(ENTRY_ID, entry.getId());
+            stmt.setLong(INSTANCE_ID, instance.getId());
             stmt.setLong(VU_ID, vu.getId());
            
             // execute the query
@@ -297,19 +291,19 @@ public class MySQLEntryRepository implements EntryRepository {
             if (numRowsChanged > 1) {
                 LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
                             "while associating a variation unit (" + vu.getId() + ") " +
-                            "with and entry (" + entry.getId() + "). Expected 1.");
+                            "with and instance (" + instance.getId() + "). Expected 1.");
                 repo.rollbackConnection(conn);
             } else {
-                if (success) entry.addVariationUnit(vu);
+                if (success) instance.addVariationUnit(vu);
                 conn.commit();
             }
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
             String msg = "Could not associate a variation unit (" + vu.getId() + ") " +
-                         "with an entry (" + entry.getId() + "): " + ex.getMessage();
+                         "with an instance (" + instance.getId() + "): " + ex.getMessage();
             LOGGER.warn(msg, ex);
-            entry = null;
+            instance = null;
         } finally {
             repo.closeConnection(conn);
         }
@@ -318,13 +312,12 @@ public class MySQLEntryRepository implements EntryRepository {
     }
 
     /* (non-Javadoc)
-     * @see org.nttext.commentary.EntryRepository#disassociate(org.nttext.commentary.Entry, org.nttext.commentary.VariationUnit)
      */
     @Override
-    public boolean disassociate(Entry entry, VariationUnit vu) {
-        int ENTRY_ID = 1, VU_ID = 2;
+    public boolean disassociate(EntryInstance instance, VariationUnit vu) {
+        int INSTANCE_ID = 1, VU_ID = 2;
         String sql = "DELETE FROM NTTEXTComm_EntryVUs " +
-        		     " WHERE entry_id = ? AND vu_id = ?";
+        		     " WHERE instance_id = ? AND vu_id = ?";
         
         boolean success = false;
         Connection conn = null;
@@ -333,7 +326,7 @@ public class MySQLEntryRepository implements EntryRepository {
             conn = repo.openConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             
-            stmt.setLong(ENTRY_ID, entry.getId());
+            stmt.setLong(INSTANCE_ID, instance.getId());
             stmt.setLong(VU_ID, vu.getId());
            
             // execute the query
@@ -342,19 +335,19 @@ public class MySQLEntryRepository implements EntryRepository {
             if (numRowsChanged > 1) {
                 LOGGER.warn("Bizarre number of rows changed (" + numRowsChanged + ") " + 
                             "while disassociating a variation unit (" + vu.getId() + ") " +
-                            "with and entry (" + entry.getId() + "). Expected 1.");
+                            "with and instance (" + instance.getId() + "). Expected 1.");
                 repo.rollbackConnection(conn);
             } else {
-                if (success) entry.removeVariationUnit(vu);
+                if (success) instance.removeVariationUnit(vu);
                 conn.commit();
             }
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
             String msg = "Could not disassociate a variation unit (" + vu.getId() + ") " +
-                         "with an entry (" + entry.getId() + "): " + ex.getMessage();
+                         "with an instance (" + instance.getId() + "): " + ex.getMessage();
             LOGGER.warn(msg, ex);
-            entry = null;
+            instance = null;
         } finally {
             repo.closeConnection(conn);
         }
@@ -362,16 +355,16 @@ public class MySQLEntryRepository implements EntryRepository {
         return success;
     }
     
-    Set<VariationUnit> getVU(Connection conn, Entry entry) throws SQLException {
-        int ENTRY_ID = 1, VU_ID = 1;
-        String sql = "SELECT vu_id FROM NTTEXTComm_EntryVUs WHERE entry_id = ? ";
+    Set<VariationUnit> getVU(Connection conn, EntryInstance instance) throws SQLException {
+        int INSTANCE_ID = 1, VU_ID = 1;
+        String sql = "SELECT vu_id FROM NTTEXTComm_EntryVUs WHERE instance_id = ? ";
         
         MySQLVariationUnitRepository vuRepo = 
                 (MySQLVariationUnitRepository)repo.getVURepository();
         Set<VariationUnit> VUs = new HashSet<VariationUnit>();
         
         PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setLong(ENTRY_ID, entry.getId());
+        stmt.setLong(INSTANCE_ID, instance.getId());
         
         ResultSet results = stmt.executeQuery();
         while (results.next()) {
@@ -383,20 +376,19 @@ public class MySQLEntryRepository implements EntryRepository {
     }
 
     /* (non-Javadoc)
-     * @see org.nttext.commentary.EntryRepository#getVU(org.nttext.commentary.Entry)
      */
     @Override
-    public Set<VariationUnit> getVU(Entry entry) {
+    public Set<VariationUnit> getVU(EntryInstance instance) {
         Set<VariationUnit> VUs = new HashSet<VariationUnit>();
         Connection conn = null;
         try {
             conn = repo.openReadOnlyConnection();
-            VUs = getVU(conn, entry);
+            VUs = getVU(conn, instance);
             
         } catch (Exception ex) {
-            String msg = "Could not retrieve associated VUs for  (" + entry.getId()+ "): " + ex.getMessage();
+            String msg = "Could not retrieve associated VUs for  (" + instance.getId()+ "): " + ex.getMessage();
             LOGGER.warn(msg, ex);
-            entry = null;
+            instance = null;
         } finally {
             repo.closeConnection(conn);
         }

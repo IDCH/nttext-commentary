@@ -15,10 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import openscriptures.ref.Passage;
-import openscriptures.ref.VerseRange;
 import openscriptures.text.Work;
-import openscriptures.utils.Language;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -115,9 +112,9 @@ public class EntryServlet extends HttpServlet {
      * @return
      * @throws IOException
      */
-    private Entry getEntry(HttpServletRequest req, HttpServletResponse resp) 
+    private EntryInstance getEntry(HttpServletRequest req, HttpServletResponse resp) 
     throws IOException {
-        Entry e = TestEntryFactory.getDefaultEntry(commentaryModule);
+        EntryInstance e = TestInstanceFactory.getDefaultInstance(commentaryModule);
         
         return e;
     }
@@ -130,8 +127,8 @@ public class EntryServlet extends HttpServlet {
             data.put("page", new PageDetails());
             data.put("navigation", new Navigation());
             
-            Entry e = getEntry(req, resp);
-            data.put("entry", new EntryData(commentaryModule, e));
+            EntryInstance e = getEntry(req, resp);
+            data.put("entry", new InstanceData(commentaryModule, e));
             
             template.process(data, page);
         } catch (TemplateException e) {

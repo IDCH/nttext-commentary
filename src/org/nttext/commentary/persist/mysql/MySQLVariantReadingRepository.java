@@ -19,7 +19,7 @@ import org.nttext.commentary.VariationUnit;
  * @author Neal Audenaert
  */
 public class MySQLVariantReadingRepository implements VariantReadingRepository {
-    private static final Logger LOGGER = Logger.getLogger(MySQLEntryRepository.class);
+    private static final Logger LOGGER = Logger.getLogger(MySQLVariantReadingRepository.class);
 
     private static final int VU_ID = 1;
     private static final int GREEK_RDG = 2;

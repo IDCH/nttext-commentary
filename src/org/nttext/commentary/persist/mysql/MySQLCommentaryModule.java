@@ -18,7 +18,7 @@ import org.idch.persist.DBBackedRepository;
 import org.idch.persist.DatabaseException;
 import org.idch.persist.RepositoryAccessException;
 import org.nttext.commentary.CommentaryModule;
-import org.nttext.commentary.EntryRepository;
+import org.nttext.commentary.InstanceRepository;
 import org.nttext.commentary.VURepository;
 import org.nttext.commentary.VariantReadingRepository;
 
@@ -40,14 +40,14 @@ public final static String MODULE_NAME = "nttext_commentary";
         return (MySQLCommentaryModule)get(MODULE_NAME);
     }
     
-    private EntryRepository entryRepo;
+    private InstanceRepository instanceRepo;
     private VURepository vuRepo; 
     private VariantReadingRepository rdgRepo;
     
     private TextModule textRepo;
 
     public MySQLCommentaryModule() throws RepositoryAccessException {
-        entryRepo = new MySQLEntryRepository(this);
+        instanceRepo = new MySQLEntryInstanceRepository(this);
         vuRepo = new MySQLVariationUnitRepository(this);
         rdgRepo = new MySQLVariantReadingRepository(this);
         
@@ -58,8 +58,8 @@ public final static String MODULE_NAME = "nttext_commentary";
     /**
      * @return
      */
-    public EntryRepository getEntryRepository() {
-        return entryRepo;
+    public InstanceRepository getInstanceRepository() {
+        return instanceRepo;
     }
     
     public VURepository getVURepository() {
@@ -114,13 +114,12 @@ public final static String MODULE_NAME = "nttext_commentary";
      */
     public boolean probe() {
         List<String> sql = new ArrayList<String>(3);
-        sql.add("SELECT entry_id FROM NTTEXTComm_Entries;");
+        sql.add("SELECT instance_id FROM NTTEXTComm_Instances;");
         sql.add("SELECT vu_id FROM NTTEXTComm_Vus;");
         sql.add("SELECT vu_id FROM NTTEXTComm_VUReference;");
         sql.add("SELECT rdg_id FROM NTTEXTComm_Rdgs;");
-        sql.add("SELECT entry_id, vu_id FROM NTTEXTComm_EntryVUs;");
+        sql.add("SELECT instance_id, vu_id FROM NTTEXTComm_EntryVUs;");
         
-        sql.add("SELECT entry_id FROM NTTEXTComm_Entries;");
         
         sql.add("SELECT structure_id FROM TEXTS_Structures");
         return probe(sql);

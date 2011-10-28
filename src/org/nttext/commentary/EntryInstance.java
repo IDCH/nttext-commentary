@@ -5,19 +5,17 @@ package org.nttext.commentary;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import openscriptures.ref.Passage;
 
 /**
- * Represents a single entry in the commentary.
+ * Represents a single instance in the commentary.
  * 
  * @author Neal Audenaert
  */
-public class Entry {
+public class EntryInstance {
     
     //======================================================================================
     // MEMBER VARIABLES
@@ -34,23 +32,23 @@ public class Entry {
 	// Constructors
 	//======================================================================================
 	
-	protected Entry() {
+	protected EntryInstance() {
 	    
 	}
 	
-	public Entry(Long id, Passage ref, String overview, Date created, Date modified) {
+	public EntryInstance(Long id, Passage ref, String overview, Date created, Date modified) {
 	    this.id = id;
 	    this.ref = ref;
 	    this.overview = overview;
 	}
 	
 	/**
-	 * Instantiates a new <tt>Entry</tt> from the provided reference. An entry must refer 
-	 * to exactly one scripture reference. 
+	 * Instantiates a new <tt>EntryInstance</tt> from the provided reference. An instance 
+	 * must refer to exactly one scripture reference. 
 	 * 
-	 * @param ref The scripture reference this entry refers to.  
+	 * @param ref The scripture reference this instance refers to.  
 	 */
-	public Entry(Passage ref) {
+	public EntryInstance(Passage ref) {
 		this.ref = ref;
 	}
 	
@@ -58,7 +56,7 @@ public class Entry {
     // ACCESSORS AND MUTATORS
     //======================================================================================
     
-	/** Returns the unique identifier for this entry. */
+	/** Returns the unique identifier for this instance. */
 	public Long getId() {
 	    return id;
 	}
@@ -67,7 +65,7 @@ public class Entry {
 	    this.id = id;
 	}
 	
-	/** Returns the scripture passage this entry refers to. */
+	/** Returns the scripture passage this instance refers to. */
 	public Passage getPassage() {
 		return this.ref;
 	}
@@ -76,14 +74,14 @@ public class Entry {
 	    this.ref = ref;
 	}
 	
-	/** Returns the overview text associated with this entry. This is expected to be
+	/** Returns the overview text associated with this instance. This is expected to be
 	 *  plain UTF-8 text. */
 	public String getOverview() {
 	    return this.overview;
 	}
 	
 	/**
-	 * Sets the overview text for this entry.
+	 * Sets the overview text for this instance.
 	 * 
 	 * @param text The text to set.
 	 */
@@ -93,8 +91,8 @@ public class Entry {
 	
 
 	/**
-	 * Adds a <tt>VariationUnit</tt> (VU) to this <tt>Entry</tt>. The supplied VU
-	 * must refer to the same passage as this entry or to a sub-passage of this entry.
+	 * Adds a <tt>VariationUnit</tt> (VU) to this <tt>EntryInstance</tt>. The supplied VU
+	 * must refer to the same passage as this instance or to a sub-passage of this instance.
 	 * 
 	 * @param vu The VU to add
 	 * @return <tt>true</tt> if the VU was added
@@ -103,7 +101,7 @@ public class Entry {
 	    if (!vu.getPassage().isSubPassageOf(ref)) {
 	        throw new InvaliedVariantUnitException(
 	                "Could not add VU (" + vu.getId() + "): Supplied VU does not refer to " +
-	                "a sub-passage of this entry. Found " + vu.getPassage() +  
+	                "a sub-passage of this instance. Found " + vu.getPassage() +  
 	                " but expected " + ref);
 	    }
 	    
@@ -114,14 +112,14 @@ public class Entry {
 	 * Removes the supplied variation unit (VU).
 	 * @param vu The VU to remove
 	 * 
-	 * @return <tt>true</tt> if this entry contained the provided VU. 
+	 * @return <tt>true</tt> if this instance contained the provided VU. 
 	 */
 	public boolean removeVariationUnit(VariationUnit vu) {
 	    return this.variants.remove(vu);
 	}
 	
 	/**
-	 * Returns an unmodifiable list of the variation units in this entry.
+	 * Returns an unmodifiable list of the variation units in this instance.
 	 * 
 	 * @return
 	 */
@@ -131,10 +129,10 @@ public class Entry {
 	}
 	
 	/**
-	 * Sets the variation units associated with this entry. This is used by the 
+	 * Sets the variation units associated with this instance. This is used by the 
 	 * persistence layer. 
 	 * 
-	 * @param variationUnits The variation units associated with this entry.
+	 * @param variationUnits The variation units associated with this instance.
 	 */
     public void setVariationUnits(Set<VariationUnit> variationUnits) {
 	    // TODO use a comparator

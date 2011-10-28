@@ -1,6 +1,6 @@
 -- A Commentary Entry
-CREATE TABLE IF NOT EXISTS NTTEXTComm_Entries (
-    entry_id     SERIAL  PRIMARY KEY,  
+CREATE TABLE IF NOT EXISTS NTTEXTComm_Instances (
+    instance_id     SERIAL  PRIMARY KEY,  
     passage      VARCHAR(64) NOT NULL, 
     overview     TEXT,                 
     
@@ -57,11 +57,11 @@ CREATE TABLE IF NOT EXISTS NTTEXTComm_Rdgs (
 
 -- Mapping of Entries to the VU's those entries describe
 CREATE TABLE IF NOT EXISTS NTTEXTComm_EntryVUs (
-    entry_id        BIGINT UNSIGNED NOT NULL,
+    instance_id        BIGINT UNSIGNED NOT NULL,
     vu_id           BIGINT UNSIGNED NOT NULL,
     
-    FOREIGN KEY (entry_id)
-      REFERENCES NTTEXTComm_Entries (entry_id)
+    FOREIGN KEY (instance_id)
+      REFERENCES NTTEXTComm_Instances (instance_id)
       ON DELETE CASCADE,
     FOREIGN KEY (vu_id)
       REFERENCES NTTEXTComm_VUs (vu_id)

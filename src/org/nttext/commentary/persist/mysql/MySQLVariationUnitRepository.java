@@ -8,21 +8,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.UUID;
 
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
-import openscriptures.text.Structure;
-import openscriptures.text.StructureRepository;
-import openscriptures.text.Token;
-import openscriptures.text.Work;
 
 import org.apache.log4j.Logger;
-import org.nttext.commentary.VUReference;
 import org.nttext.commentary.VURepository;
 import org.nttext.commentary.VariantReading;
 import org.nttext.commentary.VariationUnit;
@@ -50,7 +41,6 @@ public class MySQLVariationUnitRepository implements VURepository {
     }
     
     /* (non-Javadoc)
-     * @see org.nttext.commentary.persist.EntryRepository#create(openscriptures.ref.Passage)
      */
     @Override
     public VariationUnit create(Passage passage) {
@@ -176,7 +166,6 @@ public class MySQLVariationUnitRepository implements VURepository {
     }
     
     /* (non-Javadoc)
-     * @see org.nttext.commentary.persist.EntryRepository#lookup(openscriptures.ref.Passage)
      */
     @Override
     public VariationUnit find(Passage passage) {
@@ -207,7 +196,6 @@ public class MySQLVariationUnitRepository implements VURepository {
     }
 
     /* (non-Javadoc)
-     * @see org.nttext.commentary.persist.EntryRepository#save(org.nttext.commentary.Entry)
      */
     @Override
     public boolean save(VariationUnit vu) {

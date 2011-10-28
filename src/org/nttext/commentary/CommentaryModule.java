@@ -13,7 +13,7 @@ import openscriptures.text.WorkRepository;
  */
 public interface CommentaryModule {
 
-    public EntryRepository getEntryRepository();
+    public InstanceRepository getInstanceRepository();
     
     public VURepository getVURepository();
     

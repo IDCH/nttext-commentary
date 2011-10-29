@@ -30,41 +30,42 @@ YUI.add("nttcc", function(Y) {
 	 * The attribute configuration for the widget. This defines the core user facing state of the widget
 	 */
 	PreviewDialog.ATTRS = {
-		test : { value : "Hello World" },
+		text : {
+			value : 
+				'<p>' +
+		        '  <strong>During our preview phase</strong>, the Textual Commentary is limited to ' +
+		        '  searches in the book of 1 Peter and Philippians. We are constantly adding more ' +
+		        '  commentary material to our database, so stay tuned. <br> ' + 
+		        ' '  +
+		        '  <a href="#" title="Sign up for email updates">Notify me of updates &#8250;</a> '+
+		        '</p>' 
+				
+		},
 		
 		display : {
 			value : false
-		},
-		
-		attrA : {
-	        value: "A"                     // The default value for attrA, used if the user does not set a value during construction.
+		}
+	};
 	
-	        /*
-	        , valueFn: "_defAttrAVal"      // Can be used as a substitute for "value", when you need access to "this" to set the default value.
-	         
-	        , setter: "_setAttrA"          // Used to normalize attrA's value while during set. Refers to a prototype method, to make customization easier
-	        , getter: "_getAttrA"          // Used to normalize attrA's value while during get. Refers to a prototype method, to make customization easier
-	        , validator: "_validateAttrA"  // Used to validate attrA's value before updating it. Refers to a prototype method, to make customization easier
 	
-	        , readOnly: true               // Cannot be set by the end user. Can be set by the component developer at any time, using _set
-	        , writeOnce: true              // Can only be set once by the end user (usually during construction). Can be set by the component developer at any time, using _set
-	        
-	        , lazyAdd: false               // Add (configure) the attribute during initialization. 
-	        
-	                                       // You only need to set lazyAdd to false if your attribute is
-	                                       // setting some other state in your setter which needs to be set during initialization 
-	                                       // (not generally recommended - the setter should be used for normalization. 
-	                                       // You should use listeners to update alternate state). 
-	
-	        , broadcast: 1                 // Whether the attribute change event should be broadcast or not.
-	        */
-	    }
+	PreviewDialog.HTML_PARSER = {
+
+	     contentNode: "div.notification-content",
+	     
+	     closeNode: "a.close",
+
+	     text : function(srcNode) {
+	    	 var cNode = srcNode.one("div.notification-content");
+	    	 return (cNode) ? cNode.get("innerHTML") : "";
+	     }
+
 	};
 	
 	/* PreviewDialog extends the base Widget class */
 	Y.extend(PreviewDialog, Y.Widget, {
 	
 	    initializer: function(config) {
+//	    	alert(config);
 	    	// not doing anything interesting yet
 	    },
 	
@@ -73,61 +74,44 @@ YUI.add("nttcc", function(Y) {
 	    },
 	
 	    renderUI : function() {
-	        // TODO need to add code to sign up for announcements 
+//	    	this.get("closeNode");
+	        // TODO need to add code to sign up for announcements
+	    	
+	    	// set the text of the preview box (if not set)
+	    	// set 
 	    },
 	
 	    bindUI : function() {
+	    	var src = this.get("srcNode");
+	    	
+	    	// add a link to the 'a' tag
+	    	var closeButton = src.one("a.close");
+	    	closeButton.after("click", Y.bind(this.hide, this));
+	    	
+	    	var previewButton = Y.one("#preview_btn");
+	    	previewButton.after("click", Y.bind(this.toggle, this));
+	    	
 	    	this.after('visibleChange', Y.bind(this._afterVisbileChange, this));
+	    	
+	    	
 	    },
 	
 	    syncUI : function() {
 	    },
 	    
-	  
-	    // Beyond this point is the PreviewDialog specific application and rendering logic
-	
-	    // for each attribute, attrA, define the following methods as needed
-	    
-	    //---------------------------
-	    // HELPER METHODS FOR: attrA 
-        //---------------------------
-	    
-	    /* Attribute state supporting methods (see attribute config above) */
-	    _defAttrAVal : function() {
-	    	// default value
-        },
-
-        _setAttrA : function(attrVal, attrName) {
-            // return attrVal.toUpperCase();
-        },
-
-        _getAttrA : function(attrVal, attrName) {
-            // return attrVal.toUpperCase();
-        },
-
-        _validateAttrA : function(attrVal, attrName) {
-            // return Lang.isString(attrVal);
-        },
-
-        /* Listeners, UI update methods */
-
-        _afterAttrAChange : function(e) {
-            /* Listens for changes in state, and asks for a UI update (controller). */
-
-            // this._uiSetAttrA(e.newVal);
-        },
-
-        _uiSetAttrA : function(val) {
-            /* Update the state of attrA in the UI (view) */
-
-            // this._mynode.set("innerHTML", val);
-        },
-	    
-	    
 	   
+	    toggle : function() {
+	    	if (this.get("visible")) {
+    			this.hide();
+    		} else {
+    			this.show();
+    		}
+	    },
 	    /* Listeners, UI update methods */
         
+	    
         _afterVisbileChange : function(e) {
+        	// TODO add animation support if loaded.
         	var srcNode = this.get("srcNode");
         	if (this.get("visible"))
         		srcNode.setStyle("display", "block");
@@ -136,6 +120,13 @@ YUI.add("nttcc", function(Y) {
         }
 	    
 	});
+	
+	
+//=====================================================================================
+// NAVIGATION CONTROL
+//=====================================================================================
+
+	
 // nttcc - New Testament Textual Criticism Commentary - FOR NOW
 Y.namespace("nttext.comm").PreviewDialog = PreviewDialog;
 

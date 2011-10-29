@@ -328,9 +328,9 @@ public class VerseRef extends Passage {
 		StringBuilder sb = new StringBuilder();
 		boolean hasContent = false;
 		
-		if (this.book != null) {
+		if (this.book != null && (this.book >= 0)) {
 			hasContent = true;
-			sb.append(order.getName(this.book));
+			sb.append(order.getId(this.book));
 		}
 		
 		if (this.chapter != null) {

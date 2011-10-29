@@ -4,6 +4,7 @@
 package openscriptures.ref;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ public class BookOrder {
 	
 	public static final BookOrder KJV = new BookOrder();
 
-	public List<String> bookIds;
+	public List<String> bookIds = new ArrayList<String>();
 	public Map<String, BookName> bks = new HashMap<String, BookName>();
 	
 	

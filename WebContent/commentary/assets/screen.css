@@ -469,10 +469,18 @@ h1.title a.home-link {
 
 img#preview_btn { margin:22px 0 0;cursor:pointer }
 
-.yui3-js-enabled .blue-notification {
+.blue-notification {
   display : none;
 }
  
+#preview_ctrl .yui3-previewdialog {
+  display:inline;
+}
+
+#preview-ctrl .yui3-previewdialog-hidden {
+  display:none;
+}
+
 .yui3-js-enabled .blue-notification .hidden {
   visibility : none;
 }

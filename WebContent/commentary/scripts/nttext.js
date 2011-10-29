@@ -15,39 +15,22 @@ var NTTEXT_config = {
 };
 
 YUI(NTTEXT_config).use('nttcc', 'tabview', function(Y) {
-	
-	
 	Y.log("loaded");
-	var cssName = Y.ClassNameManager.getClassName(Y.nttext.comm.PreviewDialog.NAME, "value");
-	Y.log(cssName);
 	
 	var previewDialog = new Y.nttext.comm.PreviewDialog(
-			{ srcNode: "#preview_ctrl .preview-notification",
+			{ srcNode: "#preview_ctrl .blue-notification",
 		      visible : false });
 	previewDialog.render();
 	
-	previewDialog.after('render', function() {
-		
-		previewDialog.show();
-		
-		Y.later(2000, previewDialog, Y.bind(previewDialog.hide, previewDialog));
-		
-	});
-	
+
 // TODO preview widget
     
     // ENABLE HEADER BUTTONS
     Y.delegate('click', function(e) {
         var buttonID = e.currentTarget.get('id');
-        var preview = Y.Node.one('div.preview-notification');
-        
-        if (buttonID === 'preview_btn') {
-        	Y.Node.one("div.blue-notification").setStyle('display', 'block');
-            e.preventDefault();
-        } else if (buttonID == 'close-bn') {
-        	Y.Node.one("div.blue-notification").setStyle('display', 'none');
-        	e.preventDefault();
-        } else if (buttonID == 'signin') {
+//        var preview = Y.Node.one('div.preview-notification');
+//        
+    	if (buttonID == 'signin') {
         	// TODO this needs to actually log in the user
         	Y.Node.one("#user-account").removeClass("not-signed-in");
         	Y.Node.one("#user-account").addClass("signed-in");

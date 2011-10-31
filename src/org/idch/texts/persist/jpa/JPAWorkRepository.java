@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.idch.texts.impl.jpa;
+package org.idch.texts.persist.jpa;
 
 import java.util.List;
 import java.util.UUID;

@@ -13,5 +13,5 @@ repo.db.user=username
 repo.db.pass=password
 
 -- CLASSNAMES FOR DIFFERENT REPOSITORY MODULES
-vprops.classname=org.idch.vprops.persist.mysql.MySQLPropertyRepository
-critspace.classname=org.idch.critspace.persist.mysql.MySQLCritspaceRepository
+texts.classname=org.idch.texts.persist.mysql.MySQLTextModule
+nttext_commentary.classname=org.nttext.commentary.persist.mysql.MySQLCommentaryModule

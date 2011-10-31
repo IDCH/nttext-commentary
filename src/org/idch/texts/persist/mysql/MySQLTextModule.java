@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.idch.texts.impl;
+package org.idch.texts.persist.mysql;
 
 import java.sql.Connection;
 import java.sql.SQLException;

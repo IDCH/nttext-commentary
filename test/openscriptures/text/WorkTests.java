@@ -5,6 +5,9 @@ package openscriptures.text;
 
 import java.util.Date;
 
+import org.idch.texts.Work;
+import org.idch.texts.WorkId;
+
 import openscriptures.utils.Language;
 import openscriptures.utils.License;
 import junit.framework.TestCase;

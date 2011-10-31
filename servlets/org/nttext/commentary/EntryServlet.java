@@ -15,11 +15,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import openscriptures.text.Work;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.idch.persist.RepositoryAccessException;
+import org.idch.texts.Work;
 import org.idch.util.Filenames;
 import org.nttext.commentary.persist.mysql.MySQLCommentaryModule;
 

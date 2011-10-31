@@ -8,15 +8,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import openscriptures.text.StructureRepository;
-import openscriptures.text.TextModule;
-import openscriptures.text.TextModuleInstance;
-import openscriptures.text.TokenRepository;
-import openscriptures.text.WorkRepository;
 
 import org.idch.persist.DBBackedRepository;
 import org.idch.persist.DatabaseException;
 import org.idch.persist.RepositoryAccessException;
+import org.idch.texts.StructureRepository;
+import org.idch.texts.TextModule;
+import org.idch.texts.TextModuleInstance;
+import org.idch.texts.TokenRepository;
+import org.idch.texts.WorkRepository;
 import org.nttext.commentary.CommentaryModule;
 import org.nttext.commentary.InstanceRepository;
 import org.nttext.commentary.VURepository;

@@ -5,11 +5,12 @@ package org.nttext.commentary;
 
 import java.util.UUID;
 
+import org.idch.texts.Structure;
+import org.idch.texts.Work;
+import org.idch.texts.WorkId;
+
 import antlr.Token;
 
-import openscriptures.text.Structure;
-import openscriptures.text.Work;
-import openscriptures.text.WorkId;
 
 /**
  * @author Neal Audenaert

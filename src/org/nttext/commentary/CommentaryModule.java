@@ -3,10 +3,10 @@
  */
 package org.nttext.commentary;
 
-import openscriptures.text.StructureRepository;
-import openscriptures.text.TextModule;
-import openscriptures.text.TokenRepository;
-import openscriptures.text.WorkRepository;
+import org.idch.texts.StructureRepository;
+import org.idch.texts.TextModule;
+import org.idch.texts.TokenRepository;
+import org.idch.texts.WorkRepository;
 
 /**
  * @author Neal Audenaert

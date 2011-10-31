@@ -5,10 +5,11 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.UUID;
 
-import openscriptures.text.Structure;
-import openscriptures.text.StructureRepository;
-import openscriptures.text.StructureWrapper;
-import openscriptures.text.Work;
+import org.idch.texts.Structure;
+import org.idch.texts.StructureRepository;
+import org.idch.texts.StructureWrapper;
+import org.idch.texts.Work;
+
 
 /**
  * Identifies the base text of a variation unit in a specific edition of 
@@ -28,7 +29,7 @@ public class VUReference extends StructureWrapper {
      * @param s The span of text corresponding to this variation unit in a specific
      *         edition.
      * 
-     * @see openscriptures.text.Structure
+     * @see org.idch.texts.Structure
      */
     public static VUReference init(Structure structure, VariationUnit vu) {
         VUReference ref = new VUReference(vu, structure);
@@ -111,7 +112,7 @@ public class VUReference extends StructureWrapper {
     //=======================================================================================
     
     /** 
-     * @see openscriptures.text.StructureWrapper#accepts(openscriptures.text.Structure)
+     * @see org.idch.texts.StructureWrapper#accepts(org.idch.texts.Structure)
      */
     @Override
     public boolean accepts(Structure structure) {

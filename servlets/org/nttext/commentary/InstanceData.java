@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import openscriptures.text.TextModule;
-import openscriptures.text.Work;
-import openscriptures.text.structures.Verse;
+import org.idch.texts.TextModule;
+import org.idch.texts.Work;
+import org.idch.texts.structures.Verse;
+
 
 /**
  * A lightweight facade to provide Java bean access to the content of an instance 

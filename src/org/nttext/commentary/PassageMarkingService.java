@@ -6,10 +6,11 @@ package org.nttext.commentary;
 import java.util.List;
 import java.util.SortedSet;
 
-import openscriptures.text.Structure;
-import openscriptures.text.TextModule;
-import openscriptures.text.Token;
-import openscriptures.text.Work;
+import org.idch.texts.Structure;
+import org.idch.texts.TextModule;
+import org.idch.texts.Token;
+import org.idch.texts.Work;
+
 
 /**
  * @author Neal Audenaert

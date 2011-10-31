@@ -5,9 +5,10 @@ package org.nttext.commentary;
 
 import java.util.Comparator;
 
-import openscriptures.text.StructureComparator;
-import openscriptures.text.StructureRepository;
-import openscriptures.text.Work;
+import org.idch.texts.StructureComparator;
+import org.idch.texts.StructureRepository;
+import org.idch.texts.Work;
+
 
 /**
  * @author Neal Audenaert

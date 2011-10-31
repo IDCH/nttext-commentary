@@ -7,14 +7,14 @@ package org.nttext.commentary;
 import junit.framework.TestCase;
 import openscriptures.ref.Passage;
 import openscriptures.ref.VerseRange;
-import openscriptures.text.Structure;
-import openscriptures.text.StructureRepository;
-import openscriptures.text.TextModule;
-import openscriptures.text.Work;
-import openscriptures.text.WorkRepository;
-import openscriptures.text.structures.Verse;
 
 import org.idch.persist.RepositoryAccessException;
+import org.idch.texts.Structure;
+import org.idch.texts.StructureRepository;
+import org.idch.texts.TextModule;
+import org.idch.texts.Work;
+import org.idch.texts.WorkRepository;
+import org.idch.texts.structures.Verse;
 import org.nttext.commentary.persist.mysql.MySQLCommentaryModule;
 
 /**

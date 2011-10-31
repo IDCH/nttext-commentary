@@ -3,7 +3,9 @@
  */
 package openscriptures.text;
 
-import openscriptures.text.WorkId.Type;
+import org.idch.texts.WorkId;
+import org.idch.texts.WorkId.Type;
+
 import openscriptures.utils.Language;
 import junit.framework.TestCase;
 

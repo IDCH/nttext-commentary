@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.idch.texts.importer.sblgnt;
+package org.idch.bible.importers.sblgnt;
 
 import org.apache.log4j.Logger;
 import org.idch.texts.Structure;

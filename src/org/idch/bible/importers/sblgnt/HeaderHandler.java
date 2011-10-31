@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.idch.texts.importer.sblgnt;
+package org.idch.bible.importers.sblgnt;
 
 import org.idch.texts.Work;
 import org.idch.texts.importer.PathElement;

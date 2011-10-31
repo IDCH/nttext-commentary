@@ -10,11 +10,12 @@
 //			 system for JavaScript components.
 var NTTEXT_config = {
 	modules : {
-		nttcc   : { fullpath : '/nttext/commentary/scripts/pg-controls.js', requires : ['widget', 'substitute']}
+		'idch-ref' : { fullpath : '/nttext/commentary/scripts/idch-ref.js', requires : []},
+		nttcc   : { fullpath : '/nttext/commentary/scripts/pg-controls.js', requires : ['widget', 'substitute', 'anim', 'idch-ref']}
 	}
 };
 
-YUI(NTTEXT_config).use('nttcc', 'tabview', function(Y) {
+YUI(NTTEXT_config).use('nttcc', 'idch-ref', 'tabview', function(Y) {
 	Y.log("loaded");
 	
 	var previewDialog = new Y.nttext.comm.PreviewDialog(
@@ -22,7 +23,18 @@ YUI(NTTEXT_config).use('nttcc', 'tabview', function(Y) {
 		      visible : false });
 	previewDialog.render();
 	
+	var box;
+	var searchBoxes = Y.all(".search-wrapper");
+	while ((box = searchBoxes.shift()) != null) {
+		var control = new Y.nttext.comm.SearchControl({ srcNode : box });
+		control.render();
+	}
+	
 
+//	var refSystem = Y.idch.ref;
+//	var parser = refSystem.ReferenceParser.NT;
+//	alert(parser.parse("1 Peter 2:20"));
+	
 // TODO preview widget
     
     // ENABLE HEADER BUTTONS

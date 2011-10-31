@@ -864,7 +864,8 @@ a.med-prev-chap-btn-inactive {
 	line-height:18px;
 	padding:15px;
 	border-radius:0 0 4px 4px;
-	display:none; /*TODO remove this? */
+	visibility:hidden;
+	/* display:none;  TODO remove this? */
 }
 #top-search .search-notice { 
   margin:30px 0 0 54px;

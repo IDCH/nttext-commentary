@@ -1,10 +1,14 @@
 // START WRAPPER: The YUI.add wrapper is added by the build system, when you use 
 // YUI Builder to build your component from the raw source in this file
 
-YUI.add("idch_ref", function(Y) {
+YUI.add("idch-ref", function(Y) {
 	
 	/* Any frequently used shortcuts, strings and constants */
 	var Lang = Y.Lang;
+	
+	//====================================================================================
+    // BOOK NAME
+    //====================================================================================
 	
 	function BookName(osisId, name, alternateSpellings) {
         this.osisId = osisId;
@@ -12,13 +16,173 @@ YUI.add("idch_ref", function(Y) {
         this.alternateSpellings = alternateSpellings;
     }
   
+	//====================================================================================
+    // BOOK ORDER
+    //====================================================================================
     function BookOrder() {
         this.books = [];
     }
     
+    BookOrder.prototype.indexOf = function(osisId) {
+    	for (var i = 0; i < this.books.length; i++) {
+    		if (this.books[i].osisId == osisId)
+    			return i;
+    	}
+    	
+    	return -1;
+    };
+    
+    BookOrder.prototype.getBookName = function(search) {
+    	if (Lang.isString(search)) {
+    		search = this.indexOf(osisId);
+    	}
+    	
+    	return ((search >= 0) && (search < this.books.length))
+    		? this.books[search]
+    		: null;
+    };
+    
+    
     BookOrder.prototype.addBook = function(bookName) {
         this.books.push(bookName);
     };
+    
+    //====================================================================================
+    // PASSAGE
+    //====================================================================================
+    
+    
+    /**
+     * @param bookOrder { BookOrder } The book order to use to look up book names.
+     * @param ref { string } The OSIS formatted reference for this passage. This should be
+     * 		in the form <tt>1Pet.2.20</tt>.
+     */
+    function VerseRef(bookOrder, ref) {
+    	this.bookOrder = bookOrder;
+    	
+    	this.index = -1;
+    	this.book = null;
+    	this.chapter = null;
+    	this.verse = null;
+    	
+    	if (Lang.isString(ref)) {
+    		var parts = ref.split(".");
+    		this.setBook(parts[0]);
+    		if (parts[1]) 
+    			this.setChapter(parts[1]);
+    		if (parts[2]) 
+    			this.setVerse(parts[2]);
+    	}
+    }
+    
+    VerseRef.prototype.setBook = function(book) {
+    	var order = this.bookOrder;
+    	if (!book) {
+    		this.book = null;
+    	} else {
+    		this.index = order.indexOf(book);
+    		this.book = order.getBookName(this.index);
+    	}
+    };
+    
+    VerseRef.prototype.setChapter = function(ch) {
+    	if (Lang.isString(ch)) {
+    		ch = parseInt(ch);
+    	} 
+    	
+    	if (Lang.isNumber(ch))
+    		this.chapter = ch;
+    };
+    
+    VerseRef.prototype.setVerse = function(vs) {
+    	if (Lang.isString(vs)) {
+    		this.verse = parseInt(vs);
+    	} else if (Lang.isNumber(vs))
+    		this.verse = vs;
+    };
+    
+    VerseRef.prototype.format = function() {
+    	var str = this.book.name;
+    		ch = this.chapter, vs = this.verse;
+    	if (ch) {
+    		str += " " + ch + ((vs) ? ":" + vs : "");
+    	}
+    	
+    	return str;
+    };
+    
+    VerseRef.prototype.toOsisString = function() {
+    	var osis = this.book.osisId,
+    	    ch = this.chapter, vs = this.verse;
+    	if (ch) {
+    		osis += "." + ch + ((vs) ? "." + vs : "");
+    	}
+    	
+    	return osis;
+    };
+    
+    VerseRef.prototype.toString = function() {
+    	return this.format();
+    };
+    
+    //====================================================================================
+    // VerseRange
+    //====================================================================================
+    
+   
+    function VerseRange(bookOrder, ref) {
+    	if (bookOrder && ref) {
+    		var parts = ref.split("-");
+    		this.start = new VerseRef(bookOrder, parts[0]);
+    		this.end = (parts[1]) ? new VerseRef(bookOrder, parts[1]) : null;
+    	}
+    } 
+    
+    VerseRange.prototype.format = function() {
+    	var start = this.start,
+    		end = this.end,
+    		str = start.format();
+    	
+    	if (end) {
+    		if (start.book.index != end.book.index) {
+    			str += " - " + end.book.name;
+    			if (end.chapter) {
+    	    		str += " " + end.chapter;
+    	    		if (end.verse) 
+    	    			str += ":" + end.verse;
+    			}
+    		} else if (end.chapter && (start.chapter != end.chapter)) {
+    			str += "-" + end.chapter;
+	    		if (end.verse) 
+	    			str += ":" + end.verse;
+	    		
+    		} else if (end.verse && (start.verse != end.verse)) {
+    			str += "-" + end.verse;
+    		}
+    	}
+    	
+    	return str;
+    };
+    
+    VerseRange.prototype.toOsisString = function() {
+    	var osis = "", 	
+    		start = this.start, 
+    		end = this.end;
+    	
+    	if (start && end) {
+    		osis = start.toOsisString() + "-" + end.toOsisString();
+    	} else if (start) {
+    		osis = start.toOsisString();
+    	} else if (end) {
+    		osis = end.toOsisString();
+    	}
+    	
+    	return osis;
+    };
+    
+    //====================================================================================
+    // REFERENCE SYSTEM
+    //====================================================================================
     
     var RefSystem = {
         Bible : {
@@ -103,15 +267,30 @@ YUI.add("idch_ref", function(Y) {
     // REFERENCE PARSER CLASS
     //====================================================================================
     
+    var CHAPTER_VERSE_PATTERN = /(\d+)(?:\D+(\d+)(?:\s*,\s*(\d+))?)?/;
     
     function ReferenceParser(bookOrder) {
         this.bookOrder = bookOrder;
         this.regExs = {};
     }
     
+    ReferenceParser.prototype.getBookOrder = function() {
+    	return this.bookOrder;
+    }; 
+    
+    ReferenceParser.prototype.format = function(ref) {
+    	var parts = ref.split("-"),
+    	    firstRef = parts[0],
+    	    secondRef = parts[1];
+    	
+    	parts = firstRef.split(".");
+    };
+    
+    
+    
     ReferenceParser.prototype.parse = function(ref) {
     	var parts = ref.replace(/^\s*|\s*$/g, '').replace(/–|—/g, "-").split(/\s*-+\s*/);
-    	var chapterVersePattern = /(\d+)(?:\D+(\d+)(?:\s*,\s*(\d+))?)?/;
+    	
     	
     	var osisRef = "";
         var startBook = null;
@@ -132,8 +311,8 @@ YUI.add("idch_ref", function(Y) {
                 firstRef = firstRef.replace(re, "");
                 
                 // parse out chapter
-                if (chapterVersePattern.test(firstRef)) {
-                	nums = chapterVersePattern.exec(firstRef);
+                if (CHAPTER_VERSE_PATTERN.test(firstRef)) {
+                	nums = CHAPTER_VERSE_PATTERN.exec(firstRef);
                     startChapter = parseInt(nums[1]);
                     
                     // verse
@@ -179,8 +358,8 @@ YUI.add("idch_ref", function(Y) {
         	}
         	
         	// look for ending chapter and verse
-        	if (chapterVersePattern.test(secondRef)) {
-        		var nums = chapterVersePattern.exec(secondRef);
+        	if (CHAPTER_VERSE_PATTERN.test(secondRef)) {
+        		var nums = CHAPTER_VERSE_PATTERN.exec(secondRef);
         		
         		// if only one number and the ending book isn't specified, this is a verse
         		if (!nums[2] && !endBook) {
@@ -224,7 +403,7 @@ YUI.add("idch_ref", function(Y) {
     };
     
     
-    var simpleNTParser = new ReferencesimpleNTParser(RefSystem.Bible.NRSVA);
+    var simpleNTParser = new ReferenceParser(RefSystem.Bible.NRSVA);
     simpleNTParser.addRegEx("1Cor",    /^[1I]\s*C\D*/i); 
     simpleNTParser.addRegEx("1John",   /^[1I]\s*J\D*/i);
     simpleNTParser.addRegEx("1Pet",    /^[1I]\s*P\D*/i);
@@ -253,7 +432,15 @@ YUI.add("idch_ref", function(Y) {
     simpleNTParser.addRegEx("Rev",     /^R[ev]\D*/i);
     simpleNTParser.addRegEx("Rom",     /^R[om]\D*/i);
     simpleNTParser.addRegEx("Titus",   /^T\D*/i);
+
+    // attach everything to the package hierarchy
+    Y.namespace("idch.ref").BookName = BookName;
+    Y.namespace("idch.ref").VerseRef = VerseRef;
+    Y.namespace("idch.ref").VerseRange = VerseRange;
+    Y.namespace("idch.ref").BookOrder = BookOrder;
+    Y.namespace("idch.ref").RefSystem = RefSystem;
+    Y.namespace("idch.ref").ReferenceParser = ReferenceParser;
+    Y.namespace("idch.ref").ReferenceParser.NT = simpleNTParser;
     
-    
-}, "3.2.0", {requires:["widget", "substitute"]});
+}, "3.2.0", {requires:[]});
 // END WRAPPER

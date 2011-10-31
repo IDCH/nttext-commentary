@@ -8,7 +8,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import openscriptures.ref.Passage;
+import org.idch.bible.ref.Passage;
+
 
 /**
  * Represents a single instance in the commentary.

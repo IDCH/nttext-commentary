@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.utils;
+package org.idch.texts.util;
 
 /**
  * @author Neal Audenaert

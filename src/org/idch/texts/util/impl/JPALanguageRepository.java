@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.utils.impl;
+package org.idch.texts.util.impl;
 
 import java.util.List;
 
@@ -11,9 +11,9 @@ import javax.persistence.EntityTransaction;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.idch.texts.util.Language;
+import org.idch.texts.util.LanguageRepository;
 
-import openscriptures.utils.Language;
-import openscriptures.utils.LanguageRepository;
 
 /**
  * @author Neal Audenaert

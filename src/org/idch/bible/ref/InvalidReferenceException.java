@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.ref;
+package org.idch.bible.ref;
 
 /**
  * @author Neal Audenaert

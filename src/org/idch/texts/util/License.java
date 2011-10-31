@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.utils;
+package org.idch.texts.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -3,11 +3,11 @@
  */
 package openscriptures.ref;
 
-import openscriptures.ref.BookOrder;
-import openscriptures.ref.InvalidReferenceException;
-import openscriptures.ref.VerseRange;
-import openscriptures.ref.VerseRef;
-import openscriptures.ref.VerseSet;
+import org.idch.bible.ref.BookOrder;
+import org.idch.bible.ref.InvalidReferenceException;
+import org.idch.bible.ref.VerseRange;
+import org.idch.bible.ref.VerseRef;
+import org.idch.bible.ref.VerseSet;
 
 import junit.framework.TestCase;
 

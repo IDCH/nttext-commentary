@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.ref;
+package org.idch.bible.ref;
 
 import java.util.SortedSet;
 import java.util.TreeSet;

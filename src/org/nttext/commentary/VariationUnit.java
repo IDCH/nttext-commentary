@@ -9,7 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import openscriptures.ref.Passage;
+import org.idch.bible.ref.Passage;
+
 
 /**
  * @author Neal Audenaert

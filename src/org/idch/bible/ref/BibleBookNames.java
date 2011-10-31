@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.refsystem;
+package org.idch.bible.ref;
 
 import java.util.List;
 import java.util.Map;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.ref;
+package org.idch.bible.ref;
 
 import java.util.HashMap;
 import java.util.Map;

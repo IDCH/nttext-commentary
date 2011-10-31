@@ -4,7 +4,7 @@
 package org.nttext.commentary;
 
 
-import openscriptures.ref.Passage;
+import org.idch.bible.ref.Passage;
 
 
 /**

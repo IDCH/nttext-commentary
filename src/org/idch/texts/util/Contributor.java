@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.utils;
+package org.idch.texts.util;
 
 public class Contributor {
 	private String contributor;

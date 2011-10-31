@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.ref;
+package org.idch.bible.ref;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import openscriptures.refsystem.BookName;
 
 /**
  * Represents a particularly ordering of the books of the Bible. For now, this is a 
@@ -25,6 +23,9 @@ public class BookOrder {
 	
 	public static final BookOrder KJV = new BookOrder();
 
+	@SuppressWarnings("unused")
+    private SystemDescription information;
+	
 	public List<String> bookIds = new ArrayList<String>();
 	public Map<String, BookName> bks = new HashMap<String, BookName>();
 	

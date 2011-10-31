@@ -12,7 +12,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Transient;
 
-import openscriptures.utils.Language;
+import org.idch.texts.util.Language;
+
 
 /**
  * @author Neal Audenaert

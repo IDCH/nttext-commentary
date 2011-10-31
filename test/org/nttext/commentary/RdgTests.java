@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
-import openscriptures.ref.VerseRange;
 
+import org.idch.bible.ref.VerseRange;
 import org.idch.persist.RepositoryAccessException;
 import org.nttext.commentary.persist.mysql.MySQLCommentaryModule;
 

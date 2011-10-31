@@ -27,11 +27,11 @@ import javax.persistence.Transient;
 import org.idch.persist.RepositoryAccessException;
 import org.idch.texts.Work;
 import org.idch.texts.WorkId.Type;
+import org.idch.texts.util.Contributor;
+import org.idch.texts.util.Language;
+import org.idch.texts.util.License;
 import org.idch.util.Cache;
 
-import openscriptures.utils.Contributor;
-import openscriptures.utils.Language;
-import openscriptures.utils.License;
 
 /**
  * Provides an abstract implementation of the Work class that represents the main metadata

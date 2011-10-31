@@ -6,8 +6,8 @@ package org.idch.texts.importer.sblgnt;
 import org.idch.texts.Work;
 import org.idch.texts.importer.PathElement;
 import org.idch.texts.importer.StructureHandler;
+import org.idch.texts.util.Language;
 
-import openscriptures.utils.Language;
 
 public class HeaderHandler extends StructureHandler {
 

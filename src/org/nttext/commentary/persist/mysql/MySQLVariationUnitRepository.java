@@ -10,10 +10,10 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import openscriptures.ref.Passage;
-import openscriptures.ref.VerseRange;
 
 import org.apache.log4j.Logger;
+import org.idch.bible.ref.Passage;
+import org.idch.bible.ref.VerseRange;
 import org.nttext.commentary.VURepository;
 import org.nttext.commentary.VariantReading;
 import org.nttext.commentary.VariationUnit;

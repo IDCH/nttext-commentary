@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import openscriptures.ref.Passage;
-import openscriptures.ref.VerseRange;
 
 import org.apache.log4j.Logger;
+import org.idch.bible.ref.Passage;
+import org.idch.bible.ref.VerseRange;
 import org.nttext.commentary.EntryInstance;
 import org.nttext.commentary.InstanceRepository;
 import org.nttext.commentary.VariationUnit;

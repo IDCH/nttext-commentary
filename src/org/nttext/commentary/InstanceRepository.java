@@ -6,7 +6,8 @@ package org.nttext.commentary;
 
 import java.util.Set;
 
-import openscriptures.ref.Passage;
+import org.idch.bible.ref.Passage;
+
 
 /**
  * Defines the methods for creating, retrieving and deleting entries from the commentary.

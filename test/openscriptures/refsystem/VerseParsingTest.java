@@ -3,7 +3,8 @@
  */
 package openscriptures.refsystem;
 
-import openscriptures.ref.ReferenceParser;
+import org.idch.bible.ref.ReferenceParser;
+
 import junit.framework.TestCase;
 
 /**

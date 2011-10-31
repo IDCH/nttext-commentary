@@ -7,9 +7,9 @@ import java.util.Date;
 
 import org.idch.texts.Work;
 import org.idch.texts.WorkId;
+import org.idch.texts.util.Language;
+import org.idch.texts.util.License;
 
-import openscriptures.utils.Language;
-import openscriptures.utils.License;
 import junit.framework.TestCase;
 
 /**

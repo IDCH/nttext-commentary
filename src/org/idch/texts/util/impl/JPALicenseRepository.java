@@ -1,9 +1,9 @@
 /**
  * 
  */
-package openscriptures.utils.impl;
+package org.idch.texts.util.impl;
 
-import openscriptures.utils.LicenseRepository;
+import org.idch.texts.util.LicenseRepository;
 
 /**
  * @author Neal Audenaert

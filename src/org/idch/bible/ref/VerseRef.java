@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.ref;
+package org.idch.bible.ref;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;

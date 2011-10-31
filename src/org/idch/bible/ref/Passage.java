@@ -1,7 +1,7 @@
 /**
  * 
  */
-package openscriptures.ref;
+package org.idch.bible.ref;
 
 /**
  * Represents a selection of Bible verses. This may be a single verse, a . 

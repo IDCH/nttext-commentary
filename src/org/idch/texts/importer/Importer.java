@@ -66,23 +66,23 @@ public class Importer extends DefaultHandler {
 //========================================================================================
 
     /** The supplied name of the file to import. */
-    private String filename;
+    protected String filename;
     
     /** Used to keeps track of the XML document hierarchy during processing. */
-    private ProcessingPath path = new ProcessingPath();
+    protected ProcessingPath path = new ProcessingPath();
 
     /**
      * The import context. This is used to share state information between structure 
      * handlers and to control how tokens are generated (tokens are generated only if
      * the 'inText' flag is true.
      */
-    private Context context = null;
+    protected Context context = null;
     
     /** 
      * The <tt>StructureHandler</tt>s to be used to control how the source document 
      * is tokenized and to create structures as needed over the imported token stream.
      */
-    private List<StructureHandler> handlerChain = new ArrayList<StructureHandler>();
+    protected List<StructureHandler> handlerChain = new ArrayList<StructureHandler>();
     
 //========================================================================================
 // CONSTRUCTORS

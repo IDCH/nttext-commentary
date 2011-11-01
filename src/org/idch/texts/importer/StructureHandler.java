@@ -50,6 +50,7 @@ public abstract class StructureHandler {
     
     protected Context ctx;
     protected String name;
+    protected int count = 0;
     
     /**
      * Instantiates a new <tt>StructureHandler</tt> with the specified name.
@@ -275,6 +276,11 @@ public abstract class StructureHandler {
         }
         
         return true;
+    }
+    
+    /** Returns the number of times the start method was invoked (if implemented by subclass). */
+    public int getCount() {
+        return count;
     }
     
     /**

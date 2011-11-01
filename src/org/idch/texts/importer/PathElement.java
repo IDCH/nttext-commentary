@@ -42,16 +42,14 @@ public class PathElement {
         this.start = sb.length();
 
         // load attributes
-        int len = attrs.getLength();
-        if (len > 0) {
-            attribs = new HashMap<String, String>();
-            for (int ix = 0; ix < attrs.getLength(); ix++) {
-                attribs.put(attrs.getQName(ix), attrs.getValue(ix));
-            }
-            
-        } else {
-            attribs = null;
+        attribs = new HashMap<String, String>();
+        for (int ix = 0; ix < attrs.getLength(); ix++) {
+            attribs.put(attrs.getQName(ix), attrs.getValue(ix));
         }
+    }
+    
+    public PathElement getParent() {
+        return this.parent;
     }
     
     public String getText() {

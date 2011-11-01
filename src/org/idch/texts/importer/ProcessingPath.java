@@ -61,7 +61,7 @@ public class ProcessingPath {
      * 
      * @return The created PathElement.
      */
-    PathElement push(
+    public PathElement push(
             String nsURI, String name, String qName, Attributes attrs) {
         PathElement parent = (this.path.size() > 0) ? this.path.peek() : null;
         PathElement e = new PathElement(parent, sb, 
@@ -78,7 +78,7 @@ public class ProcessingPath {
      *  
      * @return The popped <tt>PathElement</tt>
      */
-    PathElement pop() {
+    public PathElement pop() {
         PathElement e = this.path.pop();
         e.end = sb.length();
         
@@ -98,7 +98,7 @@ public class ProcessingPath {
      * @param start The start index for the characters to be added.
      * @param length The number of characters to be added.
      */
-    void characters(char[] ch, int start, int length) {
+    public void characters(char[] ch, int start, int length) {
         sb.append(ch, start, length);
     }
     

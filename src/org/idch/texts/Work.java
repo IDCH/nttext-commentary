@@ -76,6 +76,8 @@ public class Work extends AbstractTokenSequence {
 	
 	private TokenRepository tokens = null;
 	
+    boolean lastTokenWasWhitespace = false;         // used when importing tokens
+
     // Of dubious value - cache at the repo level
 	private Cache<Integer, Token> tokenCache = new Cache<Integer, Token>("tokens", 1000);
 
@@ -168,7 +170,6 @@ public class Work extends AbstractTokenSequence {
         int size = this.size();
         
         List<Token> tokens = new ArrayList<Token>();
-        boolean lastTokenWasWhitespace = false;
         if (text == null)
             return tokens;
         
@@ -205,8 +206,8 @@ public class Work extends AbstractTokenSequence {
             if (t == null) {
                 TokenRepository tokens = this.getTokenRepository();
                 t = tokens.find(this, index);
-                
-                tokenCache.cache(t.getPosition(), t);
+                if (t != null)
+                    tokenCache.cache(t.getPosition(), t);
             }
         }
         

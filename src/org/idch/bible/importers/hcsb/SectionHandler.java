@@ -3,19 +3,20 @@
  */
 package org.idch.bible.importers.hcsb;
 
-import org.idch.texts.Structure;
+import org.idch.bible.importers.hcsb.BCV.BCVHandler;
 import org.idch.texts.importer.PathElement;
-import org.idch.texts.importer.StructureHandler;
 
-public class SectionHandler extends StructureHandler {
+public class SectionHandler extends BCVHandler {
     public static final String NAME = "SectionHeader";
     
-    public SectionHandler() {
-        super(NAME);
+    public SectionHandler(BCV bcv) {
+        super(NAME, bcv);
     }
     
     public boolean matchesStart(PathElement p) {
         return p.getName().equals("head1") || p.getName().equals("supertitle"); 
+        // TODO need to map super title as a different handler or else add pop/push 
+        //      support to active handlers
     }
     
     @Override
@@ -28,18 +29,10 @@ public class SectionHandler extends StructureHandler {
         // TODO close any open sections
         
         // TODO open section
-        
-
-        
     }
     
     @Override
     public void end(PathElement p) {
         this.ctx.inText();       // this marks a chapter number
-    }
-    
-    protected void close(Structure s) {
-        // close any open chapters, verses or sectioins
-        // by default, do nothing
     }
 }

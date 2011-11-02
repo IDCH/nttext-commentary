@@ -18,13 +18,10 @@ import org.idch.texts.importer.StructureHandler;
  * @author Neal Audenaert
  */
 public class SupHandler extends StructureHandler {
-
     public static final String NAME = "Sup";
-    
     public static final String TAGNAME = "sup";
     
     public Set<String> values = new HashSet<String>();
-    
     
     public SupHandler() {
         super(NAME);
@@ -37,7 +34,8 @@ public class SupHandler extends StructureHandler {
     @Override
     public void start(PathElement p) {
         count++;
-        // just ignore these.
+        this.ctx.notInText();           // just ignore these.
+        // FIXME this really only works in the NT. The OT may have legit superscripts
     }
     
     @Override
@@ -50,15 +48,13 @@ public class SupHandler extends StructureHandler {
             // chapter of the biblical text. When readers see a bullet in the text, they can 
             // refer to the appendix if they want to learn more about the term.
             
-            // TODO create a structure, we'll close it when we close the chapter, or when we 
-            //      hit the next bullet word.
+            // TODO later, we can create a post processor that will go through based 
+            //      on the dictionary and identify the specific words. For now, we'll use
+            //      markers.
             
-            return;
+            createEmptyStructure("bulletNote");
         }
         
-        
-        // TODO this happens once in the NT, in revelation to mark a 1/2.
-        System.out.println("Fixme: Superscript");
-       
+        this.ctx.inText();
     }
 }

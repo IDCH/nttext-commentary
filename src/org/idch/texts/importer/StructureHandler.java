@@ -6,7 +6,6 @@ package org.idch.texts.importer;
 import org.apache.log4j.Logger;
 import org.idch.texts.Structure;
 import org.idch.texts.Token;
-import org.idch.util.StopWatch;
 
 
 /**
@@ -172,6 +171,23 @@ public abstract class StructureHandler {
     protected int startAfterIndex = 0;
     
     /**
+     *  
+     * @param p
+     * @return
+     */
+    public Structure createEmptyStructure(String name) {
+        LOGGER.info("creating empty structure: " + name);
+        int end = ctx.work.getEnd() - 1;
+        if (end < 0) 
+            return null;
+        
+        Token start = ctx.work.get(end);
+        return (start != null)
+                ? ctx.getStructureRepo().create(ctx.work, name, start, null)
+                : null;
+    }
+    
+    /**
      * The typical structure creation work flow involves creating a new structure when a 
      * particular marker (start or end tag) is encountered and closing it when another 
      * marker is encountered. In this work flow, when the structure is first created, the
@@ -190,7 +206,6 @@ public abstract class StructureHandler {
             this.closeActiveStructure();
         }
         
-        // TODO use facade
         startAfterIndex = ctx.work.getEnd();
         this.activeStructure = ctx.getStructureRepo().create(ctx.work, name);
 
@@ -199,7 +214,6 @@ public abstract class StructureHandler {
         return activeStructure;
     }
     
-    private StopWatch timer = new StopWatch("Struct", 100);
     /**
      * TODO add comment
      * @return
@@ -210,9 +224,11 @@ public abstract class StructureHandler {
         Structure structure = this.activeStructure;
         if (structure != null) {
             
-            timer.start();
             // get the start token
             Token start = ctx.work.get(startAfterIndex);        // TODO possibly (although bad) null pointer exception
+            if (start == null) {
+                System.out.println("Null Start Token: " + startAfterIndex);
+            }
             if (start.getType() == Token.Type.WHITESPACE)
                 start = start.next(true);
             
@@ -221,8 +237,6 @@ public abstract class StructureHandler {
             Token end = ctx.work.get(lastPos);
             if (end.getType() == Token.Type.WHITESPACE)
                 end = end.prev(true);
-            timer.pause();
-            
             
             // handle errors
             warning += "(" + structure.getName() + "): ";
@@ -249,10 +263,9 @@ public abstract class StructureHandler {
             ctx.getStructureRepo().save(structure);
             ctx.clearHandler(this.getName());
             LOGGER.info("closed structure: " + structure.getName());
-            timer.pause();
         } else {
             warning += "No active structure.";
-            LOGGER.warn(warning);
+            LOGGER.info(warning);
         }
         
         

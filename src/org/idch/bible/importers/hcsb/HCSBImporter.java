@@ -36,32 +36,42 @@ public class HCSBImporter extends Importer {
     private long elapsedTime = 0;
     private Work work = null;
     
+    private Map<String, Integer> tagCounts = new HashMap<String, Integer>();
+    private Map<String, Integer> noteTagCounts = new HashMap<String, Integer>();
+    
     public HCSBImporter(String filename, TextModule repo) {
         super(filename, new Context(repo));
+        
+        this.initWork();
     }
     
     protected void initWork() {
+        // TODO make as abstract super class method
         // initialize the work object associated with this importer
+        if (work == null) {
+            work = this.context.getWorksRepo().create("Bible.Holman.HCSB.2011");
+            // TODO add initial metadata values
+            
+            this.context.getWorksRepo().save(work);
+            this.context.work = work;
+        }
     }
     
-    //===================================================================================
-    // OVERWRITTEN SUPERCLASS METHODS
-    //===================================================================================
+//===================================================================================
+// OVERWRITTEN SUPERCLASS METHODS
+//===================================================================================
+
+//========================================================================================
+// MEMBER VARIABLES
+//========================================================================================
+
+    /** The supplied name of the file to import. */
     
-    //========================================================================================
-    // MEMBER VARIABLES
-    //========================================================================================
 
-        /** The supplied name of the file to import. */
-        
-
-        private Map<String, Integer> tagCounts = new HashMap<String, Integer>();
-
-        private Map<String, Integer> noteTagCounts = new HashMap<String, Integer>();
-        
-    //========================================================================================
-    // CONSTRUCTORS
-    //========================================================================================
+    
+//========================================================================================
+// CONSTRUCTORS
+//========================================================================================
 
         
     public void parseDirectory(File dir) throws SAXException, ParserConfigurationException, IOException {
@@ -70,6 +80,7 @@ public class HCSBImporter extends Importer {
             if (!fname.matches("^[456]\\d\\S+_HCSB\\.textonly\\.xml$"))
                 continue;
             
+            System.out.println("Processing: " + fname);
             parseFile(file);
         }
     }
@@ -139,7 +150,6 @@ public class HCSBImporter extends Importer {
             }
         }
         
-        
         if (!handled) {
             int ct = 0;
             if (el.toPath().equals("/book/blockindent/p")) {
@@ -159,7 +169,6 @@ public class HCSBImporter extends Importer {
             
             this.tagCounts.put(name, ++ct);
         }
-        
     }
     
     
@@ -187,11 +196,10 @@ public class HCSBImporter extends Importer {
 
     
     public void characters(char[] ch, int start, int length) {
-        // This allows us to retrieve the text of any arbitrary element or between two 
-        // different elements. It collects all text in the source file, including both
-        // textual and paratextual elements.
+        // There's a lot of noise associated with notes. We're ignoring that for now. . . 
         if (!this.context.check("note"))
-            path.characters(ch, start, length);
+            super.characters(ch, start, length);
+            
     }
     
     /**
@@ -208,16 +216,11 @@ public class HCSBImporter extends Importer {
     public void doImport() throws Exception {
         long start = System.currentTimeMillis();
         try {
-            // TODO this is going to need to loop through all files in the directory.
-            
             this.addHandler(new NoteHandler());
             this.addHandler(new ParagraphHandler());
-            this.addHandler(new VerseHandler());
-            this.addHandler(new SectionHandler());
-            this.addHandler(new ChapterHandler());
-            this.addHandler(new BookHandler());
-            this.addHandler(new BookHandler.LastUpdate());
-            this.addHandler(new BookHandler.BookName());
+            
+            BCV bcv = new BCV();
+            bcv.attach(this);
             
             this.addHandler(new ParagraphHandler.BlockIndent());
             this.addHandler(new ParagraphHandler.DynamicProse());
@@ -227,7 +230,7 @@ public class HCSBImporter extends Importer {
             this.addHandler(new ParagraphHandler.Item());
             
             this.addHandler(new DisputedHandler());
-            this.addHandler(new FormatHandlers.RedLetters());
+            this.addHandler(new FormatHandlers.RedTag());
             this.addHandler(new FormatHandlers.Italics());
             this.addHandler(new FormatHandlers.Box());
             this.addHandler(new FormatHandlers.LineBreaks());
@@ -235,8 +238,6 @@ public class HCSBImporter extends Importer {
             
             this.addHandler(new PhraseSpaceHandler());
             this.addHandler(new SupHandler());
-            
-            this.addHandler(new TestHandler());
             
             this.parse();
             

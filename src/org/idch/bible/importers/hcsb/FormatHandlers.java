@@ -3,17 +3,22 @@
  */
 package org.idch.bible.importers.hcsb;
 
+import org.idch.texts.Structure;
 import org.idch.texts.importer.PathElement;
 import org.idch.texts.importer.StructureHandler;
+import org.idch.texts.structures.Speaker;
 
 public class FormatHandlers {
     
-    
-    public static class RedLetters extends StructureHandler {
+    /**
+     * 
+     * @author Neal Audenaert
+     */
+    public static class RedTag extends StructureHandler {
         public static final String NAME = "RedLetters";
         public static final String RED = "red";
 
-        public RedLetters() { super(NAME); }
+        public RedTag() { super(NAME); }
 
         public boolean matchesStart(PathElement p) {
             return p.getName().equals(RED);
@@ -22,11 +27,12 @@ public class FormatHandlers {
         @Override
         public void start(PathElement p) {
             count++;
-            // TODO these are the words of Jesus, we should create a structure to track them.
+            Structure s = this.createStructure(Speaker.STRUCTURE_NAME);
+            Speaker.init(ctx.getTextRepo(), s, "Jesus");
         }
 
         @Override
-        public void end(PathElement p) {  }
+        public void end(PathElement p) { this.closeActiveStructure(); }
     }
     
     public static class Italics extends StructureHandler {
@@ -42,7 +48,29 @@ public class FormatHandlers {
         @Override
         public void start(PathElement p) {
             count++;
-            // TODO these are the words of Jesus, we should create a structure to track them.
+            Structure s = this.createStructure("rend");
+            s.setAttribute("type", "italics");
+        }
+
+        @Override
+        public void end(PathElement p) { this.closeActiveStructure(); }
+    }
+    
+    public static class Box extends StructureHandler {
+        public static final String NAME = "Box";
+        public static final String TAGNAME = "box";
+
+        public Box() { super(NAME); }
+
+        public boolean matchesStart(PathElement p) {
+            return p.getName().equals(TAGNAME);
+        }
+
+        @Override
+        public void start(PathElement p) {
+            count++;
+            // I don't really understand what these are, but they seem to be use to 
+            // record reported inscriptions
         }
 
         @Override
@@ -68,24 +96,5 @@ public class FormatHandlers {
         public void end(PathElement p) {  }
     }
     
-    public static class Box extends StructureHandler {
-        public static final String NAME = "LineBreak";
-        public static final String TAGNAME = "box";
-
-        public Box() { super(NAME); }
-
-        public boolean matchesStart(PathElement p) {
-            return p.getName().equals(TAGNAME);
-        }
-
-        @Override
-        public void start(PathElement p) {
-            count++;
-            // I don't really understand what these are, but they seem to be use to 
-            // record reported inscriptions
-        }
-
-        @Override
-        public void end(PathElement p) {  }
-    }
+    
 }

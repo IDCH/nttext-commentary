@@ -58,7 +58,7 @@ public abstract class StructureWrapper extends Structure {
 	 * @return <tt>true</tt> if the supplied structure is an acceptable instance of this 
 	 *     wrapper. 
 	 */
-	public abstract boolean accepts(Structure sturcture);
+	public abstract boolean accepts(Structure structure);
 	
 	public int getStart() {
         return me.getStart();

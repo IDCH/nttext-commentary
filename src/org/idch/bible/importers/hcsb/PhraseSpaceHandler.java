@@ -30,12 +30,8 @@ public class PhraseSpaceHandler extends StructureHandler {
     }
     
     @Override
-    public void start(PathElement p) {
-        count++;
-        // just ignore these.
-    }
+    public void start(PathElement p) {  count++; /* just ignore these. */  }
     
     @Override
-    public void end(PathElement p) {
-    }
+    public void end(PathElement p) { }
 }

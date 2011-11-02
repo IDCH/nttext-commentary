@@ -3,19 +3,20 @@
  */
 package org.idch.bible.importers.hcsb;
 
+import org.idch.bible.importers.hcsb.BCV.BCVHandler;
 import org.idch.bible.ref.BookOrder;
 import org.idch.texts.Structure;
 import org.idch.texts.importer.PathElement;
-import org.idch.texts.importer.StructureHandler;
+import org.idch.texts.structures.Book;
 
-public class BookHandler extends StructureHandler {
-
+public class BookHandler extends BCVHandler {
     public static final String NAME = "Book";
-    
     public static final String BOOK = "book";
     
-    public BookHandler() {
-        super(NAME);
+    private Book book;
+    
+    public BookHandler(BCV bcv) {
+        super(NAME, bcv);
     }
     
     public boolean matchesStart(PathElement p) {
@@ -31,23 +32,22 @@ public class BookHandler extends StructureHandler {
         int ix = Integer.parseInt(id);
         String osisId = BookOrder.KJV.getId(ix - 1);        // book order indices are 0-based
         
-        // TODO Book of the Bible. Create a structure to track them
-        
-        // mark in text
-        // sub elements of note
-        //     lastupdate
-        //     bookname
-        //     head1
-        
+        ctx.inText();
+        Structure s = this.createStructure(Book.STRUCTURE_NAME);
+        book = Book.init(ctx.getTextRepo(), s, osisId);
     }
     
     @Override
     public void end(PathElement p) {
+        ctx.notInText();
+        this.closeActiveStructure();
     }
     
     protected void close(Structure s) {
-        // close any open chapters, verses or sectioins
-        // by default, do nothing
+        this.book = null;
+        
+        closeDependentHandler(ChapterHandler.NAME);
+        closeDependentHandler(SectionHandler.NAME);         // TODO implement this so that it will close all nested.
     }
     
     //===================================================================================
@@ -58,13 +58,12 @@ public class BookHandler extends StructureHandler {
      * 
      * @author Neal Audenaert
      */
-    public static class LastUpdate extends StructureHandler {
+    public static class LastUpdate extends BCVHandler {
         public static final String NAME = "LastUpdate";
         public static final String TAGNAME = "lastupdate";
         
-        
-        public LastUpdate() {
-            super(NAME);
+        public LastUpdate(BCV bcv) {
+            super(NAME, bcv);
         }
         
         public boolean matchesStart(PathElement p) {
@@ -76,7 +75,13 @@ public class BookHandler extends StructureHandler {
         
         @Override
         public void end(PathElement p) {
-            // definitely need to keep track of this.
+            ctx.inText();
+            
+            // set the name of the open book structure
+            BookHandler h = (BookHandler)ctx.getHandler(BookHandler.NAME);
+            if (h != null) {
+                h.book.setAttribute("lastUpdate", p.getText());
+            }
         }
     }
     
@@ -84,23 +89,29 @@ public class BookHandler extends StructureHandler {
      * 
      * @author Neal Audenaert
      */
-    public static class BookName extends StructureHandler {
+    public static class BookName extends BCVHandler {
         public static final String NAME = "BookName";
         public static final String BOOK_NAME = "bookname";
         
         
-        public BookName() { super(NAME); }
+        public BookName(BCV bcv) { super(NAME, bcv); }
         
         public boolean matchesStart(PathElement p) {
             return p.getName().equals(BOOK_NAME);
         }
         
         @Override
-        public void start(PathElement p) { count++; }
+        public void start(PathElement p) { count++; ctx.notInText(); }
         
         @Override
         public void end(PathElement p) {
-           // set the name of the open book structure
+            ctx.inText();
+            
+            // set the name of the open book structure
+            BookHandler h = (BookHandler)ctx.getHandler(BookHandler.NAME);
+            if ((h != null) && (h.book != null)) {
+                h.book.setTitle("Title: " + p.getText());
+            }
         }
     }
 }

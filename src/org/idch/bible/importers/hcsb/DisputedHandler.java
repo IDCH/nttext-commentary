@@ -3,7 +3,6 @@
  */
 package org.idch.bible.importers.hcsb;
 
-import org.idch.texts.Structure;
 import org.idch.texts.importer.PathElement;
 import org.idch.texts.importer.StructureHandler;
 
@@ -22,16 +21,10 @@ public class DisputedHandler extends StructureHandler {
     @Override
     public void start(PathElement p) {
         count++;
-        // This tag wraps a section of disputed text, we should wrap this with a structure
-        
+        // TODO this needs to be migrated to a better, probably.
+        this.createStructure("disputed");
     }
     
     @Override
-    public void end(PathElement p) {
-    }
-    
-    protected void close(Structure s) {
-        // close any open chapters, verses or sectioins
-        // by default, do nothing
-    }
+    public void end(PathElement p) { this.closeActiveStructure(); } 
 }

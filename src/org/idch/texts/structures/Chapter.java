@@ -6,6 +6,8 @@ package org.idch.texts.structures;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.idch.texts.Structure;
 import org.idch.texts.StructureRepository;
@@ -17,6 +19,7 @@ import org.idch.texts.Work;
  * @author Neal Audenaert
  */
 public class Chapter extends WorkStructureWrapper {
+    private static Pattern OSIS_ID = Pattern.compile("\\S+\\.(\\d+)");
     
     public static final String STRUCTURE_NAME = "chapter"; 
     public static final String STRUCTURE_PERSPECTIVE = "bcv";       // book, chapter, verse 
@@ -37,9 +40,15 @@ public class Chapter extends WorkStructureWrapper {
         Chapter chapter = new Chapter(repo, structure);
         
         structure.setPerspective(STRUCTURE_PERSPECTIVE);
-        structure.setAttribute(ATTR_OSIS_ID, osisId);
-        
-        // TODO set chapter number
+
+        // set the osis id and chapter number
+        Matcher m = OSIS_ID.matcher(osisId);
+        if (m.matches()) {
+            structure.setAttribute(ATTR_NUMBER, m.group(1));
+            structure.setAttribute(ATTR_OSIS_ID, osisId);
+        } else {
+            // FIXME this should have matched
+        }
         
         return chapter;
     }

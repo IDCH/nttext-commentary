@@ -17,7 +17,7 @@ public class TextModuleInstance {
     public static final TextModule get()
             throws RepositoryAccessException {
         
-        // return (TextModule)DBBackedRepository.get(MODULE_NAME);
-        return module;
+        return (TextModule)DBBackedRepository.get(MODULE_NAME);
+//        return module;
     }
 }

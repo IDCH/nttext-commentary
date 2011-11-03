@@ -23,6 +23,7 @@ import org.idch.texts.importer.Context;
 import org.idch.texts.importer.Importer;
 import org.idch.texts.importer.PathElement;
 import org.idch.texts.importer.StructureHandler;
+import org.idch.texts.util.Language;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -37,7 +38,6 @@ public class HCSBImporter extends Importer {
     private Work work = null;
     
     private Map<String, Integer> tagCounts = new HashMap<String, Integer>();
-    private Map<String, Integer> noteTagCounts = new HashMap<String, Integer>();
     
     public HCSBImporter(String filename, TextModule repo) {
         super(filename, new Context(repo));
@@ -49,8 +49,23 @@ public class HCSBImporter extends Importer {
         // TODO make as abstract super class method
         // initialize the work object associated with this importer
         if (work == null) {
-            work = this.context.getWorksRepo().create("Bible.Holman.HCSB.2011");
+            work = this.context.getWorksRepo().create("Bible.Holman.HCSB.2009");
             // TODO add initial metadata values
+
+            work.setCopyright("Copyright Broadman & Holman. All Rights Reserved. Used by Permission.");
+            work.setCreator("Edwin Blum, ed.");
+            work.setDescription(
+                    "100 scholars and English stylists from 17 denominations, prayerfully, " +
+                    "translated what is one of the most significant Bible translations " +
+                    "available, the Holman Christian Standard Bible (HCSB). Taking into " +
+                    "account the significant advancements in scholarship, translation " +
+                    "theory, and contemporary English usage, the HCSB will satisfy both " +
+                    "those new to the faith and seasoned scholars.");
+            work.setLanguage(Language.lookup("eng"));
+            work.setPublisher("Broadman & Holman");
+            work.setRefSystem("Bible.NRSVA");
+            work.setScope("Matt-Rev");
+            work.setTitle("Holman Christian Standard Bible");
             
             this.context.getWorksRepo().save(work);
             this.context.work = work;

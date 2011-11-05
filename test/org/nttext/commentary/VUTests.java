@@ -121,7 +121,7 @@ public class VUTests extends TestCase {
         
         
         String refText = "κλέος εἰ ἁμαρτάνοντες";       // "ἀλλ’",  "καὶ"
-        Structure s = textModule.createStructure(vs, refText, "VURef");
+        Structure s = textModule.createStructure(vs, "VURef", refText);
         assertNotNull(s);
         VUReference ref = VUReference.init(s, vu);
         assertNotNull(ref);

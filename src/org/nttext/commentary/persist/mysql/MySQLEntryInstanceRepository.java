@@ -150,6 +150,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
      */
     @Override
     public EntryInstance find(Passage passage) {
+        // TODO this will need to be reworked when we allow multiple instances per Entry
         String sql = "SELECT " + FIELDS + ", instance_id " +
                      "  FROM NTTEXTComm_Instances " +
                      " WHERE passage = ?";

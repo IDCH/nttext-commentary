@@ -121,7 +121,7 @@ public abstract class StructureWrapper extends Structure {
 
     
     @Override 
-    public Integer getEndTokenPosition() { return me.getStartTokenPosition(); }
+    public Integer getEndTokenPosition() { return me.getEndTokenPosition(); }
     public void setEndEndPosition(Integer pos) { me.setEndTokenPosition(pos); }
     
     //========================================================================================

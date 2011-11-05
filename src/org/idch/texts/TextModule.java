@@ -18,8 +18,10 @@ public interface TextModule {
     
     public Work getWork(TokenSequence s);
     public List<Token> getTokens(TokenSequence s);
-    public Structure createStructure(TokenSequence seq, String match, String name);
-    public List<Structure> createStructures(TokenSequence seq, String match, String name);
+    public Structure createStructure(TokenSequence seq, String name, String match);
+    public Structure createStructure(TokenSequence seq, String name, String match, String prefix);
+    public Structure createStructure(TokenSequence seq, String name, String match, int ct);
+    public List<Structure> createStructures(TokenSequence seq, String name, String match);
     public String toString(List<Token> tokens);
     public String toString(TokenSequence s);
     public Token getTokenAt(TokenSequence s, int index);

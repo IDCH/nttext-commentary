@@ -41,3 +41,5 @@ syntax: regexp
 ^src/openscriptures/Main\.java$
 syntax: regexp
 ^src/org/idch/texts/Main\.java$
+syntax: regexp
+^data/commentary$

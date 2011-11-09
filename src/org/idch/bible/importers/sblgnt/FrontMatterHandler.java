@@ -15,7 +15,7 @@ public class FrontMatterHandler extends StructureHandler {
     }
     
     public boolean matchesStart(PathElement p) {
-        return p.getName().equals("div") && p.hasAttribute("div", "front");
+        return p.getName().equals("div") && p.hasAttribute("type", "front");
     }
     
     public void start(PathElement p) {

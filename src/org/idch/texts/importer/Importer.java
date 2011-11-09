@@ -19,6 +19,7 @@ import org.idch.texts.importer.Context;
 import org.idch.texts.importer.PathElement;
 import org.idch.texts.importer.ProcessingPath;
 import org.idch.texts.importer.StructureHandler;
+import org.idch.util.StopWatch;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -217,6 +218,8 @@ public class Importer extends DefaultHandler {
             LOGGER.info("Unhandled end tag: " + this.path);
         }
     }
+    
+    StopWatch timer = new StopWatch("Tokens", 100);
 
     /** 
      * Tokenizes the source text. This method is called by SAX processor when characters 
@@ -242,7 +245,7 @@ public class Importer extends DefaultHandler {
         path.characters(ch, start, length);
         
         if (context.isInText()) {
-            String text = new String(ch, start, length);
+            String text = new String(ch, start, length);        // FIXME this is inefficient (object creation)
             if (context.work != null)
                 context.work.appendAll(text);
         }
@@ -252,6 +255,8 @@ public class Importer extends DefaultHandler {
      * Handle any final clean up once the end of the document is encountered.
      */
     public void endDocument() throws SAXException {
+        context.work.flushTokens();
+        
         // TODO notify all handlers of the end of document.
     }
 }

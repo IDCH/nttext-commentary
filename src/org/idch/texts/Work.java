@@ -31,6 +31,7 @@ import org.idch.texts.util.Contributor;
 import org.idch.texts.util.Language;
 import org.idch.texts.util.License;
 import org.idch.util.Cache;
+import org.idch.util.StopWatch;
 
 
 /**
@@ -76,7 +77,10 @@ public class Work extends AbstractTokenSequence {
 	
 	private TokenRepository tokens = null;
 	
-    boolean lastTokenWasWhitespace = false;         // used when importing tokens
+	private int tokenBufferStart = 0;
+	private List<Token> tokenBuffer = new ArrayList<Token>();
+	
+    boolean lastTokenWasWhitespace = true;         // used when importing tokens
 
     // Of dubious value - cache at the repo level
 	private Cache<Integer, Token> tokenCache = new Cache<Integer, Token>("tokens", 1000);
@@ -117,7 +121,6 @@ public class Work extends AbstractTokenSequence {
 	
 	@Transient 
 	public TokenRepository getTokenRepository() {
-	    
 	    if (this.tokens == null) {
             try {
                 this.tokens = TextModuleInstance.get().getTokenRepository();
@@ -138,6 +141,17 @@ public class Work extends AbstractTokenSequence {
 	// METHODS TO CREATE AND QUERY THE CONTENTS OF THIS WORK
 	//===================================================================================
 	
+	private boolean useTokenBuffer = true;
+	private int maxTokenBuffer = 100;
+	
+	StopWatch timer = new StopWatch("Create Token", 1000);
+	
+	public void flushTokens() {
+	    this.getTokenRepository().create(tokenBuffer);
+        tokenBuffer.clear();
+        this.tokenBufferStart = this.getTokenRepository().getNumberOfTokens(this);
+	}
+	
 	/**
      * 
      * @param w
@@ -145,21 +159,32 @@ public class Work extends AbstractTokenSequence {
      * @param pos
      * @return
      */
-    public Token append(Work w, String value) {
+    public Token append(String value) {
         // FIXME  this may have synchronization issues, but this will be used only in
         //        pretty rare instances, so it likely doesn't pose a problem in the 
         //        near term (2011-2012)
-        int size = this.size();
+        Token t = new Token(this, this.size(), value);
         
-        Token t = new Token(w, size++, value); 
-        t = this.getTokenRepository().create(t);
+        timer.start();
+        if (useTokenBuffer) {
+            // TODO synchronize on tokenBuffer
+            tokenBuffer.add(t);
+            if (tokenBuffer.size() > maxTokenBuffer) {
+                this.flushTokens();
+            }
+        } else {
+            t = this.getTokenRepository().create(t);
+        }
+        
         synchronized (tokenCache) {
             tokenCache.cache(t.getPosition(), t);
         }
+        timer.pause();
         
-        return t;
+        return t; 
     }
     
+    private static final String WHITESPACE = (" ").intern();
     /**
      * 
      * @param w
@@ -167,8 +192,6 @@ public class Work extends AbstractTokenSequence {
      * @return
      */
     public List<Token> appendAll(String text) {
-        int size = this.size();
-        
         List<Token> tokens = new ArrayList<Token>();
         if (text == null)
             return tokens;
@@ -182,32 +205,38 @@ public class Work extends AbstractTokenSequence {
                 continue;       // TODO do something about this 
 
             } else if (type == Token.Type.WHITESPACE) {
-                if (!lastTokenWasWhitespace && (size > 0)) { // normalize whitespace.
-                    tokens.add(new Token(this, size++, " "));
+                if (!lastTokenWasWhitespace) { // normalize whitespace.
+                    tokens.add(append(WHITESPACE));
                 }
 
                 lastTokenWasWhitespace = true;
             } else {
                 lastTokenWasWhitespace = false;
-                tokens.add(new Token(this, size++, token));
+                tokens.add(append(token));
             }
         }
        
-        tokens = this.getTokenRepository().create(tokens);
         return tokens;
     }
     
 	/** Returns the token at the specified index. */
     public Token get(int index) {
-        
         Token t = null;
-        t = tokenCache.get(index);
-        synchronized (tokenCache) {
-            if (t == null) {
-                TokenRepository tokens = this.getTokenRepository();
-                t = tokens.find(this, index);
-                if (t != null)
-                    tokenCache.cache(t.getPosition(), t);
+        if ((this.useTokenBuffer) && (index > this.tokenBufferStart)) {
+            int ix = index - this.tokenBufferStart;
+            if (ix >= this.tokenBuffer.size()) {
+                throw new IndexOutOfBoundsException("Index: " + ix + ", Size: " + tokenBuffer.size());
+            }
+            t = this.tokenBuffer.get(index - this.tokenBufferStart);
+        } else {
+            t = tokenCache.get(index);
+            synchronized (tokenCache) {
+                if (t == null) {
+                    TokenRepository tokens = this.getTokenRepository();
+                    t = tokens.find(this, index);
+                    if (t != null)
+                        tokenCache.cache(t.getPosition(), t);
+                }
             }
         }
         
@@ -215,12 +244,14 @@ public class Work extends AbstractTokenSequence {
     }
 
     public int size() {
-//        if (this.size >= 0)
-//            return this.size;
+        int sz = 0;
+        if (this.useTokenBuffer) {
+            sz = this.tokenBufferStart + this.tokenBuffer.size();
+        } else {
+            sz = this.getTokenRepository().getNumberOfTokens(this);
+        }
         
-        TokenRepository tokens = this.getTokenRepository();
-        int size = tokens.getNumberOfTokens(this);
-        return size;
+        return sz;
     }
 	
 	
@@ -419,10 +450,7 @@ public class Work extends AbstractTokenSequence {
      */
     @Transient
     public int getEnd() {
-        TokenRepository tokens = this.getTokenRepository();
-        
-        
-        return tokens.getNumberOfTokens(this);
+        return this.size();
         
     }
     

@@ -19,6 +19,7 @@ import org.idch.texts.TokenRepository;
 import org.idch.texts.Work;
 import org.idch.texts.WorkRepository;
 import org.idch.util.Cache;
+import org.idch.util.StopWatch;
 
 
 /**
@@ -106,11 +107,14 @@ public class MySQLTokenRepository implements TokenRepository {
         return token;
     }
     
+    StopWatch timer = new StopWatch("Appending", 100);
+    
     /* (non-Javadoc)
      * @see openscriptures.text.TokenRepository#create(openscriptures.text.Token)
      */
     @Override
     public Token create(Token t) {
+        
 
         Long wId = getWorkId(t.getWork());
         Connection conn = null;
@@ -159,29 +163,54 @@ public class MySQLTokenRepository implements TokenRepository {
         Connection conn = null;
         try {
             conn = repo.openConnection();
-
-            PreparedStatement stmt = conn.prepareStatement(CREATE_SQL, 
-                    PreparedStatement.RETURN_GENERATED_KEYS);
-            stmt.setLong(2, wId);
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("INSERT INTO TEXTS_Tokens (uuid, work_id, token_pos, token_text, token_type) VALUES");
             
-            for (Token t : tokens) {
-                if (t.getId() != null) {
-                    continue;   // FIXME already created - something's wrong here. 
+            boolean first = true;
+            int sz = tokens.size();
+            for (int i = 0; i < sz; i++) {
+                if (first) first = false;
+                else 
+                    sqlBuilder.append(", ");
+                
+                sqlBuilder.append("(?, ").append(wId).append(", ?, ?, ?)");
+            }
+                    
+            PreparedStatement stmt = conn.prepareStatement(sqlBuilder.toString(), 
+                    PreparedStatement.RETURN_GENERATED_KEYS);
+            
+            Token t = null;
+            for (int i = 0; i < sz; i++) {
+                t = tokens.get(i);
+                
+                int offset = i * 4;
+                stmt.setString(offset + 1, t.getUUID().toString());
+                stmt.setLong(offset + 2, t.getPosition());
+                stmt.setString(offset + 3, t.getText());
+                stmt.setString(offset + 4, t.getType().toString());
+            }
+            
+            int numRowsChanged = stmt.executeUpdate();
+            ResultSet results = stmt.getGeneratedKeys();
+            if (numRowsChanged != sz) {
+                // THEN WE HAVE A PROBLEM
+                throw new Exception("Unexpected number of rows changed") ;
+            }
+            
+            for (int i = 0; i < sz; i++) {
+                if (!results.next()) {
+                    throw new Exception("No ID found: " + i);
+                    // THEN WE HAVE A PROBLEM
                 }
                 
-                stmt.setString(1, t.getUUID().toString());
-                stmt.setLong(3, t.getPosition());
-                stmt.setString(4, t.getText());
-                stmt.setString(5, t.getType().toString());
-
-                int numRowsChanged = stmt.executeUpdate();
-                ResultSet results = stmt.getGeneratedKeys();
-                if (numRowsChanged == 1 && results.next()) {
-                    long id = results.getLong(1);
-                    t.setId(id);
-                }
+                t = tokens.get(i);
+                long id = results.getLong(1);
+                t.setId(id);
             }
+            
+            timer.start();
             conn.commit();
+            timer.pause();
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             String msg = "Could not create tokens: " + ex.getMessage();

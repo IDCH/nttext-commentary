@@ -391,6 +391,7 @@ public class Structure extends AbstractTokenSequence {
             checkOrder(token, end);
         checkWork(token); 
         
+        this.startToken = token;
         this.startTokenPosition = (token != null) ? token.getPosition() : null;
     }
     
@@ -431,6 +432,7 @@ public class Structure extends AbstractTokenSequence {
         if (token != null) 
             checkWork(token);
                 
+        this.endToken = token;
         this.endTokenPosition = (token != null) ? token.getPosition() : null;
     }
     
@@ -463,6 +465,8 @@ public class Structure extends AbstractTokenSequence {
         if (end != null) 
             checkWork(end);
         
+        this.endToken = start;
+        this.endToken = end;
         this.startTokenPosition = (start != null) ? start.getPosition() : null;
         this.endTokenPosition = (end != null) ? end.getPosition() : null;
     }

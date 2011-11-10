@@ -248,6 +248,7 @@ public class Structure extends AbstractTokenSequence {
 	    this.uuid = id;
 	}
 	
+	@Deprecated
 	public Structure(Work work, String name) {
 	    this.uuid = UUID.randomUUID();
         
@@ -255,10 +256,25 @@ public class Structure extends AbstractTokenSequence {
         this.workUUID = work.getUUID();
 	}
 	
+	@Deprecated
 	public Structure(Work work, String name, Token start, Token end) {
-	    this(work, name);
-	    this.setTokens(start, end);
-	}
+        this(work.getUUID(), name);
+        this.setTokens(start, end);
+    }
+	
+	public Structure(UUID workUUID, String name) {
+        this.uuid = UUID.randomUUID();
+        
+        this.name = name;
+        this.workUUID = workUUID;
+    }
+	
+	public Structure(UUID workUUID, String name, Token start, Token end) {
+        this(workUUID, name);
+        this.setTokens(start, end);
+    }
+	
+	
 	
 	protected void checkWork(Token t) throws InvalidTokenException {
 	    if (!t.getWork().getUUID().equals(this.workUUID))

@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.idch.persist.RepositoryAccessException;
 import org.idch.texts.Work;
+import org.idch.texts.WorkRepository;
 import org.idch.util.Filenames;
 import org.nttext.commentary.persist.mysql.MySQLCommentaryModule;
 
@@ -36,8 +37,8 @@ public class EntryServlet extends HttpServlet {
     private Configuration config = null;
     private CommentaryModule commentaryModule = null;
     
-    private Work sblgnt = null;
-    private Work hcsb = null;
+//    private Work sblgnt = null;
+//    private Work hcsb = null;
     
     /**
      * Initializes the template configuration. To specify a custom directory to
@@ -96,7 +97,9 @@ public class EntryServlet extends HttpServlet {
             this.commentaryModule = mod;
             
             // load references to Work objects
-            sblgnt = this.commentaryModule.getWorkRepository().find(11L);
+            WorkRepository wRepo = this.commentaryModule.getWorkRepository(); 
+            sblgnt = wRepo.findByAbbr("SBLGNT");
+            hcsb = wRepo.findByAbbr("HCSB");
         } catch (RepositoryAccessException rae) {
             String msg = "Could not initialize commentary module.";
             LOGGER.warn(msg, rae);

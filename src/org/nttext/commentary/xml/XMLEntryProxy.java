@@ -308,7 +308,7 @@ public class XMLEntryProxy {
     // MAIN METHOD
     //===================================================================================
     public static Structure resolve(TextModule module, String workAbbr, VerseRef ref) {
-        List<Work> works = module.getWorkRepository().findByAbbr("SBLGNT");
+        List<Work> works = module.getWorkRepository().findByAbbr(workAbbr);
         
         Work work = null;
         if (works.size() > 0) {

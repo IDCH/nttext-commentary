@@ -43,3 +43,5 @@ syntax: regexp
 ^src/org/idch/texts/Main\.java$
 syntax: regexp
 ^data/commentary$
+syntax: regexp
+^WebContent/WEB-INF/mysql-connector-java-5\.1\.13-bin\.jar$

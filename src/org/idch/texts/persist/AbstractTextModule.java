@@ -8,11 +8,13 @@ import java.util.List;
 import java.util.UUID;
 
 import org.idch.persist.DBBackedRepository;
+import org.idch.texts.SequenceSearcher;
 import org.idch.texts.Structure;
 import org.idch.texts.TextModule;
 import org.idch.texts.Token;
 import org.idch.texts.TokenSequence;
 import org.idch.texts.Work;
+
 
 /**
  * @author Neal Audenaert
@@ -64,7 +66,7 @@ public abstract class AbstractTextModule extends DBBackedRepository implements T
         while (ix >= 0) {
             Token start = getTokenAt(seq, ix);
             Token end = getTokenAt(seq, ix + match.length() - 1);
-            Structure s = new Structure(getWork(seq), name, start, end);
+            Structure s = new Structure(seq.getWorkUUID(), name, start, end);
             structures.add(s);
             
             ix = seqText.indexOf(match, ix + 1);
@@ -84,22 +86,16 @@ public abstract class AbstractTextModule extends DBBackedRepository implements T
      * @return
      */
     public Structure createStructure(TokenSequence seq, String name, String match, String prefix) {
-        String seqText = toString(seq);
+        SequenceSearcher searcher = new SequenceSearcher(this, seq);
         
-        int ix = 0;
-        int startAt = seqText.indexOf(prefix);
-        if (startAt < 0) {
-            System.out.println("Prefix not found: '" + prefix + "'. ");
-            ix = seqText.indexOf(match);
+        int ix = searcher.find(prefix);
+        if (searcher.matched()) {
+            searcher.find(match, ix + prefix.length());
         } else {
-            ix = seqText.indexOf(match, startAt + prefix.length());
+            System.out.println("Prefix not found: '" + prefix + "'. ");
         }
         
-        Token start = getTokenAt(seq, ix);
-        Token end = getTokenAt(seq, ix + match.length() - 1);
-        Structure s = new Structure(getWork(seq), name, start, end);
-        
-        return s;
+        return (searcher.matched()) ? searcher.getStructure(name) : null;
     }
     
     /**
@@ -113,22 +109,15 @@ public abstract class AbstractTextModule extends DBBackedRepository implements T
      * @return
      */
     public Structure createStructure(TokenSequence seq, String name, String match, int ct) {
-        String seqText = toString(seq);
+        SequenceSearcher searcher = new SequenceSearcher(this, seq);
         
-        int i = 0;
-        int ix = seqText.indexOf(match);
-        while (ix >= 0) {
-            i++;
-            if (++i == ct) {
-                Token start = getTokenAt(seq, ix);
-                Token end = getTokenAt(seq, ix + match.length() - 1);
-                return new Structure(getWork(seq), name, start, end);
-            }
-            
-            ix = seqText.indexOf(match, ix + 1);
+        int i = 1;
+        searcher.find(match);
+        while (searcher.matched() && (i < ct)) {
+            searcher.next(); i++;
         }
         
-        return null;
+        return (searcher.matched()) ? searcher.getStructure(name) : null;
     }
     
     /**
@@ -137,16 +126,34 @@ public abstract class AbstractTextModule extends DBBackedRepository implements T
      * 
      * @param seq The token sequence from which to create the structure.
      * @param name The name of the structure to create.
-     * @param match The text to match
+     * @param pattern The text to match
      * @return
      */
-    public Structure createStructure(TokenSequence seq, String name, String match) {
-        String seqText = toString(seq);
+    public Structure createStructure(TokenSequence seq, String name, String pattern) {
+        SequenceSearcher searcher = new SequenceSearcher(this, seq);
+        searcher.find(pattern);
         
-        int ix = seqText.indexOf(match);
-        Token start = getTokenAt(seq, ix);
-        Token end = getTokenAt(seq, ix + match.length() - 1);
-        Structure s = new Structure(getWork(seq), name, start, end);
+        Structure s = null;
+        if (searcher.matched()) {
+            s = searcher.getStructure(name);
+        }
+        
+        return s;
+    }
+    
+    /** 
+     * Creates a new structure with the specified name that spans the provided token 
+     * sequence. 
+     * @param seq The token sequence to be used to create the new structure 
+     * @param name The name of the new structure
+     * 
+     * @return The newly created structure
+     */
+    public Structure createStructure(TokenSequence seq, String name) {
+        Structure s = new Structure(seq.getWorkUUID(), name);
+        s.setStartTokenPosition(seq.getStart());
+        if (seq.getEnd() > seq.getStart())
+            s.setEndTokenPosition(seq.getEnd() - 1);
         
         return s;
     }

@@ -18,6 +18,16 @@ public interface TextModule {
     
     public Work getWork(TokenSequence s);
     public List<Token> getTokens(TokenSequence s);
+    
+    /** 
+     * Creates a new structure with the specified name that spans the provided token 
+     * sequence. 
+     * @param seq The token sequence to be used to create the new structure 
+     * @param name The name of the new structure
+     * 
+     * @return The newly created structure
+     */
+    public Structure createStructure(TokenSequence seq, String name);
     public Structure createStructure(TokenSequence seq, String name, String match);
     public Structure createStructure(TokenSequence seq, String name, String match, String prefix);
     public Structure createStructure(TokenSequence seq, String name, String match, int ct);

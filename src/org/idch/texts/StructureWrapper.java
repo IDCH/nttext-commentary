@@ -34,7 +34,7 @@ public abstract class StructureWrapper extends Structure {
 	 * 
 	 */
 	protected StructureWrapper(Structure structure) {
-	    if (!accepts(structure)) {
+	    if ((structure == null) || !accepts(structure)) {
             throw new InvalidStructureException(structure);
         }
 	    
@@ -58,7 +58,7 @@ public abstract class StructureWrapper extends Structure {
 	 * @return <tt>true</tt> if the supplied structure is an acceptable instance of this 
 	 *     wrapper. 
 	 */
-	public abstract boolean accepts(Structure structure);
+	protected abstract boolean accepts(Structure structure);
 	
 	public int getStart() {
         return me.getStart();
@@ -255,7 +255,10 @@ public abstract class StructureWrapper extends Structure {
         
         InvalidStructureException(Structure s) {
             super("Cannot create a WrappedStructure. The supplied structure instance (" +
-            		s.getName() + ") is not acceptd.");
+            		    ((s != null) ? s.getName() : "null structure") + 
+            	  ") is not acceptd.");
+            
+            this.s = s;
         }
         
         public Structure getStructureInstance() {

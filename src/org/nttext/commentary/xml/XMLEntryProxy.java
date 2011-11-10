@@ -4,12 +4,15 @@
 package org.nttext.commentary.xml;
 
 import java.io.File;
-import java.text.Collator;
-import java.util.Locale;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.idch.bible.ref.Passage;
 import org.idch.bible.ref.VerseRange;
+import org.idch.bible.ref.VerseRef;
 import org.idch.persist.RepositoryAccessException;
 import org.idch.texts.Structure;
 import org.idch.texts.StructureRepository;
@@ -46,6 +49,7 @@ public class XMLEntryProxy {
      * @return
      */
     private static String getCDataBlock(Element parentElement, String cdataElementName) {
+        // TODOD should move this to XML Utils
         NodeList nodeList = parentElement.getElementsByTagName(cdataElementName);
         if (nodeList.getLength() != 1) 
             return null;
@@ -68,9 +72,13 @@ public class XMLEntryProxy {
     //===================================================================================
     // MEMBER VARIABLES
     //===================================================================================
-    
-    
+
     CommentaryModule module;
+    InstanceRepository repo;
+    VURepository vuRepo;
+    VariantReadingRepository rdgRepo;
+    
+    Set<String> missingWorks = new HashSet<String>();
     
     //===================================================================================
     // CONSTRUCTORS
@@ -81,14 +89,50 @@ public class XMLEntryProxy {
      */
     XMLEntryProxy(CommentaryModule module) {
         this.module = module;
+        this.repo = module.getInstanceRepository();
+        this.vuRepo = module.getVURepository();
+        this.rdgRepo = module.getRdgRepository();
     }
     
     //===================================================================================
     // IMPORT METHOD
     //===================================================================================
     
-    EntryInstance importEntry(Element e) {
-        InstanceRepository repo = module.getInstanceRepository();
+    /**
+     * Extracts the commentary for an entry. 
+     * 
+     * @param e
+     * @param vsRange
+     * @param instance
+     */
+    private EntryInstance getOverview(Element e, VerseRange vsRange) {
+        String overview = XMLEntryProxy.getCDataBlock(e, "overview");
+        EntryInstance instance = repo.create(vsRange);
+        instance.setOverview(overview);
+        
+        return instance;
+    }
+    
+    /** 
+     * Extracts the variation units associated with an entry.
+     * @param e
+     * @param instance
+     */
+    private void getVariationUnits(Element e, EntryInstance instance) {
+        NodeList nodes = e.getElementsByTagName("variationUnits");
+        if (nodes.getLength() != 1) 
+            return;
+        
+        Element variationUnits = (Element)nodes.item(0);
+        NodeList vus = variationUnits.getElementsByTagName("vu");
+        for (int i = 0; i < vus.getLength(); i++) {
+            Element vuElement = (Element)vus.item(i);
+            VariationUnit vu = this.createVariationUnit(vuElement);
+            repo.associate(instance, vu);
+        }
+    }
+    
+    public EntryInstance importEntry(Element e) {
         EntryInstance instance = null;
         
         String passage = e.getAttribute("passage");
@@ -96,49 +140,37 @@ public class XMLEntryProxy {
         instance = repo.find(vsRange);
         if (instance != null) {
             //  TODO duplicate entry - throw an exception
+            System.err.println("Duplicate Entry: " + passage);
             return null; 
         }
         
-        String overview = getCDataBlock(e, "overview");
-        instance = repo.create(vsRange);
-        instance.setOverview(overview);
-        
-        // create variation units
-        NodeList nodes = e.getElementsByTagName("variationUnits");
-        if (nodes.getLength() != 1) {
-            // TODO we have a problem - throw an exception 
-            return null;
-        }
-        
-        Element variationUnits = (Element)nodes.item(0);
-        NodeList vus = variationUnits.getElementsByTagName("vu");
-        for (int i = 0; i < vus.getLength(); i++) {
-            Element vuElement = (Element)vus.item(i);
-            VariationUnit vu = createVariationUnit(vuElement);
-            repo.associate(instance, vu);
-        }
+        System.out.println("Importing entry for " + passage);
+        instance = this.getOverview(e, vsRange);
+        this.getVariationUnits(e, instance);
         
         repo.save(instance);
         return instance;
     }
-    
-    private VariationUnit createVariationUnit(Element vuElement) {
-        VURepository vuRepo = module.getVURepository();
-        VariantReadingRepository rdgRepo = module.getRdgRepository();
-        
-        String passage = vuElement.getAttribute("passage");
-        String commentary = getCDataBlock(vuElement, "commentary");
-        
-        VariationUnit vu = vuRepo.create(new VerseRange(passage));
-        vu.setCommentary(commentary);
-        
-        // TODO process references
+
+    /**
+     * Processes the references for a variation unit
+     * @param vuElement
+     * @param vu
+     */
+    private void processReferences(Element vuElement, VariationUnit vu) {
         NodeList vsRefs = vuElement.getElementsByTagName("verseReference");
         for (int i = 0; i < vsRefs.getLength(); i++) {
             createVUReference(vu, (Element)vsRefs.item(i));
         }
-        
-        // process readings
+    }
+    
+    /**
+     * Helper function that processes all readings for a particular variation unit.
+     * 
+     * @param vuElement
+     * @param vu
+     */
+    private void processReadings(Element vuElement, VariationUnit vu) {
         NodeList readings = vuElement.getElementsByTagName("readings");
         if (readings.getLength() == 1) {
             NodeList rdgs = ((Element)readings.item(0)).getElementsByTagName("rdg");
@@ -151,46 +183,109 @@ public class XMLEntryProxy {
                 rdg.setWitnessDescription(getWitnesses(rdgElement));
             
                 rdgRepo.save(rdg);
+//                System.out.println("      Created variant reading: " + 
+//                            rdg.getEnglishReading() + " (" + rdg.getGreekReading() + "): " + 
+//                            rdg.getWitnessDescription());
             }
         }
+    }
+    
+    private VariationUnit createVariationUnit(Element vuElement) {
+        String passage = vuElement.getAttribute("passage");
+        String commentary = getCDataBlock(vuElement, "commentary");
+        
+//        System.out.println("   Creating variation unit for " + passage);
+        VariationUnit vu = vuRepo.create(new VerseRange(passage));
+        vu.setCommentary(commentary);
+        
+        this.processReferences(vuElement, vu);
+        this.processReadings(vuElement, vu);
         
         vuRepo.save(vu);
         return vu;
     }
     
-    private VUReference createVUReference(VariationUnit vu, Element refElement) {
-        TextModule textModule = module.getTextRepository();
-        WorkRepository workRepo = module.getWorkRepository();
-        StructureRepository structRepo = module.getStructureRepository();
-        
-        Passage passage = vu.getPassage();
-        String workAbbr = refElement.getAttribute("work");
-        Work work = workRepo.findByAbbr(workAbbr).get(0);
-        if (work == null) {
-            // FIXME better error handling, for now, we know it works.
-            System.err.println("Could not find work: " + workAbbr);
+    private Structure getPassageReference(TextModule module, Passage passage, String workAbbr) {
+        if (this.missingWorks.contains(workAbbr))
             return null;
+        
+        // TODO move to TextModule
+        WorkRepository workRepo = module.getWorkRepository();
+        
+        List<Work> works = workRepo.findByAbbr(workAbbr);
+        if (works.size() == 0) {
+            // just ignore references to works that we don't have
+            System.out.println("Cannot find references for work. No such work: " + workAbbr);
+            this.missingWorks.add(workAbbr);
+            return null;
+        } else if (works.size() > 1) {
+            System.out.println("Multiple works found for: " + workAbbr + ". Using first.");
         }
         
-        // TODO need to create a better structure 
-        Verse vs = Verse.getVerse(textModule, work, passage.getFirst().toString());
+        Work work = workRepo.findByAbbr(workAbbr).get(0);
+        VerseRef firstRef = passage.getFirst();
+        VerseRef lastRef = passage.getLast();
+        
+        Structure structure = null;
+        if (!firstRef.equals(lastRef)) {
+            Verse startVs = Verse.getVerse(module, work, firstRef.toString());
+            Verse endVs = Verse.getVerse(module, work, lastRef.toString());
+            structure = new Structure(work, "passage", 
+                    startVs.getStartToken(), endVs.getEndToken());
+        } else {
+            structure = Verse.getVerse(module, work, firstRef.toString());
+        }
+        
+        return structure;
+    }
+    
+    /**
+     * 
+     * @param vu
+     * @param refElement
+     * @return
+     */
+    private VUReference createVUReference(VariationUnit vu, Element refElement) {
+        TextModule textModule = module.getTextRepository();
+        StructureRepository structRepo = module.getStructureRepository();
+        
+        String abbr = refElement.getAttribute("work");
+        Structure passage = this.getPassageReference(textModule, vu.getPassage(), abbr);
+        if (passage == null)
+            return null;            // we can't find this work
+        
         String text = refElement.getAttribute("text");
 
         // contextual search options
-        String prefix = refElement.getAttribute("prefix");
-        String ct = refElement.getAttribute("ct");
+        String prefix = StringUtils.trimToNull(refElement.getAttribute("prefix"));
+        String ct = StringUtils.trimToNull(refElement.getAttribute("ct"));
 
         Structure refStructure = null;
-        if (prefix != null) {
-            refStructure = textModule.createStructure(vs, "VURef", text, prefix);
+        if (text.equalsIgnoreCase("ALL")) {
+            refStructure = textModule.createStructure(passage, "VURef");
+        } else if (prefix != null) {
+            refStructure = textModule.createStructure(passage, "VURef", text, prefix);
         } else if (ct != null && StringUtils.isNumeric(ct)) {
-            refStructure = textModule.createStructure(vs, "VURef", text, Integer.parseInt(ct));
+            refStructure = textModule.createStructure(passage, "VURef", text, Integer.parseInt(ct));
         } else {
-            refStructure = textModule.createStructure(vs, "VURef", text);
+            refStructure = textModule.createStructure(passage, "VURef", text);
         }
         
-        VUReference ref = VUReference.init(refStructure, vu);
-        structRepo.save(ref);
+        VUReference ref = null;
+        if (refStructure == null) {
+            System.out.println("Could not find reference (" + abbr + "): " + vu.getPassage());
+            System.out.println("        Passage: " + textModule.toString(passage));
+            System.out.println("   Text to find: " + text);
+        } else { 
+//            System.out.println("Found reference (" + abbr + "): " + vu.getPassage());
+//            System.out.println("        Passage: " + textModule.toString(passage));
+//            System.out.println("   Matched Text: " + text);
+//            System.out.println("   Matched Text: " + textModule.toString(refStructure));
+            
+            ref = VUReference.init(refStructure, vu);
+            structRepo.save(ref);
+        }
+        
         
         return ref;
     }
@@ -212,51 +307,39 @@ public class XMLEntryProxy {
     //===================================================================================
     // MAIN METHOD
     //===================================================================================
+    public static Structure resolve(TextModule module, String workAbbr, VerseRef ref) {
+        List<Work> works = module.getWorkRepository().findByAbbr("SBLGNT");
+        
+        Work work = null;
+        if (works.size() > 0) {
+            work = works.get(0);
+        } else {
+            return null;
+        }
+        
+        StructureRepository structureRepository = module.getStructureRepository();
+        SortedSet<Structure> structures = structureRepository.find(work, "verse", "osisId", ref.toString());
+        return (structures.size() > 0) ? structures.first() : null;
+    }
     
     public static void main(String[] args) {
-        File input = new File("data/commentary/1Pet_1.xml");
-
-        String str1 = "ἀλλ εἰ ἀγαθοποιοῦντες";
-        String str2 = "αλλ εἰ ἀγαθοποιοῦντες";
-        
-        Collator collator = Collator.getInstance();
-        collator.setStrength(Collator.PRIMARY);
-        collator.setDecomposition(Collator.FULL_DECOMPOSITION);
-        System.out.println(collator.compare(str1, str2));
-        
-//        for (int i = 0; i < str1.length() && i < str2.length(); i++) {
-//            char a = str1.charAt(i), b = str2.charAt(i);
-//            System.out.println((int)a + " = " + (int)b + " is " + (a == b));
-//        }
+        File input = new File("data/commentary/Phil1.xml");
         XMLEntryProxy proxy;
         try {
-            MySQLCommentaryModule repo = MySQLCommentaryModule.get();
-//            Structure s = repo.getStructureRepository().find(19667L);
-//            System.out.println(repo.getTextRepository().toString(s));
-//            
-//            s = repo.getStructureRepository().find(19668L);
-//            System.out.println(repo.getTextRepository().toString(s));
-//            
-//            s = repo.getStructureRepository().find(19669L);
-//            System.out.println(repo.getTextRepository().toString(s));
-//            
-//            s = repo.getStructureRepository().find(19670L);
-//            System.out.println(repo.getTextRepository().toString(s));
-            
-//            proxy = new XMLEntryProxy(MySQLCommentaryModule.get());
-//            Document doc = XMLUtil.getXmlDocument(input);
-//            Element el = doc.getDocumentElement();
-//            NodeList entries = el.getChildNodes();
-//            for (int i = 0; i < entries.getLength(); i++) {
-//                Node entry = entries.item(i);
-//                
-//                if (entry.getNodeType() != Node.ELEMENT_NODE) {
-//                    // skip text and comment nodes
-//                    continue;
-//                }
-//                
-//                proxy.importEntry((Element)entry);
-//            }
+            proxy = new XMLEntryProxy(MySQLCommentaryModule.get());
+            Document doc = XMLUtil.getXmlDocument(input);
+            Element el = doc.getDocumentElement();
+            NodeList entries = el.getChildNodes();
+            for (int i = 0; i < entries.getLength(); i++) {
+                Node entry = entries.item(i);
+                
+                if (entry.getNodeType() != Node.ELEMENT_NODE) {
+                    // skip text and comment nodes
+                    continue;
+                }
+                
+                proxy.importEntry((Element)entry);
+            }
               
             System.out.println("done.");
         } catch (RepositoryAccessException e) {

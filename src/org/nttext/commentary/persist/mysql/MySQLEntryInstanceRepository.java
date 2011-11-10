@@ -301,8 +301,10 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
-            String msg = "Could not associate a variation unit (" + vu.getId() + ") " +
-                         "with an instance (" + instance.getId() + "): " + ex.getMessage();
+            String vuId = (vu != null) ? vu.getId() + "" : "null";
+            String id = (instance != null) ? instance.getId() + "" : "null";
+            String msg = "Could not associate a variation unit (" + vuId + ") " +
+                         "with an instance (" + id + "): " + ex.getMessage();
             LOGGER.warn(msg, ex);
             instance = null;
         } finally {

@@ -10,15 +10,18 @@ import org.apache.log4j.Logger;
  * @author Neal Audenaert
  */
 public class VerseRange extends Passage {
+    private static final Logger LOGGER = Logger.getLogger(VerseRange.class);
     
     // TODO implements Comparable<VerseRange>
     //      add in overlap tests, add in merge operation
+    
+   
     
     //=======================================================================================
     // SYMBOLIC CONSTANTS
     //=======================================================================================
     
-    private static final Logger LOGGER = Logger.getLogger(VerseRange.class);
+    
     
     private static String BAD_VERSE_ORDER = 
         "The supplied ending verse is before the starting verse.";

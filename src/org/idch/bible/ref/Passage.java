@@ -3,19 +3,110 @@
  */
 package org.idch.bible.ref;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
+import org.idch.texts.Structure;
+import org.idch.texts.TextModule;
+import org.idch.texts.Work;
+import org.idch.texts.WorkRepository;
+import org.idch.texts.structures.Verse;
+
 /**
  * Represents a selection of Bible verses. This may be a single verse, a . 
  * @author Neal Audenaert
  */
 public abstract class Passage implements Comparable<Passage> {
-	protected static final String LOGGER = Passage.class.getName();
+    private static final Logger LOGGER = Logger.getLogger(Passage.class);
 	
+    //=======================================================================================
+    // STATIC MEMBERS
+    //=======================================================================================
+    
+	private static boolean recheckMissingWorks = false;
+	   
+    private static Set<String> missingWorks = new HashSet<String>();
+    private static Set<String> multipleWorks = new HashSet<String>();
+    
+    //=======================================================================================
+    // STATIC METHODS
+    //=======================================================================================
+    
+    /**
+     * 
+     * @param module
+     * @param passage
+     * @param workAbbr
+     * 
+     * @return
+     */
+    public static Structure resolve(TextModule module, Passage passage, String workAbbr) {
+        // TODO need a more generic form of this so that it can work with non-tokenized texts
+        // TODO Currently this only works (really) for verse ranges. May need to support 
+        //      non-contiguous passages.
+        if (!recheckMissingWorks && missingWorks.contains(workAbbr))
+            return null;
+        
+        WorkRepository workRepo = module.getWorkRepository();
+        
+        List<Work> works = workRepo.findByAbbr(workAbbr);
+        if (works.size() == 0) {
+            LOGGER.warn("Cannot find references for work (" + workAbbr + "): No such work.");
+            missingWorks.add(workAbbr);
+            return null;
+        } else if (works.size() > 1) {
+            if (multipleWorks.add(workAbbr)) {
+                LOGGER.warn("Found multiple works found (" + workAbbr + "). Using first.");
+            }
+        }
+        
+        Work work = workRepo.findByAbbr(workAbbr).get(0);
+        VerseRef firstRef = passage.getFirst();
+        VerseRef lastRef = passage.getLast();
+        
+        Structure structure = null;
+        if (!firstRef.equals(lastRef)) {
+            Verse startVs = Verse.getVerse(module, work, firstRef.toString());
+            Verse endVs = Verse.getVerse(module, work, lastRef.toString());
+            structure = new Structure(work.getUUID(), "passage", 
+                    startVs.getStartToken(), endVs.getEndToken());
+        } else {
+            structure = Verse.getVerse(module, work, firstRef.toString());
+        }
+        
+        return structure;
+    }
+    
+    /** 
+     * Resets the set of missing works. After a call to this method, works for which a 
+     * previous lookup has failed will be retried.
+     */
+    public static void resetMissingWorks() {
+        missingWorks.clear();
+        multipleWorks.clear();
+    }
+    
+    //=======================================================================================
+    // MEMBER VARIABLES
+    //=======================================================================================
+    
 	protected BookOrder order = BookOrder.KJV;
 	
+	//=======================================================================================
+    // CONSTRUCTOR
+    //=======================================================================================
+    
 	protected Passage(BookOrder order) {
 		this.order = order;
 	}
 	
+	//=======================================================================================
+    // METHODS
+    //=======================================================================================
+    
 	public abstract VerseRef getFirst();
 	
 	public abstract VerseRef getLast();

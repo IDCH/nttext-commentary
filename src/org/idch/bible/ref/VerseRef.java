@@ -214,8 +214,16 @@ public class VerseRef extends Passage {
 	
 	/** 
 	 * Returns the short or canonical name used to identify this book in the given 
-	 * <tt>BookOrder</tt>. Note that this is not the  
+	 * <tt>BookOrder</tt>. This is typically the osisId of the book.
 	 * 
+	 * @return
+	 */
+	public String getBookIdentifier() {
+	    return (this.book != null) ? order.getId(book) : null;
+	}
+	
+	/**
+	 * Returns the common name of the book as defined by the associated book order.
 	 * @return
 	 */
 	public String getBookName() {

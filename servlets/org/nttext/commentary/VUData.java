@@ -36,6 +36,10 @@ public class VUData {
         return vu.getCommentary();
     }
     
+    public int getNumberOfReadings() {
+        return vu.getReadings().size();
+    }
+    
     public List<RdgData> getVariantReadings() {
         List<RdgData> readings = new ArrayList<RdgData>();
         

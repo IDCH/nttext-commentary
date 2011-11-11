@@ -29,14 +29,14 @@
      
         <#if firstRdg>
           <#assign firstRdg=false>
-          <th rowspan="3" class="vu">${vu.index}</th>
+          <th rowspan="${vu.numberOfReadings}" class="vu">${vu.index}</th>
           <th class="vn">${rdg.index}</th>
           <td class="rdg">
             <span class="${rdg.classname}">${rdg.english!""}</span><br>
             <span lang="el">${rdg.greek!""}</span>
           </td>
           <td class="wit">${rdg.witnesses!""}</td>
-          <td rowspan="3" class="explanation">${vu.commentary!""}</td>
+          <td rowspan="${vu.numberOfReadings}" class="explanation">${vu.commentary!""}</td>
         <#else>
           <th class="vn">${rdg.index}</th>
           <td class="rdg"><span class="${rdg.classname}">${rdg.english!""}</span><br>
@@ -50,5 +50,4 @@
     
     </#list>
   </table>
-</div>
-    
+</div>  <!-- End Commentary Body -->

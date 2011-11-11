@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import org.idch.texts.TextModule;
 import org.idch.texts.Work;
+import org.idch.texts.WorkRepository;
 import org.idch.texts.structures.Verse;
 
 
@@ -24,12 +25,24 @@ public class InstanceData {
     private CommentaryModule module;
     
     private VUComparator sblgntRefComparator;
-    
+    private Work sblgnt;
+    private Work hcsb;
     public InstanceData(CommentaryModule module, EntryInstance inst) {
         this.instance = inst;
         this.module = module;
         
-        Work sblgnt = module.getWorkRepository().find(11L);
+        WorkRepository repo = module.getWorkRepository();
+        
+        List<Work> works = repo.findByAbbr("SBLGNT");
+        if (works.size() > 0) {
+            sblgnt = works.get(0);
+        }
+        
+        works = repo.findByAbbr("HCSB");
+        if (works.size() > 0) {
+            hcsb = works.get(0);
+        }
+        
         sblgntRefComparator = new VUComparator(module.getStructureRepository(), sblgnt);
     }
     
@@ -51,9 +64,7 @@ public class InstanceData {
      * @return
      */
     public PassageReference getPrimaryPassage() {
-        // TODO change to HCSB
-        Work sblgnt = module.getWorkRepository().find(11L);
-        return new PassageReference(module, sblgnt, instance);
+        return new PassageReference(module, hcsb, instance);
     }
     
     /**
@@ -61,7 +72,6 @@ public class InstanceData {
      * @return
      */
     public PassageReference getSecondaryPassage() {
-        Work sblgnt = module.getWorkRepository().find(11L);
         return new PassageReference(module, sblgnt, instance);
     }
     
@@ -113,11 +123,16 @@ public class InstanceData {
         }
         
         public String getLanguage() {
-            return this.work.getLanguage().getName();
+            return (work != null && work.getLanguage() != null)
+                        ? this.work.getLanguage().getName()
+                        : "Unknown";
+            
         }
         
         public String getLg() {
-            return this.work.getLgCode();
+            return ((work != null) && work.getLgCode() != null)
+                    ? work.getLgCode()
+                    : "unk";
         }
         
         public String getVersion() {

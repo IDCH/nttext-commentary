@@ -3,12 +3,20 @@
  */
 package org.nttext.commentary;
 
+import org.idch.bible.ref.VerseRange;
+
 /**
  * Model object for implementing navigational controls.
  * 
  * @author Neal Audenaert
  */
 public class Navigation {
+    
+    private VerseRange prevVerse;
+    private VerseRange nextVerse;
+    private VerseRange prevChapter;
+    private VerseRange nextChapter;
+    
 
     public String getPrevChapterUrl() {
         return "entry/1Pet.2.1";

@@ -7,7 +7,11 @@
 repo.sqldir=/projects/nttext/sql
 
 -- DATABASE CONNECTION DATA
-repo.db.jndi=CNTTS_Commentary_DB
+#repo.db.jndi=CNTTS_Commentary_DB
+repo.db.url=jdbc:mysql://<dbserver>/critspace?useUnicode=true&amp;characterEncoding=UTF-8
+repo.db.driver=com.mysql.jdbc.Driver
+repo.db.user=username
+repo.db.pass=password
 
 -- CLASSNAMES FOR DIFFERENT REPOSITORY MODULES
 texts.classname=org.idch.texts.persist.mysql.MySQLTextModule

@@ -30,12 +30,28 @@
   <import file="${basedir}/../build-tools/hibernate.xml"/>
   <import file="${basedir}/../build-tools/dbutils.xml"/>
 
+  <path id="src.path">
+    <pathelement location="${src.dir}"/>
+    <pathelement location="${basedir}/servlets"/>
+  </path>
+
+  <path id="lib.classpath">
+    <fileset dir="${lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="/usr/share/tomcat6/lib">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+
   <!-- TODO: there's a lot to be improved here:
              1. Move this into a sharable location (e.g., build-tools/basic-servelet.xml)
              2. Make a property identifying the war file name
              3. Support Tomcat's manager application, and other servelet engines
              4. Fix the directory structure here. What we have now is dictated by how Eclipse
                 interacts with Tomcat.
+             5. Better messaging when deployment fails (e.g., run with inadequate permissions)
   -->
   <target name="war" description="Builds a Web ARchive for deployment to a servelet container" depends="compile">
     <war destfile="${build.dir}/commentary.war"

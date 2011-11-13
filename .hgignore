@@ -14,6 +14,8 @@ syntax: regexp
 ^WebContent/WEB-INF/classes$
 syntax: regexp
 ^WebContent/WEB-INF/lib$
+syntax: regexp
+^WebContent/META-INF/context.xml$
 
 syntax: regexp
 ^data/BibleOrg$

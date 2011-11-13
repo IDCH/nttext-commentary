@@ -16,7 +16,7 @@
 
       <init-param>
         <param-name>templateDirectory</param-name>
-        <param-value>/var/lib/tomcat6/webapps/commentary/WEB-INF/templates</param-value>
+        <param-value>WEB-INF/templates</param-value>
       </init-param>
     </servlet>
 

@@ -53,7 +53,9 @@ public class BCV {
         importer.addHandler(verseHandler);
     }
     
-    public static abstract class BCVHandler extends StructureHandler {
+    // TODO: for some reason, the Java compiler chokes on this unless we give the fully-
+    // qualified class name for StructureHandler. Compiler bug?
+    public static abstract class BCVHandler extends org.idch.texts.importer.StructureHandler {
         public static OsisId getOsisId(BookOrder order, String n) {
             Matcher m = OSIS_ID.matcher(n);
             if (m.matches()) {

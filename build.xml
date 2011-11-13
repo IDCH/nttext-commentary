@@ -30,6 +30,33 @@
   <import file="${basedir}/../build-tools/hibernate.xml"/>
   <import file="${basedir}/../build-tools/dbutils.xml"/>
 
+  <!-- TODO: there's a lot to be improved here:
+             1. Move this into a sharable location (e.g., build-tools/basic-servelet.xml)
+             2. Make a property identifying the war file name
+             3. Support Tomcat's manager application, and other servelet engines
+             4. Fix the directory structure here. What we have now is dictated by how Eclipse
+                interacts with Tomcat.
+  -->
+  <target name="war" description="Builds a Web ARchive for deployment to a servelet container" depends="compile">
+    <war destfile="${build.dir}/commentary.war"
+         webxml="${basedir}/WebContent/WEB-INF/web.xml">
+      <classes dir="${classfile.dir}"/>
+      <lib dir="${lib.dir}">
+        <exclude name="mysql-connector-java*.jar"/>
+      </lib>
+      <fileset dir="${basedir}/WebContent">
+        <exclude name="WEB-INF"/>
+        <exclude name="META-INF"/>
+        <exclude name="classes"/>
+      </fileset>
+    </war>
+  </target>
+
+  <target name="deploy" description="Deploys the application to a servelet container" depends="war" if="tomcat.home">
+    <copy file="${build.dir}/commentary.war"
+          toDir="${tomcat.home}/webapps"/>
+  </target>
+
   <target name="run" description="Executes the indexer" depends="compile, copy-metafiles">
     <!-- <java classname="org.nttext.mss.importer.MSSParser" classpathref="test.path" fork="${junit.fork}"/> -->
     <java classname="openscriptures.Main" classpathref="test.path" fork="${junit.fork}"/>

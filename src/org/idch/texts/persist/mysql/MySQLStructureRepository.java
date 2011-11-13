@@ -114,7 +114,7 @@ public class MySQLStructureRepository implements StructureRepository {
     private boolean update(Structure s) {
         int NAME = 1, PERSPECTIVE = 2, START = 3, END = 4, ID = 5;
         String sql = 
-                "UPDATE TEXTS_Structures SET " +
+                "UPDATE texts_structures SET " +
                 "    structure_name = ?, " +
                 "    perspective = ?, " + 
                 "    start_pos = ?, " + 
@@ -188,7 +188,7 @@ public class MySQLStructureRepository implements StructureRepository {
         if (s.getId() != null)
             return null;
         
-        String sql = "INSERT INTO TEXTS_Structures (" + FIELDS + ") " +
+        String sql = "INSERT INTO texts_structures (" + FIELDS + ") " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
         
         boolean success = false;
@@ -258,7 +258,7 @@ public class MySQLStructureRepository implements StructureRepository {
      */
     @Override
     public boolean hasStructuresFor(UUID workId) {
-        String sql = "SELECT structure_id FROM TEXTS_Structures WHERE work_uuid = ? LIMIT 1";
+        String sql = "SELECT structure_id FROM texts_structures WHERE work_uuid = ? LIMIT 1";
 
         boolean hasStructures = false;
         Connection conn = null;
@@ -352,11 +352,11 @@ public class MySQLStructureRepository implements StructureRepository {
         String ident = null;
         boolean useUUID = false;
         if (s.getId() != null) {
-            sql = "SELECT " + FIELDS + " FROM TEXTS_Structures WHERE structure_id = ?";
+            sql = "SELECT " + FIELDS + " FROM texts_structures WHERE structure_id = ?";
             ident = s.getId().toString();
         } else if (s.getUUID() != null) {
             ident = s.getUUID().toString();
-            sql = "SELECT " + FIELDS + ", structure_id FROM TEXTS_Structures WHERE uuid = ?";
+            sql = "SELECT " + FIELDS + ", structure_id FROM texts_structures WHERE uuid = ?";
             useUUID = true;
         } else {
             String msg = "Could not retrieve work. No identifier supplied.";
@@ -416,7 +416,7 @@ public class MySQLStructureRepository implements StructureRepository {
         int WORK_ID = 1, NAME = 2;
         String sql = 
                 "SELECT " + FIELDS + ", structure_id " +
-                "  FROM TEXTS_Structures" + 
+                "  FROM texts_structures" + 
                 " WHERE work_uuid = ? AND structure_name = ?" +
                 " ORDER BY start_pos ASC, end_pos DESC";
         
@@ -448,7 +448,7 @@ public class MySQLStructureRepository implements StructureRepository {
         int WORK_ID = 1, START_POS = 2, END_POS = 3;
         String sql =
                 "SELECT " + FIELDS + ", structure_id " +
-                "  FROM TEXTS_Structures" + 
+                "  FROM texts_structures" + 
                 " WHERE work_uuid = ? AND " +
                 "       start_pos <= ? AND end_pos > ?" +
                 " ORDER BY start_pos ASC, end_pos DESC";
@@ -482,7 +482,7 @@ public class MySQLStructureRepository implements StructureRepository {
         int WORK_ID = 1, NAME = 2, START_POS = 3, END_POS = 4;
         String sql =
                 "SELECT " + FIELDS + ", structure_id " +
-                "  FROM TEXTS_Structures" + 
+                "  FROM texts_structures" + 
                 " WHERE work_uuid = ? AND " +
                 "       structure_name = ? AND start_pos >= ? AND end_pos < ?" +
                 " ORDER BY start_pos ASC, end_pos DESC";
@@ -519,7 +519,7 @@ public class MySQLStructureRepository implements StructureRepository {
             END_AFTER = 5, END_BEFORE = 6;
         String sql =
                 "SELECT " + FIELDS + ", structure_id " +
-                "  FROM TEXTS_Structures" + 
+                "  FROM texts_structures" + 
                 " WHERE work_uuid = ? AND " +
                 "       structure_name = ? AND " +
                 "       (start_pos <= ? AND end_pos > ?) " +
@@ -568,7 +568,7 @@ public class MySQLStructureRepository implements StructureRepository {
         int NAME = 1, ATTR = 2, VALUE = 3;
         String sql = 
                 "SELECT " + FIELDS + ", S.structure_id AS structure_id" +
-                "  FROM TEXTS_Structures AS S, TEXTS_StructureAttributes AS A" + 
+                "  FROM texts_structures AS S, texts_structureattributes AS A" + 
                 " WHERE S.structure_id = A.structure_id AND" +
                 "       S.structure_name = ? AND" +
                 "       A.attr_key = ? AND" +
@@ -610,7 +610,7 @@ public class MySQLStructureRepository implements StructureRepository {
         int WORK_ID = 1, NAME = 2, ATTR = 3, VALUE = 4;
         String sql = 
                 "SELECT " + FIELDS + ", S.structure_id AS structure_id" +
-                "  FROM TEXTS_Structures AS S, TEXTS_StructureAttributes AS A" + 
+                "  FROM texts_structures AS S, texts_structureattributes AS A" + 
                 " WHERE S.structure_id = A.structure_id AND" +
                 "       S.work_uuid = ? AND " +
                 "       S.structure_name = ? AND" +
@@ -648,13 +648,13 @@ public class MySQLStructureRepository implements StructureRepository {
     
     private static class AttrRepo {
         private static final String DROP_SQL = 
-                "DELETE FROM TEXTS_StructureAttributes WHERE structure_id = ?";
+                "DELETE FROM texts_structureattributes WHERE structure_id = ?";
         private static final String INSERT_SQL = 
-                "INSERT INTO TEXTS_StructureAttributes (structure_id, attr_key, attr_value) " +
+                "INSERT INTO texts_structureattributes (structure_id, attr_key, attr_value) " +
                         "VALUES (?, ?, ?)";
         private static final String SELECT_SQL = 
                 "SELECT attr_key, attr_value " +
-                "  FROM TEXTS_StructureAttributes " +
+                "  FROM texts_structureattributes " +
                 " WHERE structure_id = ?";        
         
         public AttrRepo() {  }

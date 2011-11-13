@@ -1,5 +1,5 @@
 -- Defines works that are recorded in a local database
-CREATE TABLE IF NOT EXISTS TEXTS_Works (
+CREATE TABLE IF NOT EXISTS texts_works (
     work_id             SERIAL  PRIMARY KEY,
     uuid                CHAR(38) NOT NULL UNIQUE,
     
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS TEXTS_Works (
 ) ENGINE=InnoDB CHARSET utf8;
 
 -- Defines the tokens for works stored in this database 
-CREATE TABLE IF NOT EXISTS TEXTS_Tokens (
+CREATE TABLE IF NOT EXISTS texts_tokens (
     token_id       SERIAL  PRIMARY KEY,
     uuid           CHAR(38) NOT NULL UNIQUE,
     work_id        BIGINT UNSIGNED NOT NULL,
@@ -34,11 +34,11 @@ CREATE TABLE IF NOT EXISTS TEXTS_Tokens (
     UNIQUE (work_id, token_pos),
     
     FOREIGN KEY (work_id)
-      REFERENCES TEXTS_Works (work_id)
+      REFERENCES texts_works (work_id)
       ON DELETE CASCADE
 ) ENGINE=InnoDB CHARSET utf8;
 
-CREATE TABLE IF NOT EXISTS TEXTS_Structures (
+CREATE TABLE IF NOT EXISTS texts_structures (
     structure_id        SERIAL  PRIMARY KEY,
     uuid                CHAR(38) NOT NULL UNIQUE,
     work_uuid           CHAR(38) NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS TEXTS_Structures (
 ) ENGINE=InnoDB CHARSET utf8;
 
 -- Attributes for a structure
-CREATE TABLE IF NOT EXISTS TEXTS_StructureAttributes (
+CREATE TABLE IF NOT EXISTS texts_structureattributes (
     structure_id   BIGINT UNSIGNED NOT NULL,
     attr_key       VARCHAR(255),
     attr_value     TEXT,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS TEXTS_StructureAttributes (
     UNIQUE (structure_id, attr_key),
     
     FOREIGN KEY (structure_id)
-      REFERENCES TEXTS_Structures (structure_id)
+      REFERENCES texts_structures (structure_id)
       ON DELETE CASCADE
     
 ) ENGINE=InnoDB CHARSET utf8;

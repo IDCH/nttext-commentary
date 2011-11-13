@@ -57,7 +57,7 @@ public class MySQLVariationUnitRepository implements VURepository {
         if (vu.getId() != null)
             return null;
         
-        String sql = "INSERT INTO NTTEXTComm_VUs (" + FIELDS +") " +
+        String sql = "INSERT INTO nttextcomm_vus (" + FIELDS +") " +
                      "VALUES (?, ?, now(), now())";
         Connection conn = null;
         try {
@@ -130,7 +130,7 @@ public class MySQLVariationUnitRepository implements VURepository {
     
     VariationUnit find(Connection conn, long id) throws SQLException {
         String sql = "SELECT " + FIELDS + ", vu_id " +
-                     "  FROM NTTEXTComm_VUs " +
+                     "  FROM nttextcomm_vus " +
                      " WHERE vu_id = ?";
         
         VariationUnit vu = null;;
@@ -170,7 +170,7 @@ public class MySQLVariationUnitRepository implements VURepository {
     @Override
     public VariationUnit find(Passage passage) {
         String sql = "SELECT " + FIELDS + ", vu_id " +
-                     "  FROM NTTEXTComm_VUs " +
+                     "  FROM nttextcomm_vus " +
                      " WHERE passage = ?";
        
         VariationUnit vu = null;;
@@ -207,7 +207,7 @@ public class MySQLVariationUnitRepository implements VURepository {
             return false;
         
         int ID = 2, OVERVIEW = 1;
-        String sql = "UPDATE NTTEXTComm_VUs SET " +
+        String sql = "UPDATE nttextcomm_vus SET " +
                      "  commentary = ?, " +
                      "  last_updated = now()" +
                      "WHERE vu_id = ?";
@@ -256,7 +256,7 @@ public class MySQLVariationUnitRepository implements VURepository {
             return false;
         
         int ID = 1;
-        String sql = "DELETE FROM NTTEXTComm_VUs " +
+        String sql = "DELETE FROM nttextcomm_vus " +
                      " WHERE vu_id = ?";
         
         boolean success = false;

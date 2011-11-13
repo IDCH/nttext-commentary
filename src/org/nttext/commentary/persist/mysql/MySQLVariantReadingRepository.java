@@ -65,9 +65,9 @@ public class MySQLVariantReadingRepository implements VariantReadingRepository {
             return null;
         
         int ID = 5;
-        String sql = "INSERT INTO NTTEXTComm_Rdgs (" + FIELDS + ") " +
+        String sql = "INSERT INTO nttextcomm_rdgs (" + FIELDS + ") " +
                      "SELECT ?, ?, ?, ?, COALESCE(max(seq_no), -1) + 1 " +
-                     "  FROM NTTEXTComm_Rdgs" +
+                     "  FROM nttextcomm_rdgs" +
                      " WHERE vu_id = ?";
         
         PreparedStatement stmt = conn.prepareStatement(sql, 
@@ -137,7 +137,7 @@ public class MySQLVariantReadingRepository implements VariantReadingRepository {
     
     List<VariantReading> find(Connection conn, VariationUnit vu) throws SQLException {
         String sql = "SELECT " + FIELDS + ", rdg_id " +
-                     "  FROM NTTEXTComm_Rdgs " +
+                     "  FROM nttextcomm_rdgs " +
                      " WHERE vu_id = ?" +
                      " ORDER BY seq_no ASC";
 
@@ -185,7 +185,7 @@ public class MySQLVariantReadingRepository implements VariantReadingRepository {
     
     public VariantReading synchronize(VariantReading rdg) {
         String sql = "SELECT " + FIELDS + ", rdg_id " +
-                    "  FROM NTTEXTComm_Rdgs " +
+                    "  FROM nttextcomm_rdgs " +
                     " WHERE rdg_id = ?";
         Connection conn = null;
         try {
@@ -220,7 +220,7 @@ public class MySQLVariantReadingRepository implements VariantReadingRepository {
             return false;
         
         int ENGLISH = 1, GREEK = 2, WITNESSES = 3, ID = 4;
-        String sql = "UPDATE NTTEXTComm_Rdgs SET " +
+        String sql = "UPDATE nttextcomm_rdgs SET " +
                      "  english_rdg = ?, " +
                      "  greek_rdg = ?," +
                      "  witnesses = ?" +
@@ -271,9 +271,9 @@ public class MySQLVariantReadingRepository implements VariantReadingRepository {
             return false;
         
         int RDG_ID = 1, VU_ID = 1, SEQ_NO = 2;
-        String select_sql = "SELECT seq_no FROM NTTEXTComm_Rdgs WHERE rdg_id = ?";
-        String delete_sql = "DELETE FROM NTTEXTComm_Rdgs WHERE rdg_id = ?";
-        String update_sql = "UPDATE NTTEXTComm_Rdgs SET" +
+        String select_sql = "SELECT seq_no FROM nttextcomm_rdgs WHERE rdg_id = ?";
+        String delete_sql = "DELETE FROM nttextcomm_rdgs WHERE rdg_id = ?";
+        String update_sql = "UPDATE nttextcomm_rdgs SET" +
         		            "       seq_no = seq_no - 1" +
         		            " WHERE vu_id = ? AND seq_no > ?" +
         		            " ORDER BY seq_no ASC";

@@ -66,12 +66,9 @@ public class MySQLTextModule extends AbstractTextModule {
      */
     public boolean probe() {
         List<String> sql = new ArrayList<String>(3);
-        sql.add("SELECT work_id" +
-                "  FROM TEXTS_Works;");
-        sql.add("SELECT token_id  " +
-                "  FROM TEXTS_Tokens");
-        sql.add("SELECT structure_id" +
-                "  FROM TEXTS_Structures");
+        sql.add("SELECT work_id FROM texts_sorks;");
+        sql.add("SELECT token_id FROM texts_tokens");
+        sql.add("SELECT structure_id FROM texts_structures");
         return probe(sql);
     }
 }

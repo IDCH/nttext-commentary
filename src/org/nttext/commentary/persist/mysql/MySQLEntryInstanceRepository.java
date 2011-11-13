@@ -58,7 +58,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
         if (instance.getId() != null)
             return null;
         
-        String sql = "INSERT INTO NTTEXTComm_Instances (" + FIELDS +") " +
+        String sql = "INSERT INTO nttextcomm_instances (" + FIELDS +") " +
                      "VALUES (?, ?, now(), now())";
         Connection conn = null;
         try {
@@ -119,7 +119,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
     @Override
     public EntryInstance find(long id) {
         String sql = "SELECT " + FIELDS + ", instance_id " +
-                     "  FROM NTTEXTComm_Instances " +
+                     "  FROM nttextcomm_instances " +
         		     " WHERE instance_id = ?";
         
         EntryInstance instance = null;;
@@ -152,7 +152,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
     public EntryInstance find(Passage passage) {
         // TODO this will need to be reworked when we allow multiple instances per Entry
         String sql = "SELECT " + FIELDS + ", instance_id " +
-                     "  FROM NTTEXTComm_Instances " +
+                     "  FROM nttextcomm_instances " +
                      " WHERE passage = ?";
        
         EntryInstance instance = null;;
@@ -186,7 +186,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
             return false;
         
         int ID = 2, OVERVIEW = 1;
-        String sql = "UPDATE NTTEXTComm_Instances SET " +
+        String sql = "UPDATE nttextcomm_instances SET " +
         		     "  overview = ?, " +
         		     "  last_updated = now()" +
         		     "WHERE instance_id = ?";
@@ -233,7 +233,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
             return false;
         
         int ID = 1;
-        String sql = "DELETE FROM NTTEXTComm_Instances " +
+        String sql = "DELETE FROM nttextcomm_instances " +
                      " WHERE instance_id = ?";
         
         boolean success = false;
@@ -273,7 +273,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
     @Override
     public boolean associate(EntryInstance instance, VariationUnit vu) {
         int INSTANCE_ID = 1, VU_ID = 2;
-        String sql = "INSERT INTO NTTEXTComm_EntryVUs (instance_id, vu_id)" +
+        String sql = "INSERT INTO nttextcomm_entryvus (instance_id, vu_id)" +
         		     "VALUES (?, ?)";
         
         boolean success = false;
@@ -319,7 +319,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
     @Override
     public boolean disassociate(EntryInstance instance, VariationUnit vu) {
         int INSTANCE_ID = 1, VU_ID = 2;
-        String sql = "DELETE FROM NTTEXTComm_EntryVUs " +
+        String sql = "DELETE FROM nttextcomm_entryvus " +
         		     " WHERE instance_id = ? AND vu_id = ?";
         
         boolean success = false;
@@ -360,7 +360,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
     
     Set<VariationUnit> getVU(Connection conn, EntryInstance instance) throws SQLException {
         int INSTANCE_ID = 1, VU_ID = 1;
-        String sql = "SELECT vu_id FROM NTTEXTComm_EntryVUs WHERE instance_id = ? ";
+        String sql = "SELECT vu_id FROM nttextcomm_entryvus WHERE instance_id = ? ";
         
         MySQLVariationUnitRepository vuRepo = 
                 (MySQLVariationUnitRepository)repo.getVURepository();

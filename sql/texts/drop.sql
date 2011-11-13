@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS TEXTS_StructureAttributes;
-DROP TABLE IF EXISTS TEXTS_Structures;
-DROP TABLE IF EXISTS TEXTS_Tokens;
-DROP TABLE IF EXISTS TEXTS_Works;
+DROP TABLE IF EXISTS texts_structureattributes;
+DROP TABLE IF EXISTS texts_structures;
+DROP TABLE IF EXISTS texts_tokens;
+DROP TABLE IF EXISTS texts_works;

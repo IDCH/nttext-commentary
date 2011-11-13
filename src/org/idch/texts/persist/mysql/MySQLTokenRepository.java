@@ -41,7 +41,7 @@ public class MySQLTokenRepository implements TokenRepository {
             "token_id, uuid, work_id, token_pos, token_text, token_type ";
     
     private static final String CREATE_SQL = 
-            "INSERT INTO TEXTS_Tokens (uuid, work_id, token_pos, token_text, token_type) " +
+            "INSERT INTO texts_tokens_Tokens (uuid, work_id, token_pos, token_text, token_type) " +
                     "VALUES (?, ?, ?, ?, ?)";
     
     private Cache<Long, Token> cache = new Cache<Long, Token>("Tokens", 1000);
@@ -164,7 +164,7 @@ public class MySQLTokenRepository implements TokenRepository {
         try {
             conn = repo.openConnection();
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("INSERT INTO TEXTS_Tokens (uuid, work_id, token_pos, token_text, token_type) VALUES");
+            sqlBuilder.append("INSERT INTO texts_tokens (uuid, work_id, token_pos, token_text, token_type) VALUES");
             
             boolean first = true;
             int sz = tokens.size();
@@ -233,7 +233,7 @@ public class MySQLTokenRepository implements TokenRepository {
         int WORK_ID = 1, NEXT_POS = 1;
         String sql = 
             "SELECT COALESCE(MAX(token_pos), -1) + 1 " +
-            "  FROM TEXTS_Tokens" +
+            "  FROM texts_tokens" +
             " WHERE work_id = ?";
         
         int pos = -1;
@@ -262,7 +262,7 @@ public class MySQLTokenRepository implements TokenRepository {
 
     @Override
     public Token find(UUID uuid) {
-        String sql = "SELECT " + FIELDS + "FROM TEXTS_Tokens WHERE uuid = ?"; 
+        String sql = "SELECT " + FIELDS + "FROM texts_tokens WHERE uuid = ?"; 
         
         Token token = null;
         Connection conn = null;
@@ -293,7 +293,7 @@ public class MySQLTokenRepository implements TokenRepository {
     public Token find(Work w, int pos) {
         Long wId = getWorkId(w);
         String sql = "SELECT " + FIELDS + 
-                     "  FROM TEXTS_Tokens" +
+                     "  FROM texts_tokens" +
                      " WHERE work_id = " + wId + " AND token_pos = " + pos;
         
         assert pos >= 0 : "Position must be non-negative";
@@ -339,7 +339,7 @@ public class MySQLTokenRepository implements TokenRepository {
     @Override
     public List<Token> find(Work w, int start, int end) {
         int WORK = 1, START = 2, END = 3;
-        String sql = "SELECT " + FIELDS + "FROM TEXTS_Tokens " +
+        String sql = "SELECT " + FIELDS + "FROM texts_tokens " +
         		     " WHERE work_id = ? " +
         		     "   AND token_pos >= ? AND token_pos < ?" +
         		     " ORDER BY token_pos"; 

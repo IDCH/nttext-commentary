@@ -83,7 +83,7 @@ public class MySQLWorkRepository implements WorkRepository {
         if (w.getId() != null)
             return null;
         
-        String sql = "INSERT INTO TEXTS_Works (" + FIELDS +") " +
+        String sql = "INSERT INTO texts_works (" + FIELDS +") " +
         		     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conn = null;
         try {
@@ -202,11 +202,11 @@ public class MySQLWorkRepository implements WorkRepository {
         String ident = null;
         boolean useUUID = false;
         if (w.getId() != null) {
-            sql = "SELECT " + FIELDS + " FROM TEXTS_Works WHERE work_id = ?";
+            sql = "SELECT " + FIELDS + " FROM texts_works WHERE work_id = ?";
             ident = w.getId().toString();
         } else if (w.getUUID() != null) {
             ident = w.getUUID().toString();
-            sql = "SELECT " + FIELDS + ", work_id FROM TEXTS_Works WHERE uuid = ?";
+            sql = "SELECT " + FIELDS + ", work_id FROM texts_works WHERE uuid = ?";
             useUUID = true;
         } else {
             String msg = "Could not retrieve work. No identifier supplied.";
@@ -251,7 +251,7 @@ public class MySQLWorkRepository implements WorkRepository {
     public List<Work> findByType(String type) {
         int worktype = 1;
         String sql = "SELECT " + FIELDS + ", work_id " +
-        		     "  FROM TEXTS_Works " +
+        		     "  FROM texts_works " +
         		     " WHERE work_type = ?";
         
         List<Work> works = new ArrayList<Work>();
@@ -285,7 +285,7 @@ public class MySQLWorkRepository implements WorkRepository {
     public List<Work> findByType(String type, String lgCode) {
         int worktype = 1, lg = 2;
         String sql = "SELECT " + FIELDS + ", work_id " +
-                     "  FROM TEXTS_Works " +
+                     "  FROM texts_works " +
                      " WHERE work_type = ? AND language = ?";
         
         List<Work> works = new ArrayList<Work>();
@@ -322,7 +322,7 @@ public class MySQLWorkRepository implements WorkRepository {
     public List<Work> findByAbbr(String abbreviation) {
         int abbr = 1;
         String sql = "SELECT " + FIELDS + ", work_id " +
-                     "  FROM TEXTS_Works " +
+                     "  FROM texts_works " +
                      " WHERE abbreviation = ?";
        
         List<Work> works = new ArrayList<Work>();
@@ -354,7 +354,7 @@ public class MySQLWorkRepository implements WorkRepository {
             CREATOR = 4, PUBLISHER = 5, LG = 6, TYPE = 7, RIGHTS  = 8, 
             SCOPE = 9, REF = 10, URL  = 11, PUB_DATE = 12, IMPORT_DATE = 13, ID = 14;
         String sql =
-                "UPDATE TEXTS_Works SET" +
+                "UPDATE texts_works SET" +
                 "  title = ?, " +
                 "  abbreviation = ?, " +
                 "  description = ?, " +
@@ -430,7 +430,7 @@ public class MySQLWorkRepository implements WorkRepository {
      */
     public boolean remove(Work w) {
         int ID = 1;
-        String sql = "DELETE FROM TEXTS_Works WHERE work_id = ?";
+        String sql = "DELETE FROM texts_works WHERE work_id = ?";
         
         boolean success = false;
         Connection conn = null;

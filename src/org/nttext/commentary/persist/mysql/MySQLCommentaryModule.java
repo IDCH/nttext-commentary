@@ -114,14 +114,14 @@ public final static String MODULE_NAME = "nttext_commentary";
      */
     public boolean probe() {
         List<String> sql = new ArrayList<String>(3);
-        sql.add("SELECT instance_id FROM NTTEXTComm_Instances;");
-        sql.add("SELECT vu_id FROM NTTEXTComm_Vus;");
-        sql.add("SELECT vu_id FROM NTTEXTComm_VUReference;");
-        sql.add("SELECT rdg_id FROM NTTEXTComm_Rdgs;");
-        sql.add("SELECT instance_id, vu_id FROM NTTEXTComm_EntryVUs;");
+        sql.add("SELECT instance_id FROM nttextcomm_instances;");
+        sql.add("SELECT vu_id FROM nttextcomm_vus;");
+        sql.add("SELECT vu_id FROM nttextcomm_vureference;");
+        sql.add("SELECT rdg_id FROM nttextcomm_rdgs;");
+        sql.add("SELECT instance_id, vu_id FROM _entryvus;");
         
         
-        sql.add("SELECT structure_id FROM TEXTS_Structures");
+        sql.add("SELECT structure_id FROM texts_structures");
         return probe(sql);
     }
 

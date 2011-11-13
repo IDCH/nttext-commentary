@@ -1,5 +1,5 @@
 -- A Commentary Entry
-CREATE TABLE IF NOT EXISTS NTTEXTComm_Instances (
+CREATE TABLE IF NOT EXISTS nttextcomm_instances (
     instance_id     SERIAL  PRIMARY KEY,  
     passage      VARCHAR(64) NOT NULL, 
     overview     TEXT,                 
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS NTTEXTComm_Instances (
 
 
 -- Variation Units
-CREATE TABLE IF NOT EXISTS NTTEXTComm_VUs (
+CREATE TABLE IF NOT EXISTS nttextcomm_vus (
     vu_id        SERIAL PRIMARY KEY,
     passage      VARCHAR(64) NOT NULL,
     commentary   TEXT,
@@ -22,18 +22,18 @@ CREATE TABLE IF NOT EXISTS NTTEXTComm_VUs (
 
 -- Links a VU to its manifestation in a particular NT edition.
 -- TODO remove - this should simply be a structure . . . . maybe
-CREATE TABLE IF NOT EXISTS NTTEXTComm_VUReference (
+CREATE TABLE IF NOT EXISTS nttextcomm_vureference (
     vu_id           BIGINT UNSIGNED NOT NULL, 
     structure_uuid  CHAR(38) NOT NULL,
     baseReading     TEXT NOT NULL,
 
     FOREIGN KEY (vu_id)
-      REFERENCES NTTEXTComm_VUs (vu_id)
+      REFERENCES nttextcomm_vus (vu_id)
       ON DELETE CASCADE
 ) ENGINE=InnoDB CHARSET utf8;
 
 -- Variant Readings
-CREATE TABLE IF NOT EXISTS NTTEXTComm_Rdgs (
+CREATE TABLE IF NOT EXISTS nttextcomm_rdgs (
     -- Unique id for this reading
     rdg_id          SERIAL PRIMARY KEY,         
     -- The variation unit this is a reading of 
@@ -50,26 +50,26 @@ CREATE TABLE IF NOT EXISTS NTTEXTComm_Rdgs (
     UNIQUE (vu_id, seq_no),
     
     FOREIGN KEY (vu_id)
-      REFERENCES NTTEXTComm_VUs (vu_id)
+      REFERENCES nttextcomm_vus (vu_id)
       ON DELETE CASCADE
     
 ) ENGINE=InnoDB CHARSET utf8;
 
 -- Mapping of Entries to the VU's those entries describe
-CREATE TABLE IF NOT EXISTS NTTEXTComm_EntryVUs (
-    instance_id        BIGINT UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS nttextcomm_entryvus (
+    instance_id     BIGINT UNSIGNED NOT NULL,
     vu_id           BIGINT UNSIGNED NOT NULL,
     
     FOREIGN KEY (instance_id)
-      REFERENCES NTTEXTComm_Instances (instance_id)
+      REFERENCES nttextcomm_instances (instance_id)
       ON DELETE CASCADE,
     FOREIGN KEY (vu_id)
-      REFERENCES NTTEXTComm_VUs (vu_id)
+      REFERENCES nttextcomm_vus (vu_id)
       ON DELETE CASCADE
 ) ENGINE=InnoDB CHARSET utf8;
 
 -- Mapping of variant readings to the manuscripts in which those readings are found
--- CREATE TABLE IF NOT EXISTS NTTEXTComm_RdgWitnesses (
+-- CREATE TABLE IF NOT EXISTS nttextcomm_rdgwitnesses (
     
     
 -- ) ENGINE=InnoDB CHARSET utf8;

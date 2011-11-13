@@ -53,12 +53,9 @@
   </target>
 
   <target name="deploy" description="Deploys the application to a servelet container" depends="war" if="tomcat.home">
+    <echo message="Copying war file (${build.dir}/commentary.war) to ${tomcat.home}/webapps"/>
     <copy file="${build.dir}/commentary.war"
           toDir="${tomcat.home}/webapps"/>
   </target>
 
-  <target name="run" description="Executes the indexer" depends="compile, copy-metafiles">
-    <!-- <java classname="org.nttext.mss.importer.MSSParser" classpathref="test.path" fork="${junit.fork}"/> -->
-    <java classname="openscriptures.Main" classpathref="test.path" fork="${junit.fork}"/>
-  </target>
 </project>

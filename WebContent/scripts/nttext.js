@@ -10,8 +10,8 @@
 //			 system for JavaScript components.
 var NTTEXT_config = {
 	modules : {
-		'idch-ref' : { fullpath : '/nttext/commentary/scripts/idch-ref.js', requires : []},
-		nttcc   : { fullpath : '/nttext/commentary/scripts/pg-controls.js', requires : ['widget', 'substitute', 'anim', 'idch-ref']}
+		'idch-ref' : { fullpath : '/commentary/scripts/idch-ref.js', requires : []},
+		nttcc   : { fullpath : '/commentary/scripts/pg-controls.js', requires : ['widget', 'substitute', 'anim', 'idch-ref']}
 	}
 };
 

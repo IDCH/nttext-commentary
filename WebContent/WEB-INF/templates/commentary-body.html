@@ -1,5 +1,6 @@
 <div id="commentary">
   <h2>Textual Commentary <span class="reference">${entry.passage}</span></h2>
+  <#if entry.showTable>
   <table summary="Significant textual variants for your selected verse">
     <thead>
       <tr>
@@ -50,4 +51,8 @@
     
     </#list>
   </table>
+  <#else>
+  <p>None of the textual variants in this entry contribute to significant changes in the 
+     meaning of this passage.</p>
+  </#if>
 </div>  <!-- End Commentary Body -->

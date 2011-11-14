@@ -1,15 +1,15 @@
 <div class="search-wrapper"> 
-  <a href="${navigation.prevCh.url}" title="${navigation.prevCh.label}" 
+  <a href="/commentary/entry/${navigation.prevCh.url}" title="${navigation.prevCh.label}" 
      class="prev-chap-btn<#if !navigation.prevCh.available> prev-chap-btn-inactive</#if>">&laquo;</a> 
-  <a href="${navigation.prevVs.url}" title="${navigation.prevVs.label}" 
+  <a href="/commentary/entry/${navigation.prevVs.url}" title="${navigation.prevVs.label}" 
      class="prev-verse-btn<#if !navigation.prevVs.available> prev-verse-btn-inactive</#if>" >&#8249;</a>
   <form action="entry" method="GET">
     <input type="text" name="q" value="${(entry.passage)!""}"/>
   </form>
   <a href="#" title="Search" class="search-btn">Search</a>
-  <a href="${navigation.nextVs.url}" title="${navigation.nextVs.label}" 
+  <a href="/commentary/entry/${navigation.nextVs.url}" title="${navigation.nextVs.label}" 
      class="next-verse-btn<#if !navigation.nextVs.available> next-verse-btn-inactive</#if>">&#8250;</a> 
-  <a href="${navigation.nextCh.url}" title="${navigation.nextCh.label}" 
+  <a href="/commentary/entry/${navigation.nextCh.url}" title="${navigation.nextCh.label}" 
      class="next-chap-btn<#if !navigation.nextCh.available> next-chap-btn-inactive</#if>">&raquo;</a>
    
   <div class="search-notice">

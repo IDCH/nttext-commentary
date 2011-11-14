@@ -57,9 +57,9 @@ public class VerseRefTests extends TestCase {
 		checkRef(new VerseRef("3.16"), null, 3, 16, null);
 	}
 	
-	public void checkToString(String strRef) {
+	public void checkToOsisId(String strRef) {
 		VerseRef ref = new VerseRef(strRef);
-		assertEquals(strRef, ref.toString());
+		assertEquals(strRef, ref.toOsisId());
 	}
 	
 	public void checkCompareTo(String strRefA, String strRefB, int expected) {
@@ -78,12 +78,12 @@ public class VerseRefTests extends TestCase {
     }
 	
 	public void testToString() {
-		checkToString("John.3.16");
-		checkToString("John.3.16!a");
-		checkToString("John.3");
-		checkToString("John");
-		checkToString("3.16");
-		checkToString("16");
+		checkToOsisId("John.3.16");
+		checkToOsisId("John.3.16!a");
+		checkToOsisId("John.3");
+		checkToOsisId("John");
+		checkToOsisId("3.16");
+		checkToOsisId("16");
 	}
 	
 	public void testParams() throws InvalidReferenceException {

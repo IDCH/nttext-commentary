@@ -228,12 +228,12 @@ public class XMLEntryProxy {
         
         Structure structure = null;
         if (!firstRef.equals(lastRef)) {
-            Verse startVs = Verse.getVerse(module, work, firstRef.toString());
-            Verse endVs = Verse.getVerse(module, work, lastRef.toString());
+            Verse startVs = Verse.getVerse(module, work, firstRef.toOsisId());
+            Verse endVs = Verse.getVerse(module, work, lastRef.toOsisId());
             structure = new Structure(work, "passage", 
                     startVs.getStartToken(), endVs.getEndToken());
         } else {
-            structure = Verse.getVerse(module, work, firstRef.toString());
+            structure = Verse.getVerse(module, work, firstRef.toOsisId());
         }
         
         return structure;
@@ -318,7 +318,7 @@ public class XMLEntryProxy {
         }
         
         StructureRepository structureRepository = module.getStructureRepository();
-        SortedSet<Structure> structures = structureRepository.find(work, "verse", "osisId", ref.toString());
+        SortedSet<Structure> structures = structureRepository.find(work, "verse", "osisId", ref.toOsisId());
         return (structures.size() > 0) ? structures.first() : null;
     }
     

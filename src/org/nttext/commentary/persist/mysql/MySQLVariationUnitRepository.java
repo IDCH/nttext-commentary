@@ -66,7 +66,7 @@ public class MySQLVariationUnitRepository implements VURepository {
             PreparedStatement stmt = conn.prepareStatement(sql, 
                     PreparedStatement.RETURN_GENERATED_KEYS);
             
-            stmt.setString(PASSAGE, vu.getPassage().toString());
+            stmt.setString(PASSAGE, vu.getPassage().toOsisId());
             stmt.setString(OVERVIEW, vu.getCommentary());
            
             // execute the query
@@ -179,7 +179,7 @@ public class MySQLVariationUnitRepository implements VURepository {
             conn = repo.openReadOnlyConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             
-            stmt.setString(1, passage.toString());
+            stmt.setString(1, passage.toOsisId());
             
             ResultSet results = stmt.executeQuery();
             if (results.next())

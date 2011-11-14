@@ -67,7 +67,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
             PreparedStatement stmt = conn.prepareStatement(sql, 
                     PreparedStatement.RETURN_GENERATED_KEYS);
             
-            stmt.setString(PASSAGE, instance.getPassage().toString());
+            stmt.setString(PASSAGE, instance.getPassage().toOsisId());
             stmt.setString(OVERVIEW, instance.getOverview());
            
             // execute the query
@@ -161,7 +161,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
             conn = repo.openReadOnlyConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
             
-            stmt.setString(1, passage.toString());
+            stmt.setString(1, passage.toOsisId());
             
             ResultSet results = stmt.executeQuery();
             if (results.next())

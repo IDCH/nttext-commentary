@@ -15,13 +15,9 @@ public class VerseRange extends Passage {
     // TODO implements Comparable<VerseRange>
     //      add in overlap tests, add in merge operation
     
-   
-    
     //=======================================================================================
     // SYMBOLIC CONSTANTS
     //=======================================================================================
-    
-    
     
     private static String BAD_VERSE_ORDER = 
         "The supplied ending verse is before the starting verse.";
@@ -74,7 +70,7 @@ public class VerseRange extends Passage {
 		this.end = end;
 		
 		if (start.compareTo(end) > 0)  
-		    throw new InvalidReferenceException(BAD_VERSE_ORDER, this.toString());
+		    throw new InvalidReferenceException(BAD_VERSE_ORDER, this.toOsisId());
 	}
 	
 	/**
@@ -139,42 +135,60 @@ public class VerseRange extends Passage {
     // OBJECT METHOD OVERRIDES
     //=======================================================================================
     
+	private StringBuilder appendExt(VerseRef ref, String prefix, StringBuilder sb) {
+	    if (ref.getExtension() != null)
+	        sb.append(prefix).append(ref.getExtension());
+	    
+	    return sb;
+	}
+	
+	private StringBuilder appendVerse(VerseRef ref, String prefix, StringBuilder sb) {
+        if (ref.isVerseSpecified())
+            sb.append(prefix).append(ref.getVerse());
+        
+        return sb;
+    }
+	
 	/** 
 	 * Returns a string representation of this verse range.
 	 */
-	public String toString() {
-		if (this.start.equals(this.end)) 
-		    return this.start.toString();
+	public String format() {
+		if (start.equals(end)) 
+		    return start.format();
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.start.toString()).append("-");
+		sb.append(start.format());
 		
-		if (start.getBookIndex() != end.getBookIndex()) {
-			sb.append(end.toString());
-		} else {
-			Integer ch = end.getChapter();
-			Integer vs = end.getVerse();
-			String ext = end.getExtension();
-			
-			if (start.getChapter() != ch) {
-				sb.append(ch);
-				
-				if (vs != null) {
-					sb.append(".").append(vs);
-					if (ext != null)
-						sb.append("!").append(ext);
-				}
-			} else if (start.getVerse() != vs) {
-				sb.append(vs);
-				if (ext != null)
-					sb.append("!").append(ext);
-			} else if (start.getExtension() != ext) {
-				sb.append(ext);
-			} else {
-				// TODO handle error.
-			}
+		if (end != null && !start.equals(end)) {
+		    if (start.getBookIndex() != end.getBookIndex()) {
+		        sb.append(" - ").append(end.format());
+		    } else if (end.isChapterSpecified() && start.getChapter() != end.getChapter()) {
+		        sb.append("-").append(end.getChapter());
+		        appendVerse(end, ":", sb);
+		        appendExt(end, "", sb);
+		    } else if (end.isVerseSpecified() && (start.getVerse() != end.getVerse())) {
+		        sb.append("-").append(end.getVerse());
+		        appendExt(end, "", sb);
+		    } else if ((end.getExtension() != null) && 
+		                start.getExtension().equals(end.getExtension())) {
+		        sb.append("-").append(end.getExtension());
+		    }
 		}
 		
 		return sb.toString();
+	}
+	
+	public String toOsisId() {
+	    StringBuilder sb = new StringBuilder();
+        sb.append(start.toOsisId());
+	    if (end != null && !start.equals(end)) {
+	        sb.append("-").append(end.toOsisId());
+	    } 
+	    
+	    return sb.toString();
+	}
+	
+	public String toString() {
+	    return this.format();
 	}
 }

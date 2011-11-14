@@ -4,7 +4,6 @@
 package openscriptures.ref;
 
 import org.idch.bible.ref.BookOrder;
-import org.idch.bible.ref.InvalidReferenceException;
 import org.idch.bible.ref.VerseRange;
 import org.idch.bible.ref.VerseRef;
 import org.idch.bible.ref.VerseSet;
@@ -51,12 +50,12 @@ public class VerseSetTests extends TestCase {
 	}
 	
 	public void testValidReferences() {
-		VerseRange range = null;
+//		VerseRange range = null;
 		VerseSet set = null;
 		VerseRange jn3_16_18 = new VerseRange("John.3.16-18");
 		VerseRef jn1_1 = new VerseRef("John.1.1");
 		
-		set = new VerseSet(jn3_16_18.toString() + "," + jn1_1.toString());
+		set = new VerseSet(jn3_16_18.toOsisId() + "," + jn1_1.toOsisId());
 		checkRef(set.getFirst(), "John", 1, 1, null);
 		checkRef(set.getLast(), "John", 3, 18, null);
 		

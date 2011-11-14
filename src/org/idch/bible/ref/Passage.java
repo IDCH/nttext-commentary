@@ -69,12 +69,12 @@ public abstract class Passage implements Comparable<Passage> {
         
         Structure structure = null;
         if (!firstRef.equals(lastRef)) {
-            Verse startVs = Verse.getVerse(module, work, firstRef.toString());
-            Verse endVs = Verse.getVerse(module, work, lastRef.toString());
+            Verse startVs = Verse.getVerse(module, work, firstRef.toOsisId());
+            Verse endVs = Verse.getVerse(module, work, lastRef.toOsisId());
             structure = new Structure(work.getUUID(), "passage", 
                     startVs.getStartToken(), endVs.getEndToken());
         } else {
-            structure = Verse.getVerse(module, work, firstRef.toString());
+            structure = Verse.getVerse(module, work, firstRef.toOsisId());
         }
         
         return structure;
@@ -110,6 +110,10 @@ public abstract class Passage implements Comparable<Passage> {
 	public abstract VerseRef getFirst();
 	
 	public abstract VerseRef getLast();
+	
+	public abstract String format();
+	
+	public abstract String toOsisId();
 	
 	/**
 	 * Indicates whether this passage is contained within the supplied passage.
@@ -153,4 +157,7 @@ public abstract class Passage implements Comparable<Passage> {
 	public boolean equals(Object o) {
 	    return this.compareTo((Passage)o) == 0;
 	}
+	
+	public abstract String toString();
+	
 }

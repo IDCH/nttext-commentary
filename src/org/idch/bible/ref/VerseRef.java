@@ -275,6 +275,41 @@ public class VerseRef extends Passage {
 	//======================================================================================
 	// UTILITY METHODS
 	//======================================================================================
+	public String format() {
+	    StringBuilder builder = new StringBuilder();
+	    builder.append(this.getBookName());
+	    
+	    if (this.isChapterSpecified()) {
+	        builder.append(" ").append(chapter);
+	        
+	        if (this.isVerseSpecified()) {
+	            builder.append(":").append(verse);
+	            
+	            if (this.ext != null)
+                    builder.append(this.ext);
+	        }
+	    }
+	    
+	    return builder.toString();
+	}
+	
+	public String toOsisId() {
+	    StringBuilder builder = new StringBuilder();
+	    builder.append(this.getBookIdentifier());
+	    if (this.isChapterSpecified()) {
+            builder.append(".").append(chapter);
+            
+            if (this.isVerseSpecified()) {
+                builder.append(".").append(verse);
+                
+                if (this.ext != null)
+                    builder.append("!").append(this.ext);
+                
+            }
+        }
+	    
+	    return builder.toString();
+	}
 	
 	/**
 	 * Checks to ensure that this object refers to a valid verse.
@@ -338,29 +373,6 @@ public class VerseRef extends Passage {
 	 * Returns this verse reference as a canonically formatted string.
 	 */
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		boolean hasContent = false;
-		
-		if (this.book != null && (this.book >= 0)) {
-			hasContent = true;
-			sb.append(order.getId(this.book));
-		}
-		
-		if (this.chapter != null) {
-			if (hasContent) sb.append(".");
-			sb.append(this.chapter);
-			hasContent = true;
-		}
-		
-		if (this.verse != null) {
-			if (hasContent) sb.append(".");
-			sb.append(this.verse);
-			hasContent = true;
-		}
-		
-		if (this.ext != null)
-			sb.append("!").append(this.ext);
-		
-		return sb.toString();
+	    return this.format();
 	}
 }

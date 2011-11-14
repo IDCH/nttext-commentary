@@ -22,6 +22,17 @@ public interface InstanceRepository {
     
     public EntryInstance find(Passage passage);
     
+    /**
+     * Finds the passages needed to support next/previous navigation. This will 
+     * return an array of four (possibly <tt>null</tt>) passages. The first will be 
+     * the first entry for the immediately preceding chapter, followed by the preceding 
+     * verse, following verse, and following chapter.
+     * 
+     * @param instance
+     * @return
+     */
+    public Passage[] findNavigationalPassages(EntryInstance instance);
+        
     public boolean save(EntryInstance instance);
     
     public boolean remove(EntryInstance instance);

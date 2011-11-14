@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.idch.bible.ref.Passage;
+import org.idch.bible.ref.VerseRef;
+import org.idch.texts.Structure;
 import org.idch.texts.TextModule;
 import org.idch.texts.Work;
 import org.idch.texts.WorkRepository;
@@ -122,8 +125,20 @@ public class InstanceData {
         
         public String getMarkedText() {
             TextModule textModule = module.getTextRepository();
-            Verse vs = Verse.getVerse(textModule, work, instance.getPassage().toOsisId());
-            return textModule.toString(vs);
+            Passage passage = instance.getPassage();
+            VerseRef start = passage.getFirst();
+            VerseRef end = passage.getLast();
+            
+            Structure s = Verse.getVerse(textModule, work, start.toOsisId());
+            
+            if (!start.equals(end)) {
+                Verse endVs = Verse.getVerse(textModule, work, end.toOsisId());
+                
+                s = new Structure(work.getUUID(), "passage", 
+                        s.getStartToken(), endVs.getEndToken());
+            }
+            
+            return textModule.toString(s);
         }
         
         public String getLanguage() {

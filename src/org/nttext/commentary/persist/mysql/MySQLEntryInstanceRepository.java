@@ -15,6 +15,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.idch.bible.ref.Passage;
 import org.idch.bible.ref.VerseRange;
+import org.idch.bible.ref.VerseRef;
 import org.nttext.commentary.EntryInstance;
 import org.nttext.commentary.InstanceRepository;
 import org.nttext.commentary.VariationUnit;
@@ -35,6 +36,16 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
     private static final String FIELDS =  
             "passage, overview, date_created, last_updated "; 
     
+    private static final int INS_BOOK = 3;
+    private static final int INS_S_CH = 4;
+    private static final int INS_S_VS = 5;
+    private static final int INS_E_CH = 6;
+    private static final int INS_E_VS = 7;
+    private static final int INS_HASH = 8;
+    
+    private static final String PASSAGE_FIELDS = 
+            "book_id, start_ch, start_vs, end_ch, end_vs, vs_hash";
+    
     private MySQLCommentaryModule repo = null;
     
     MySQLEntryInstanceRepository(MySQLCommentaryModule repo) {
@@ -48,6 +59,22 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
         return this.create(new EntryInstance(passage));
     }
    
+    private int hash(Passage passage) {
+        VerseRef start = passage.getFirst();
+        int bk = start.getBookIndex();
+        int ch = (start.isChapterSpecified()) ? start.getChapter() : -1;
+        int vs = (start.isVerseSpecified()) ? start.getVerse() : -1;
+        
+        return hash(bk, ch, vs);
+    }
+    
+    private int hash(int bk, int ch, int vs) {
+        int hash = ((bk > 0) ? 1000000 * bk : 0) +
+                   ((ch > 0) ?    1000 * ch : 0) +
+                   ((vs > 0) ?           vs : 0);
+        return hash;
+    }
+    
     /**
      * 
      * @param instance
@@ -58,8 +85,13 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
         if (instance.getId() != null)
             return null;
         
-        String sql = "INSERT INTO nttextcomm_instances (" + FIELDS +") " +
-                     "VALUES (?, ?, now(), now())";
+        String sql = "INSERT INTO nttextcomm_instances (" + FIELDS +", " + PASSAGE_FIELDS +") " +
+                     "VALUES (?, ?, now(), now(), ?, ?, ?, ?, ?, ?)";
+        
+        Passage passage = instance.getPassage();
+        VerseRef start = passage.getFirst();
+        VerseRef end = passage.getLast();
+
         Connection conn = null;
         try {
             // build the statement
@@ -67,8 +99,14 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
             PreparedStatement stmt = conn.prepareStatement(sql, 
                     PreparedStatement.RETURN_GENERATED_KEYS);
             
-            stmt.setString(PASSAGE, instance.getPassage().toOsisId());
+            stmt.setString(PASSAGE, passage.toOsisId());
             stmt.setString(OVERVIEW, instance.getOverview());
+            stmt.setInt(INS_BOOK, start.getBookIndex());
+            stmt.setInt(INS_S_CH, start.getChapter());
+            stmt.setInt(INS_S_VS, start.getVerse());
+            stmt.setInt(INS_E_CH, end.getChapter());
+            stmt.setInt(INS_E_VS, end.getVerse());
+            stmt.setInt(INS_HASH, hash(passage));
            
             // execute the query
             int numRowsChanged = stmt.executeUpdate();
@@ -81,6 +119,9 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
             }
             
             conn.commit();
+            
+            if (instance != null) LOGGER.info("Creatied entry instance: " + passage.toOsisId());
+            else                  LOGGER.warn("Failed to create entry instance: " + passage.toOsisId());
         } catch (Exception ex) {
             repo.rollbackConnection(conn);
             
@@ -176,6 +217,126 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
        
         return instance;
     }
+    
+    private Passage findPrecedingChapter(Connection conn, int hash) 
+            throws SQLException {
+        
+        String sql = "SELECT passage, max(book_id), max(start_ch), min(start_vs) " +
+                     "  FROM nttextcomm_instances " +
+                     " WHERE vs_hash < ?";
+        
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, hash);
+        
+        ResultSet results = stmt.executeQuery();
+        if (results.next()) {
+            String ref = results.getString(1);
+            if (ref != null)
+                return new VerseRange(ref);
+        }
+        
+        return null;
+    }
+    
+    private Passage findPrecedingVerse(Connection conn, int hash) 
+            throws SQLException {
+        String sql = "SELECT passage FROM nttextcomm_instances " +
+                     " WHERE vs_hash < ?" +
+                     " ORDER BY vs_hash DESC" +
+                     " LIMIT 1";
+       
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, hash);
+       
+        ResultSet results = stmt.executeQuery();
+        if (results.next()) {
+            String ref = results.getString(1);
+            if (ref != null)
+                return new VerseRange(ref);
+        }
+       
+        return null;
+    }
+    
+    private Passage findFollowingVerse(Connection conn, int hash) 
+            throws SQLException {
+        String sql = "SELECT passage FROM nttextcomm_instances " +
+                     " WHERE vs_hash > ?" +
+                     " ORDER BY vs_hash ASC" +
+                     " LIMIT 1";
+       
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, hash);
+       
+        ResultSet results = stmt.executeQuery();
+        if (results.next()) {
+            String ref = results.getString(1);
+            if (ref != null)
+                return new VerseRange(ref);
+        }
+       
+        return null;
+    }
+    
+    private Passage findFollowingChapter(Connection conn, int bk, int ch) 
+            throws SQLException {
+        
+        String sql = "SELECT passage, min(book_id), min(start_ch), min(start_vs) " +
+                     "  FROM nttextcomm_instances " +
+                     " WHERE vs_hash > ?";
+        
+        int hash = hash(bk, ch + 1, 0);
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, hash);
+        
+        ResultSet results = stmt.executeQuery();
+        if (results.next()) {
+            String ref = results.getString(1);
+            if (ref != null)
+                return new VerseRange(ref);
+        }
+        
+        return null;
+    }
+    
+   
+    /**
+     * Finds the passages needed to support next/previous navigation. This will 
+     * return an array of four (possibly <tt>null</tt>) passages. The first will be 
+     * the first entry for the immediately preceding chapter, followed by the preceding 
+     * verse, following verse, and following chapter.
+     * 
+     * @param instance
+     * @return
+     */
+    public Passage[] findNavigationalPassages(EntryInstance instance) {
+        Passage[] passages = new Passage[4];
+        
+        VerseRef ref = instance.getPassage().getFirst();
+        int bk = ref.getBookIndex();
+        int ch = (ref.isChapterSpecified()) ? ref.getChapter() : -1;
+        
+        int hash = hash(ref);
+        Connection conn = null;
+        try {
+            conn = repo.openReadOnlyConnection();
+            
+            passages[0] = findPrecedingChapter(conn, hash);
+            passages[1] = findPrecedingVerse(conn, hash);
+            passages[2] = findFollowingVerse(conn, hash);
+            passages[3] = findFollowingChapter(conn, bk, ch);
+            
+        } catch (Exception ex) {
+            String msg = "Could not retrieve navigational passages for entry (" + 
+                    instance.getPassage() + "): " + ex.getMessage();
+            LOGGER.warn(msg, ex);
+            instance = null;
+        } finally {
+            repo.closeConnection(conn);
+        }
+       
+        return passages;
+    }
 
     /* (non-Javadoc)
      */
@@ -223,7 +384,7 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
         
         return success;
     }
-
+    
     /* (non-Javadoc)
      */
     @Override

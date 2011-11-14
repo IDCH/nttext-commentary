@@ -1,7 +1,13 @@
 -- A Commentary Entry
 CREATE TABLE IF NOT EXISTS nttextcomm_instances (
-    instance_id     SERIAL  PRIMARY KEY,  
-    passage      VARCHAR(64) NOT NULL, 
+    instance_id  SERIAL  PRIMARY KEY,  
+    passage      VARCHAR(64) NOT NULL,
+    book_id      INTEGER,
+    start_ch     INTEGER,
+    start_vs     INTEGER,
+    end_ch       INTEGER,
+    end_vs       INTEGER,
+    vs_hash      INTEGER,
     overview     TEXT,                 
     
     date_created TIMESTAMP DEFAULT now(),

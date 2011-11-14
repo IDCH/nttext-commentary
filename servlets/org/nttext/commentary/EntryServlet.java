@@ -166,7 +166,8 @@ public class EntryServlet extends HttpServlet {
             Template template = config.getTemplate("/404.html");
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("page", new PageDetails());
-            data.put("navigation", new Navigation(null));
+            data.put("navigation", new Navigation(
+                    commentaryModule.getInstanceRepository(), null));
 
             template.process(data, page);
         } catch (TemplateException ex) {
@@ -196,7 +197,8 @@ public class EntryServlet extends HttpServlet {
             Template template = config.getTemplate("/400.html");
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("page", new PageDetails());
-            data.put("navigation", new Navigation(null));
+            data.put("navigation", new Navigation(
+                    commentaryModule.getInstanceRepository(), null));
 
             template.process(data, page);
         } catch (TemplateException ex) {
@@ -336,7 +338,7 @@ public class EntryServlet extends HttpServlet {
             data.put("page", new PageDetails());
 
             data.put("entry", new InstanceData(commentaryModule, e));
-            data.put("navigation", new Navigation(e));
+            data.put("navigation", new Navigation(commentaryModule.getInstanceRepository(), e));
 
             template.process(data, page);
         } catch (TemplateException ex) {

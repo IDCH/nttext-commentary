@@ -3,7 +3,9 @@
  */
 package org.nttext.commentary;
 
+import org.idch.bible.ref.BookOrder;
 import org.idch.bible.ref.VerseRange;
+import org.idch.bible.ref.VerseRef;
 
 /**
  * Model object for implementing navigational controls.
@@ -12,41 +14,116 @@ import org.idch.bible.ref.VerseRange;
  */
 public class Navigation {
     
-    private VerseRange prevVerse;
-    private VerseRange nextVerse;
-    private VerseRange prevChapter;
-    private VerseRange nextChapter;
+    private BookOrder order;
+    private int bookId;
+    private int ch;
+    private int vs;
     
+    private LinkDetails prevVerse;
+    private LinkDetails nextVerse;
+    private LinkDetails prevChapter;
+    private LinkDetails nextChapter;
+    
+    public Navigation(EntryInstance instance) {
+        if (instance == null) {
+            prevChapter = new LinkDetails(null);
+            prevVerse = new LinkDetails(null);
+            nextVerse = new LinkDetails(null);
+            nextChapter = new LinkDetails(null);
+            return;
+        }
+            
+        VerseRef first = instance.getPassage().getFirst();
+        if (first == null) {
+            // TODO BAD THINGS
+        }
+        
+        this.order = first.getBookOrder();
+        this.bookId = first.getBookIndex();
+        this.ch = first.getChapter();
+        this.vs = first.getVerse();
 
-    public String getPrevChapterUrl() {
-        return "entry/1Pet.2.1";
+        this.initPrevChapter();
+        this.initPrevVerse();
+        this.initNextVerse();
+        this.initNextChapter();
     }
     
-    public String getPrevVerseUrl() {
-        return "entry/1Pet.2.19";
+    private LinkDetails getLinkDetails(int bk, int ch, int vs) {
+        VerseRef ref = new VerseRef(order, bk, ch, vs, null);
+        return new LinkDetails(new VerseRange(ref, ref));
     }
     
-    public String getNextVerseUrl() {
-        return "entry/1Pet.2.21";
+    private void initPrevChapter() {
+        if (vs > 1) {
+            prevChapter = getLinkDetails(bookId, ch, 1);
+        } else if (ch > 1) {
+            prevChapter = getLinkDetails(bookId, ch - 1, 1);
+        } else {
+            prevChapter = new LinkDetails(null);
+        }
     }
     
-    public String getNextChapterUrl() {
-        return "entry/1Pet.3.1";
+    private void initNextChapter() {
+        if (ch < 3) {
+            nextChapter = getLinkDetails(bookId, ch + 1, 1);
+        } else {
+            nextChapter = new LinkDetails(null);
+        }
     }
     
-    public String getPrevChapterLabel() {
-        return "1 Peter 2:1";
+    private void initNextVerse() {
+        if (vs < 30) {
+            nextVerse = getLinkDetails(bookId, ch, vs + 1);
+        } else {
+            nextVerse = new LinkDetails(null);
+        }
     }
-
-    public String getPrevVerseLabel() {
-        return "1 Peter 2:19";
+    
+    private void initPrevVerse() {
+        if (vs > 1) {
+            prevVerse = getLinkDetails(bookId, ch, vs - 1);
+        } else {
+            prevVerse = new LinkDetails(null);
+        }
     }
-
-    public String getNextVerseLabel() {
-        return "1 Peter 2:21";
+    
+    public LinkDetails getPrevCh() {
+        return this.prevChapter;
     }
-
-    public String getNextChapterLabel() {
-        return "1 Peter 3:1";
+    
+    public LinkDetails getPrevVs() {
+        return this.prevVerse;
+    }
+    
+    public LinkDetails getNextVs() {
+        return this.nextVerse;
+    }
+    
+    public LinkDetails getNextCh() {
+        return this.nextChapter;
+    }
+    
+    //===================================================================================
+    // LINK DETAILS CLASS
+    //===================================================================================
+    public static class LinkDetails {
+        private final VerseRange passage;
+        
+        LinkDetails(VerseRange passage) {
+            this.passage = passage;
+        }
+        
+        public boolean getAvailable() {
+            return passage != null;
+        }
+        
+        public String getUrl() {
+            return getAvailable() ? passage.toOsisId() : "#";
+        }
+        
+        public String getLabel() {
+            return getAvailable() ? passage.format() : "";
+        }
     }
 }

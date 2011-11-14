@@ -98,6 +98,10 @@ public class InstanceData {
         return variants;
     }
     
+    public boolean getShowTable() {
+        return !this.instance.getVariationUnits().isEmpty();
+    }
+    
     //===================================================================================
     // INNER CLASS TO REPRESENT A SCRIPTURE REFERENCE FOR A PASSAGE
     //===================================================================================
@@ -118,7 +122,7 @@ public class InstanceData {
         
         public String getMarkedText() {
             TextModule textModule = module.getTextRepository();
-            Verse vs = Verse.getVerse(textModule, work, instance.getPassage().toString());
+            Verse vs = Verse.getVerse(textModule, work, instance.getPassage().toOsisId());
             return textModule.toString(vs);
         }
         

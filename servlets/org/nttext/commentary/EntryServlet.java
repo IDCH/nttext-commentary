@@ -166,7 +166,7 @@ public class EntryServlet extends HttpServlet {
             Template template = config.getTemplate("/404.html");
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("page", new PageDetails());
-            data.put("navigation", new Navigation());
+            data.put("navigation", new Navigation(null));
 
             template.process(data, page);
         } catch (TemplateException ex) {
@@ -196,7 +196,7 @@ public class EntryServlet extends HttpServlet {
             Template template = config.getTemplate("/400.html");
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("page", new PageDetails());
-            data.put("navigation", new Navigation());
+            data.put("navigation", new Navigation(null));
 
             template.process(data, page);
         } catch (TemplateException ex) {
@@ -303,7 +303,7 @@ public class EntryServlet extends HttpServlet {
         InstanceRepository repo = commentaryModule.getInstanceRepository();
         instance = repo.find(passage);
         if (instance == null) {
-            String message = "There is no entry for this passage (" + passage.toString() + ").";
+            String message = "There is no entry for this passage (" + passage.toOsisId() + ").";
 
             write404(message, resp);
             return null;
@@ -336,7 +336,7 @@ public class EntryServlet extends HttpServlet {
             data.put("page", new PageDetails());
 
             data.put("entry", new InstanceData(commentaryModule, e));
-            data.put("navigation", new Navigation());
+            data.put("navigation", new Navigation(e));
 
             template.process(data, page);
         } catch (TemplateException ex) {

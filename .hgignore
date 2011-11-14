@@ -44,5 +44,3 @@ syntax: regexp
 ^src/repositories\.properties$
 syntax: regexp
 ^src/org/idch/texts/Main\.java$
-syntax: regexp
-^data/commentary$

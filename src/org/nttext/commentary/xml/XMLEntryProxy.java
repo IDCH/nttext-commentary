@@ -231,7 +231,7 @@ public class XMLEntryProxy {
         if (!firstRef.equals(lastRef)) {
             Verse startVs = Verse.getVerse(module, work, firstRef.toOsisId());
             Verse endVs = Verse.getVerse(module, work, lastRef.toOsisId());
-            structure = new Structure(work, "passage", 
+            structure = new Structure(work.getUUID(), "passage", 
                     startVs.getStartToken(), endVs.getEndToken());
         } else {
             structure = Verse.getVerse(module, work, firstRef.toOsisId());
@@ -324,6 +324,8 @@ public class XMLEntryProxy {
     }
     
     public static void main(String[] args) {
+        // TODO somewhere along the chain here, we're getting the wrong character encoding
+        //      applied to these files on the server (but not on my desktop).
         List<String> files = new ArrayList<String>();
         files.add("Phil1.xml");
         files.add("Phil2.xml");

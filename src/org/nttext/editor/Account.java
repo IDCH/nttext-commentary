@@ -13,5 +13,6 @@ public class Account {
     /** 
      * Need to change this to be a real user, the account owner
      */
+    @SuppressWarnings("unused")
     private String owner = null;
 }

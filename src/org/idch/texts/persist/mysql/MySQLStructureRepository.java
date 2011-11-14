@@ -170,7 +170,7 @@ public class MySQLStructureRepository implements StructureRepository {
      */
     @Override
     public Structure create(Work work, String name) {
-        return create(new Structure(work, name));
+        return create(new Structure(work.getUUID(), name));
     }
 
     /* (non-Javadoc)
@@ -178,7 +178,7 @@ public class MySQLStructureRepository implements StructureRepository {
      */
     @Override
     public Structure create(Work work, String name, Token start, Token end) {
-        return create(new Structure(work, name, start, end));
+        return create(new Structure(work.getUUID(), name, start, end));
     }
 
         

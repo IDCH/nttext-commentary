@@ -33,10 +33,11 @@ import org.nttext.util.jpa.InstitutionRepositoryImpl;
 /**
  * @author Neal Audenaert
  */
+@SuppressWarnings("unused")
 public class MSSParser {
     private static final Logger LOGGER = Logger.getLogger(MSSParser.class);
     
-	private static String FNAME_LECT = "data/mss/Lectionaries.csv";
+    private static String FNAME_LECT = "data/mss/Lectionaries.csv";
 	private static String FNAME_MAJ  = "data/mss/Majuscules.csv";
 	private static String FNAME_MIN  = "data/mss/Minuscules.csv";
 	private static String FNAME_PAP  = "data/mss/Papyri.csv";

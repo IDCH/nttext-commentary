@@ -12,6 +12,7 @@ import java.util.List;
  *  
  * @author Neal Audenaert
  */
+@SuppressWarnings("unused")
 public class SystemDescription {
 // TODO figure out the right name for this.
     /*
@@ -24,7 +25,7 @@ public class SystemDescription {
         </work>
      */
     
-	private String name; 
+    private String name; 
 	private String version;
 	private Date lastUpdated;
 	private List<String> contributor;

@@ -22,7 +22,8 @@ public class Provenance {
     /** A narrative description of the provenance of this manuscript. */
     private String narrative = "";
 	
-	private Set<ProvenanceDetails> details;
+	@SuppressWarnings("unused")
+    private Set<ProvenanceDetails> details;
 	
 	//=======================================================================================
     // CONSTRUCTORS

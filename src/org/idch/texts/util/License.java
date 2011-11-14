@@ -120,6 +120,22 @@ public class License {
 			"forms and require that derivative forms be shared.";
 	}
 	
+	public String getName() {
+	    return this.name;
+	}
+	
+	public String getAbbreviation() {
+	    return this.abbreviation;
+	}
+	
+	public String getDescription() {
+	    return this.description;
+	}
+	
+	public URL getUrl() {
+	    return this.url;
+	}
+	
 	/** 
 	 * Indicates whether or not this licenses requires that use of a work attribute 
 	 * the rights holder. 

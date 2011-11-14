@@ -16,6 +16,7 @@ import java.util.Map;
  * 
  * @author Neal Audenaert
  */
+@SuppressWarnings("unused")
 public class BibleBookNames {
 	// TODO generate METS record from this info.
 	
@@ -23,7 +24,7 @@ public class BibleBookNames {
 	//	    http://code.google.com/p/open-scriptures/source/browse/branches/php-prototypes/reference-parser.lib.php
 	
 	public static class BookNameLeader {
-		private String canonicalForm;
+        private String canonicalForm;
 		private String[] alternateForms;
 	}
 	

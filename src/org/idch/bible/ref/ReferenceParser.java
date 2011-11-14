@@ -230,7 +230,6 @@ public class ReferenceParser {
         int endChapter = 0;
         int endVerse = 0;
         
-        String ch = null;
         String vs = null;
         
         // Parse the starting reference

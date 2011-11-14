@@ -39,7 +39,9 @@ public class MemStructureRepository implements StructureRepository {
     //===================================================================================
     private static long nextId = 1;
     
+    @SuppressWarnings("unused")
     private MemTextModule repo = null;
+    @SuppressWarnings("unused")
     private AttrIndex attrs = null;
     
     private Map<String, Structure> structuresByUUID = new HashMap<String, Structure>();
@@ -74,7 +76,7 @@ public class MemStructureRepository implements StructureRepository {
      */
     @Override
     public Structure create(Work work, String name) {
-        return create(new Structure(work, name));
+        return create(new Structure(work.getUUID(), name));
     }
 
     /* (non-Javadoc)
@@ -82,7 +84,7 @@ public class MemStructureRepository implements StructureRepository {
      */
     @Override
     public Structure create(Work work, String name, Token start, Token end) {
-        return create(new Structure(work, name, start, end));
+        return create(new Structure(work.getUUID(), name, start, end));
     }
 
         
@@ -262,6 +264,7 @@ public class MemStructureRepository implements StructureRepository {
         }
     }
     
+    @SuppressWarnings("unused")
     private static class StructureIndexByWork {
         private static SortedSet<Structure> filter(SortedSet<Structure> structures, int pos) {
             SortedSet<Structure> results = new TreeSet<Structure>(new StructureComparator());
@@ -327,6 +330,7 @@ public class MemStructureRepository implements StructureRepository {
     }
     
     
+    @SuppressWarnings("unused")
     private static class AttrIndex {
         Map<KeyValuePair, SortedSet<Structure>> structures = new HashMap<KeyValuePair, SortedSet<Structure>>();
         
@@ -378,13 +382,6 @@ public class MemStructureRepository implements StructureRepository {
         }
         
     }   // END AttrRepo class
-    
-    /**
-     * Stores a set of structures indexed by name. These are typically
-     * @author Neal Audenaert
-     */
-    private static class NamedStructureSet {
-    }
     
     
     private static class KeyValuePair implements Comparable<KeyValuePair> {

@@ -28,7 +28,7 @@ public class JPAStructureRepository extends JPARepository<Structure> implements 
      * @see openscriptures.text.StructureRepository#create(openscriptures.text.Work, java.lang.String)
      */
     public Structure create(Work work, String name) {
-        return create(new Structure(work, name));
+        return create(new Structure(work.getUUID(), name));
     }
 
     /* (non-Javadoc)
@@ -36,7 +36,7 @@ public class JPAStructureRepository extends JPARepository<Structure> implements 
      */
     @Override
     public Structure create(Work work, String name, Token start, Token end) {
-        return create(new Structure(work, name, start, end));
+        return create(new Structure(work.getUUID(), name, start, end));
     }
 
     /* (non-Javadoc)

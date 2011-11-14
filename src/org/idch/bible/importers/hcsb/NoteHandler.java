@@ -29,8 +29,8 @@ public class NoteHandler extends StructureHandler {
             inText = ctx.isInText();            // TODO need to test to see if notes ever appear outside of the text
             ctx.notInText();
             
-            String n = p.getAttribute("n");       
-            String type = p.getAttribute("type");
+//            String n = p.getAttribute("n");       
+//            String type = p.getAttribute("type");
             
             
         } else {

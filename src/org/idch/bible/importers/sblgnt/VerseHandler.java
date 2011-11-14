@@ -8,7 +8,6 @@ import org.idch.texts.Structure;
 import org.idch.texts.importer.PathElement;
 import org.idch.texts.importer.StructureHandler;
 import org.idch.texts.structures.Verse;
-import org.idch.util.StopWatch;
 
 
 public class VerseHandler extends StructureHandler {

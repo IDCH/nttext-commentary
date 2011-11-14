@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,39 +38,51 @@ import freemarker.template.TemplateException;
 public class EntryServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(EntryServlet.class);
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    //===================================================================================
+    // SYMBOLIC CONSTANTS
+    //===================================================================================
+    
+    /** The initialization parameters used to specify where to find the templates 
+     *  (defaults to <tt>WEB-INF/templates</tt>). This path will be resolved relative
+     *  to the directory this servelet is deployed to. */
+    public static final String INIT_PARAM_TEMPL_DIR = "templateDirectory";
+    
+    public static final String DEFAULT_TEMPL_DIR = "WEB-INF/templates";
+    
+    //===================================================================================
+    // MEMBER VARIABLES
+    //===================================================================================
+    // TODO add support for XML and JSON requests as well
+    
     private Configuration config = null;
     private CommentaryModule commentaryModule = null;
     private Set<String> availableBooks = new HashSet<String>();
 
-
+    private String defaultEntryRef = "Phil.1.1";        // TODO make configurable
+    
     //===================================================================================
     // SERVLET INITIALIZATION METHODS
     //===================================================================================
 
-    private static File urlToFile(URL res) {
-        String externalForm = res.toExternalForm(  );
-        if (externalForm.startsWith("file:")) {
-            return new File(externalForm.substring(5));
-        }
-        return null;
-    }
     /**
      * Initializes the template configuration. To specify a custom directory to
      * use for the view templates set the <tt>templateDirectory</tt> parameter to the 
-     * appropriate location in the servlet configuration. 
+     * appropriate location in the Servlet configuration. 
      * 
      * @return A <tt>Configuration</tt> object to be used to lookup template files.
      * @throws ServletException
      */
-    private Configuration loadTemplateConfiguration() throws ServletException {
-        // TODO test proper error handling
-        // TODO test better documentation
-
-        String templatePath =  this.getInitParameter("templateDirectory");
+    private void initTemplateConfiguration() throws ServletException {
+        String templatePath = this.getInitParameter(INIT_PARAM_TEMPL_DIR);
         if (StringUtils.isBlank(templatePath))
-            templatePath = "/projects/commentary_old/templates/";
-
-        File templateDir = new File(templatePath);
+            templatePath = DEFAULT_TEMPL_DIR;
+        
+        String realPath = this.getServletContext().getRealPath(templatePath);
+        File templateDir = new File(realPath);
         if (!templateDir.exists() || !templateDir.isDirectory() || !templateDir.canRead()) {
             String msg = "Expected a readable directory to lookup view templates. ";
             try {
@@ -94,24 +105,22 @@ public class EntryServlet extends HttpServlet {
             throw new ServletException(msg, e);
         }
 
-        return config;
+        this.config = config;
     }
 
-    public void init() throws ServletException {
-        this.config = loadTemplateConfiguration();
-
-        // TODO get this from a configureation module
+    private void initAvailableBooks() throws ServletException {
+        // TODO get this from a configuration module
         this.availableBooks.add("phil");
-
+    }
+    
+    private void initRepositoryModule() throws ServletException {
+        // TODO The configurability and flexibility of the modules/repository architecture
+        //      is poor. The following tasks are needed. 
+        //      1. Define and configure using context.xml
+        //      2. Use JNDI to identify the DataSource to use.
+        
         try {
             MySQLCommentaryModule mod = MySQLCommentaryModule.get();
-            // FIXME TEMPORARY TEST HARNESS CODE -- REMOVE THIS FOR PRODUCTION
-            if (!mod.probe()) {
-                LOGGER.warn("Database not initialized");
-                // mod.create();
-            }
-            // FIXME END TEMPORARY TEST HARNESS CODE -- REMOVE THIS FOR PRODUCTION
-
             this.commentaryModule = mod;
 
         } catch (RepositoryAccessException rae) {
@@ -120,30 +129,47 @@ public class EntryServlet extends HttpServlet {
             throw new ServletException(msg, rae);
         }
     }
+    
+    
+    public void init() throws ServletException {
+        initTemplateConfiguration();
+        initAvailableBooks();
+        initRepositoryModule();
+    }
 
     //===================================================================================
     // ERROR RESPONSES
     //===================================================================================
 
+
     /**
+     * Writes a 404 error response (404 Not Found The requested resource could not be found 
+     * but may be available again in the future. Subsequent requests by the client 
+     * are permissible.)
      * 
-     * @param msg
-     * @param resp
-     * @throws IOException
+     * @param msg A message explaining the error.
+     * @param resp The response object to write to.
+     * @throws IOException If there are problems writing to the response object.
      */
     private void write404(String msg, HttpServletResponse resp) throws IOException {
+        // TODO need to make the error handling more robust and user friendly.
+        //      1. We need well designed error pages.
+        //      2. Need a fallback if either the page template isn't there or if there 
+        //         are problems processing the page.
+        //      3. Need to generalize this so that it can be used by different Servlets
+        //         and applications.
+        //      4. Need to do a better job of setting header values and of generating
+        //         appropriately formatted responses (HTML, JSON, XML, etc).
+        
         StringWriter page = new StringWriter();
         try {
-            Template template = config.getTemplate("/entry.html");
+            Template template = config.getTemplate("/404.html");
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("page", new PageDetails());
-
-            //            data.put("entry", new InstanceData(commentaryModule, e));
             data.put("navigation", new Navigation());
 
             template.process(data, page);
         } catch (TemplateException ex) {
-            // TODO do something more sensible here
             page.append("Oops. . . could not process page: " + ex.getMessage());
             ex.printStackTrace(new PrintWriter(page));
         }
@@ -151,15 +177,39 @@ public class EntryServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html");
-        // TODO I think we need to set the main error message in the header
         PrintWriter out = resp.getWriter();
         out.write(page.getBuffer().toString());
         out.flush();
-
     }
 
+    /**
+     * Writes 400 an error response (400 Bad Request The request cannot be fulfilled due to 
+     * bad syntax.)
+     * 
+     * @param msg A message explaining the error.
+     * @param resp The response object to write to.
+     * @throws IOException If there are problems writing to the response object.
+     */
     private void writeBadRequest(String msg, HttpServletResponse resp) throws IOException {
-        // TODO implement me
+        StringWriter page = new StringWriter();
+        try {
+            Template template = config.getTemplate("/400.html");
+            Map<String, Object> data = new HashMap<String, Object>();
+            data.put("page", new PageDetails());
+            data.put("navigation", new Navigation());
+
+            template.process(data, page);
+        } catch (TemplateException ex) {
+            page.append("Oops. . . could not process page: " + ex.getMessage());
+            ex.printStackTrace(new PrintWriter(page));
+        }
+
+        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+        out.write(page.getBuffer().toString());
+        out.flush();
     }
 
 
@@ -168,26 +218,47 @@ public class EntryServlet extends HttpServlet {
     //===================================================================================
 
     private boolean checkAvaliableBook(Passage passage, HttpServletResponse resp) throws IOException { 
+        // TODO Do a better job of formatting and ordering books. More efficient 
+        //      string processing with StringBuilder. 
+        
+        boolean valid = true;
         VerseRef ref = passage.getFirst();
         String bk = ref.getBookIdentifier();
-        if (!this.availableBooks.contains(bk.toLowerCase())) {
-            // TODO format 404 with preview only message
+        if (bk == null) {
+            valid = false;
+            String message = "Only a few books are available during our preview phase. " +
+                    "Unfortunately, " + ref.getBookName() + " isn't one " +
+                    "of them. Please select from the following books: ";
+            
+            writeBadRequest(message, resp);
+            
+        } else if (!this.availableBooks.contains(bk.toLowerCase())) {
+            valid = false;
+            
             String message = "Only a few books are available during our preview phase. " +
                 "Unfortunately, " + ref.getBookName() + " isn't one " +
                 "of them. Please select from the following books: ";
+            boolean first = true;
+            for (String book : this.availableBooks) {
+                if (!first) message += ", ";
+                else first = false;
+                
+                message += book;
+            }
+            
             write404(message, resp);
-            return false;
-        } 
+        }
 
-        return true;
+        return valid;
     }
 
     private VerseRange getPassage(HttpServletRequest req, HttpServletResponse resp) 
         throws IOException {
         String ref = req.getPathInfo();
-        ref = StringUtils.trimToNull(ref.replaceFirst("/", ""));
-        if (ref == null)                // FIXME magic string
-            ref = "Phil.1.1";           // set to default verse
+        ref = StringUtils.trimToNull(ref);
+        ref = (ref == null)                
+                ? ref = defaultEntryRef 
+                : ref.replaceFirst("/", "");
 
         VerseRange passage = null;
         try {
@@ -199,9 +270,19 @@ public class EntryServlet extends HttpServlet {
             passage = null;
         }
 
-        // TODO check to see if verse is specified.
+        if (checkAvaliableBook(passage, resp)) {
+            VerseRef first = passage.getFirst();
+            if (!first.isChapterSpecified()) 
+                first.setChapter(1);
+            
+            if (!first.isVerseSpecified()) 
+                first.setVerse(1);
+            
+        } else {
+            passage = null;
+        }
 
-        return checkAvaliableBook(passage, resp) ? passage : null;
+        return passage;
     }
 
     /**
@@ -216,7 +297,7 @@ public class EntryServlet extends HttpServlet {
         throws IOException {
         EntryInstance instance = null;
         VerseRange passage = getPassage(req, resp);
-        if (passage == null)
+        if (passage == null)  // FIXME need to check the return value and behave appropriately
             return null;
 
         InstanceRepository repo = commentaryModule.getInstanceRepository();
@@ -245,13 +326,11 @@ public class EntryServlet extends HttpServlet {
 
         EntryInstance e = getEntry(req, resp);
         if (e == null) {
-            if (!resp.isCommitted()) {
-                // TODO write 404
-            }
-
+            assert resp.isCommitted();
             return;
         }
-        // TODO handle XML and JSON requests as well
+        
+        
         try {
             Map<String, Object> data = new HashMap<String, Object>();
             data.put("page", new PageDetails());
@@ -261,8 +340,8 @@ public class EntryServlet extends HttpServlet {
 
             template.process(data, page);
         } catch (TemplateException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+            // we'll go ahead and return the mangled page for de-bugging purposes
+            LOGGER.warn("Error processing template page for entry: " + e.getPassage(), ex);
         }
 
         resp.setCharacterEncoding("UTF-8");

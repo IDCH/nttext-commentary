@@ -4,7 +4,7 @@
   <a href="${navigation.prevVs.url}" title="${navigation.prevVs.label}" 
      class="prev-verse-btn<#if !navigation.prevVs.available> prev-verse-btn-inactive</#if>" >&#8249;</a>
   <form action="entry" method="GET">
-    <input type="text" name="q">
+    <input type="text" name="q" value="${(entry.passage)!""}"/>
   </form>
   <a href="#" title="Search" class="search-btn">Search</a>
   <a href="${navigation.nextVs.url}" title="${navigation.nextVs.label}" 

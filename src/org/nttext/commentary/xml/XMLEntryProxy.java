@@ -4,6 +4,7 @@
 package org.nttext.commentary.xml;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -323,27 +324,34 @@ public class XMLEntryProxy {
     }
     
     public static void main(String[] args) {
-        File input = new File("data/commentary/Phil1.xml");
-        XMLEntryProxy proxy;
-        try {
-            proxy = new XMLEntryProxy(MySQLCommentaryModule.get());
-            Document doc = XMLUtil.getXmlDocument(input);
-            Element el = doc.getDocumentElement();
-            NodeList entries = el.getChildNodes();
-            for (int i = 0; i < entries.getLength(); i++) {
-                Node entry = entries.item(i);
-                
-                if (entry.getNodeType() != Node.ELEMENT_NODE) {
-                    // skip text and comment nodes
-                    continue;
+        List<String> files = new ArrayList<String>();
+        files.add("Phil1.xml");
+        files.add("Phil2.xml");
+        files.add("Phil3.xml");
+        File dir = new File("data/commentary");
+        for (String filename : files) {
+            File input = new File(dir, filename);
+            XMLEntryProxy proxy;
+            try {
+                proxy = new XMLEntryProxy(MySQLCommentaryModule.get());
+                Document doc = XMLUtil.getXmlDocument(input);
+                Element el = doc.getDocumentElement();
+                NodeList entries = el.getChildNodes();
+                for (int i = 0; i < entries.getLength(); i++) {
+                    Node entry = entries.item(i);
+                    
+                    if (entry.getNodeType() != Node.ELEMENT_NODE) {
+                        // skip text and comment nodes
+                        continue;
+                    }
+                    
+                    proxy.importEntry((Element)entry);
                 }
-                
-                proxy.importEntry((Element)entry);
+                  
+                System.out.println("done.");
+            } catch (RepositoryAccessException e) {
+                System.err.println("Error accessing repository: " + e);
             }
-              
-            System.out.println("done.");
-        } catch (RepositoryAccessException e) {
-            System.err.println("Error accessing repository: " + e);
         }
     }
 }

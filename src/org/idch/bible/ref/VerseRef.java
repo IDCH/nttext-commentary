@@ -233,9 +233,15 @@ public class VerseRef extends Passage {
 	public Integer getChapter() {
 		return this.chapter;
 	}
-	
+    public void setChapter(int ch) {
+        this.chapter = ch;       // TODO validate that the chapter is in range.
+    }
+    
 	public Integer getVerse() {
 		return this.verse;
+	}
+	public void setVerse(int vs) {
+	    this.verse = vs;       // TODO validate that the verse is in range.
 	}
 	
 	public String getExtension() {

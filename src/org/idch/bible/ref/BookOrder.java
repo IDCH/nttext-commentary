@@ -132,7 +132,8 @@ public class BookOrder {
 	    bks.put(id, bk);
 	}
 	
-	private void generateRegEx() {
+	@SuppressWarnings("unused")
+    private void generateRegEx() {
 	    Map<String, Pattern> patterns = new HashMap<String, Pattern>();
 	    
 //	    patterns.put("1Chr",    Pattern.compile("1 Chronicles",             Pattern.CASE_INSENSITIVE));  

@@ -219,7 +219,7 @@ public class VerseRef extends Passage {
 	 * @return
 	 */
 	public String getBookIdentifier() {
-	    return (this.book != null) ? order.getId(book) : null;
+	    return this.isBookSpecified() ? order.getId(book) : null;
 	}
 	
 	/**
@@ -227,7 +227,7 @@ public class VerseRef extends Passage {
 	 * @return
 	 */
 	public String getBookName() {
-		return (this.book != null) ? order.getName(book) : null;
+		return this.isBookSpecified() ? order.getName(book) : null;
 	}
 	
 	public Integer getChapter() {
@@ -247,7 +247,7 @@ public class VerseRef extends Passage {
 	 * @return <tt>true</tt> if the book is specified.
 	 */
 	public boolean isBookSpecified() {
-		return this.book != null;
+		return (this.book != null) && (this.book >= 0) && (this.book < this.order.size());
 	}
 	
 	/**
@@ -280,11 +280,10 @@ public class VerseRef extends Passage {
 		//		give book according to the specified reference system. 
 		
 		// make sure that we have a valid book, given our reference system
-		if ((book != null) || (book < 0)) {
+		if (this.isBookSpecified()) {
 			return false;
 		}
 		
-		// TODO check to see if the chapter and verse are valid.
 		return true;
 	}
 	

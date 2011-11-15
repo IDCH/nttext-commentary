@@ -4,7 +4,6 @@
 package org.nttext.commentary.xml;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -326,13 +325,9 @@ public class XMLEntryProxy {
     public static void main(String[] args) {
         // TODO somewhere along the chain here, we're getting the wrong character encoding
         //      applied to these files on the server (but not on my desktop).
-        List<String> files = new ArrayList<String>();
-        files.add("Phil1.xml");
-        files.add("Phil2.xml");
-        files.add("Phil3.xml");
         File dir = new File("data/commentary");
-        for (String filename : files) {
-            File input = new File(dir, filename);
+        File[] files = dir.listFiles(); 
+        for (File input : files) {
             XMLEntryProxy proxy;
             try {
                 proxy = new XMLEntryProxy(MySQLCommentaryModule.get());
@@ -353,7 +348,8 @@ public class XMLEntryProxy {
                 System.out.println("done.");
             } catch (RepositoryAccessException e) {
                 System.err.println("Error accessing repository: " + e);
-            }
+                e.printStackTrace();
+            } 
         }
     }
 }

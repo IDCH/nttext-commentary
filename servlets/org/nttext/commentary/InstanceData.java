@@ -4,14 +4,20 @@
 package org.nttext.commentary;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.idch.bible.ref.Passage;
 import org.idch.bible.ref.VerseRef;
 import org.idch.texts.Structure;
+import org.idch.texts.StructureComparator;
+import org.idch.texts.StructureRepository;
 import org.idch.texts.TextModule;
+import org.idch.texts.Token;
+import org.idch.texts.TokenSequence;
 import org.idch.texts.Work;
 import org.idch.texts.WorkRepository;
 import org.idch.texts.structures.Verse;
@@ -113,18 +119,18 @@ public class InstanceData {
      * @author Neal Audenaert
      */
     public static class PassageReference {
-        private CommentaryModule module;
+        private TextModule textModule;
         private Work work;
         private EntryInstance instance;
         
         public PassageReference(CommentaryModule module, Work w, EntryInstance inst) {
-            this.module = module;
+            textModule = module.getTextRepository();
             this.work = w;
             this.instance = inst;
         }
         
-        public String getMarkedText() {
-            TextModule textModule = module.getTextRepository();
+        /** Returns a structure for the scripture passage referenced by this instance. */
+        private Structure getPassageReference() {
             Passage passage = instance.getPassage();
             VerseRef start = passage.getFirst();
             VerseRef end = passage.getLast();
@@ -138,7 +144,68 @@ public class InstanceData {
                         s.getStartToken(), endVs.getEndToken());
             }
             
-            return textModule.toString(s);
+            return s;
+        }
+        
+        private SortedSet<VUReference> getVUReferences() {
+            // TODO this needs to be done at a higher level - we don't know how to order
+            //      VUs unless we have a base text.
+            SortedSet<VUReference> vuRefs = new TreeSet<VUReference>(new StructureComparator());
+            StructureRepository sRepo = textModule.getStructureRepository();
+
+            Set<VariationUnit> vus = instance.getVariationUnits();
+            for (VariationUnit vu : vus) {
+                VUReference ref = VUReference.findReference(sRepo, work, vu);
+                vuRefs.add(ref);
+            }
+
+            return vuRefs;
+        }
+        
+        public String toString(List<Token> tokens) {
+            StringBuilder sb = new StringBuilder();
+            for (Token t : tokens) {
+                sb.append(t.getText());
+            }
+            
+            return sb.toString();
+        }
+        
+      
+        String START_LINK = "<a href=\"#VAR_ID\" class=\"var VAR_ID\" title=\"View the details of this variation unit\">";
+        String END_LINK = "<sup>IX</sup></a>";
+        
+        private void markRefs(Token t, SortedSet<VUReference> vuRefs, StringBuilder sb) {
+            int ix = 0;
+            for (VUReference ref : vuRefs) {
+                //  <a href="#var-01" class="var var-01" title="View the details of this variation unit">καὶ πάσχοντες<sup>1</sup></a>
+                
+                ix++;
+                if (ref.getStart() == t.getPosition()) {
+                    String varId = ((ix < 10) ? "var-0" + ix : "var-" + ix);
+                    sb.append(START_LINK.replaceAll("VAR_ID", varId));
+                } else if (ref.getEnd() == t.getPosition()) {
+                    sb.append(END_LINK.replaceAll("IX", Integer.toString(ix)));
+                }
+                
+            }
+        }
+        
+        /**
+         * Returns the text of the referenced scripture passage, marked with the variation 
+         * unit references corresponding to this entry instance.
+         */
+        public String getMarkedText() {
+            Structure s = getPassageReference();
+            List<Token> tokens = textModule.getTokens(s);
+            SortedSet<VUReference> vuRefs = getVUReferences();
+            
+            StringBuilder sb = new StringBuilder();
+            for (Token t : tokens) {
+                markRefs(t, vuRefs, sb);
+                sb.append(t.getText());
+            }
+            return sb.toString();
         }
         
         public String getLanguage() {

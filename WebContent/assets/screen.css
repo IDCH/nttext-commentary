@@ -286,41 +286,49 @@ ul {
 ol li, ul li {
 	padding:2px 0;
 }
-span.var {
-	padding:3px;
-	-webkit-border-radius:3px;
-	-moz-border-radius:3px;
-	border-radius:3px;
+a.var {
+    padding:3px;
+    font-weight:normal;
+    -webkit-border-radius:3px;
+    -moz-border-radius:3px;
+    border-radius:3px;
+}
+a.var, a.var:hover, a.var:visited {
+    color:#252525;
+    border-bottom:none;
+}
+p.secondary-scripture a.var, p.secondary-scripture a.var:hover, p.secondary-scripture a.var:visited {
+    color:#59534F;
 }
 /* Variant highlight colors */
-span.var-01 {
+a.var-01 {
 	background:url(images/sprite_text_highlights.png) repeat-x left top;
 }
-span.var-02 {
+a.var-02 {
 	background:url(images/sprite_text_highlights.png) repeat-x left -26px;
 }
-span.var-03 {
+a.var-03 {
 	background:url(images/sprite_text_highlights.png) repeat-x left -105px;
 }
-span.var-04 {
+a.var-04 {
 	background:url(images/sprite_text_highlights.png) repeat-x left -79px;
 }
-span.var-05 {
+a.var-05 {
 	background:url(images/sprite_text_highlights.png) repeat-x left -52px;
 }
-span.var-06 {
+a.var-06 {
 	background:url(images/sprite_text_highlights.png) repeat-x left -131px;
 }
-span.var-07 {
+a.var-07 {
 	background:url(images/sprite_text_highlights.png) repeat-x left -157px;
 }
-span.var-08 {
+a.var-08 {
 	background:url(images/sprite_text_highlights.png) repeat-x left -183px;
 }
-span.var-09 {
+a.var-09 {
 	background:url(images/sprite_text_highlights.png) repeat-x left -209px;
 }
-span.var-10 {
+a.var-10 {
 	background:url(images/sprite_text_highlights.png) repeat-x left -237px;
 }
 bold, strong {

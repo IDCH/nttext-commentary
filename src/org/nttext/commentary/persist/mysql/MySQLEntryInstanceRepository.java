@@ -223,7 +223,8 @@ public class MySQLEntryInstanceRepository implements InstanceRepository {
         
         String sql = "SELECT passage, max(book_id), max(start_ch), min(start_vs) " +
                      "  FROM nttextcomm_instances " +
-                     " WHERE vs_hash < ?";
+                     " WHERE vs_hash < ?" +
+                     " ORDER BY vs_hash DESC";
         
         PreparedStatement stmt = conn.prepareStatement(sql);
         stmt.setInt(1, hash);

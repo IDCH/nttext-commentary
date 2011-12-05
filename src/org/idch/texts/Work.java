@@ -353,7 +353,7 @@ public class Work extends AbstractTokenSequence {
         return Language.lookup(this.language);
     }
     /** Sets the primary language used in this work. */
-    public void setLanguage(Language lg) { this.language = lg.getCode(); }
+    public void setLanguage(Language lg) { this.language = lg.getIsoIdentifier(); }
     
     /** Returns the language code. */
     @Basic public String getLgCode() { return this.language; }

@@ -180,7 +180,7 @@ public class WorkId {
 	
 	/** Returns the language of this work */
 	@Transient public Language getLanguage() { return this.language; }
-	@Basic String getLgCode() { return (language != null) ? this.language.getCode() : null; }
+	@Basic String getLgCode() { return (language != null) ? this.language.getIsoIdentifier() : null; }
 	void setLgCode(String lgCode) {
 	    this.language = Language.lookup(lgCode); 
 	}
@@ -208,7 +208,7 @@ public class WorkId {
 		if (this.type != null) builder.append(type.value);
 		if (this.language != null) {
 			if (builder.length() > 0) builder.append(".");
-			builder.append(this.language.getCode());
+			builder.append(this.language.getIsoIdentifier());
 		}
 		
 		if (this.publisher != null) {

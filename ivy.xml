@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-  <info organisation="org.idch" module="">
+  <info organisation="org.idch" module="nttext-commentary">
     <description homepage="https://github.com/IDCH/nttext-commentary">
         Web application for the NTText.org Exegetical Commentary on New 
         Testament Textual Variants. This application is deployed at 

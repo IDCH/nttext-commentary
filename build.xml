@@ -21,14 +21,15 @@
 <!==  of the target by prefixing "basic." onto the target name. See build.xml for documentation
 <!==  of the properties, paths, and targets that are available for customization.
 <!== ==================================================================================== -->
-<project name="nttext" default="package" basedir=".">
+<project name="nttext-commentary" default="package" basedir=".">
 
   <!-- Import the basic default project -->
   <property name="build.properties" value="${basedir}/build.properties"/>
+  <property file="${build.properties}"/>
   
-  <import file="${basedir}/../build-tools/basic.xml"/>
-  <import file="${basedir}/../build-tools/hibernate.xml"/>
-  <import file="${basedir}/../build-tools/dbutils.xml"/>
+  <import file="${buildtools.dir}/basic.xml"/>
+  <import file="${buildtools.dir}/hibernate.xml"/>
+  <import file="${buildtools.dir}/dbutils.xml"/>
 
   <path id="src.path">
     <pathelement location="${src.dir}"/>

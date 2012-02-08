@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-  <info organisation="org.idch" module="LHA">
-    <description homepage="http://www.idch.org">
-      Document indexer for building a metadata database of (e.g., PDF) documents.
+  <info organisation="org.idch" module="">
+    <description homepage="https://github.com/IDCH/nttext-commentary">
+        Web application for the NTText.org Exegetical Commentary on New 
+        Testament Textual Variants. This application is deployed at 
+        http://nttext.org/commentary
     </description>
   </info>
   <configurations>
@@ -20,26 +22,25 @@
   
   <dependencies defaultconfmapping="compile->compile(*),master(*);runtime->runtime(*)">
    <!-- 
-    <dependency org="org.idch" name="IDCHCore" rev="latest.integration"/>
     <dependency org="com.googlecode.json-simple" name="json-simple" rev="1.1"/>
-     --> 
     <dependency org="org.apache.commons" name="commons-lang" rev="2.1"/>
-    <dependency org="freemarker" name="freemarker" rev="2.3.8"/>
     <dependency org="com.ibm.icu" name="icu4j" rev="4.8.1.1"/>
+     --> 
+    <dependency org="freemarker" name="freemarker" rev="2.3.8"/>
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.18"/>
     <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.1"/>
-    <dependency org="org.idch" name="IDCHCore" rev="latest.integration"/>
+    <dependency org="org.idch" name="JOpenScriptures" rev="latest.integration"/>
     
-     <!-- Hibernate Dependencies
-         TODO These may move to the main IDCH core project at some point -->
-
-    <!--  TODO Add in validator and search. Need to update the enterprise repo.  --> 
-    <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7"/>
-    <dependency org="javassist" name="javassist" rev="3.12.0.GA"/>
+    <!-- Hibernate Dependencies -->
     <dependency org="org.hibernate" name="hibernate-core" rev="3.6.2.Final"/>
     <dependency org="org.hibernate" name="hibernate-entitymanager" rev="3.6.2.Final"/>
     <dependency org="org.hibernate" name="hibernate-tools" rev="3.2.4.GA"/>
     <dependency org="org.hibernate" name="hibernate-c3p0" rev="3.6.2.Final"/>
+
+    <!--  TODO Add in validator and search. Need to update the enterprise repo.  
+    <dependency org="hsqldb" name="hsqldb" rev="1.8.0.7"/>
+    <dependency org="javassist" name="javassist" rev="3.12.0.GA"/>
     <dependency org="org.hibernate" name="hibernate-jpamodelgen" rev="1.1.1.Final"/>
+          --> 
   </dependencies>
 </ivy-module>

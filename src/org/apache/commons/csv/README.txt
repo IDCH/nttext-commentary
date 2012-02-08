@@ -6,4 +6,4 @@ Since this project is currently a sandboxed project, I have elected to copy
 its source directly into this project rather than depending on published and 
 updated JAR files to be distributed to the appropriate repositories or building
 and maintaining the JAR file myself. This should be adequate in the short term 
-but should be re-evaluated in the medium to long term (i.e., by 2012).
+but should be re-evaluated in the medium to long term (i.e., sometime in 2012).
